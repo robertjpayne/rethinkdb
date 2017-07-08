@@ -238,7 +238,6 @@ bool term_type_is_valid(Term::TermType type) {
     case Term::MAKE_OBJ:
     case Term::BINARY:
     case Term::VAR:
-    case Term::JAVASCRIPT:
     case Term::HTTP:
     case Term::ERROR:
     case Term::IMPLICIT_VAR:
@@ -429,7 +428,6 @@ bool term_is_write_or_meta(Term::TermType type) {
     case Term::MAKE_OBJ:
     case Term::BINARY:
     case Term::VAR:
-    case Term::JAVASCRIPT:
     case Term::HTTP:
     case Term::ERROR:
     case Term::IMPLICIT_VAR:
@@ -617,7 +615,6 @@ bool term_forbids_writes(Term::TermType type) {
     case Term::MAKE_OBJ:
     case Term::BINARY:
     case Term::VAR:
-    case Term::JAVASCRIPT:
     case Term::HTTP:
     case Term::ERROR:
     case Term::IMPLICIT_VAR:

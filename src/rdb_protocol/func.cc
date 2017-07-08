@@ -99,57 +99,8 @@ bool reql_func_t::is_simple_selector() const {
     return body->is_simple_selector();
 }
 
-js_func_t::js_func_t(const std::string &_js_source,
-                     uint64_t timeout_ms,
-                     backtrace_id_t _backtrace)
-    : func_t(_backtrace),
-      js_source(_js_source),
-      js_timeout_ms(timeout_ms) { }
-
-js_func_t::~js_func_t() { }
-
-scoped_ptr_t<val_t> js_func_t::call(
-    env_t *env,
-    const std::vector<datum_t> &args,
-    UNUSED eval_flags_t eval_flags) const {
-    try {
-        js_runner_t::req_config_t config;
-        config.timeout_ms = js_timeout_ms;
-
-        r_sanity_check(!js_source.empty());
-        js_result_t result;
-
-        try {
-            result = env->get_js_runner()->call(js_source, args, config);
-        } catch (const extproc_worker_exc_t &e) {
-            rfail(base_exc_t::INTERNAL,
-                  "Javascript query `%s` caused a crash in a worker process.",
-                  js_source.c_str());
-        }
-
-        return scoped_ptr_t<val_t>(
-                boost::apply_visitor(
-                        js_result_visitor_t(js_source, js_timeout_ms, this), result));
-    } catch (const datum_exc_t &e) {
-        rfail(e.get_type(), "%s", e.what());
-        unreachable();
-    }
-}
-
-optional<size_t> js_func_t::arity() const {
-    return r_nullopt;
-}
-
-deterministic_t js_func_t::is_deterministic() const {
-    return deterministic_t::no;
-}
-
 void reql_func_t::visit(func_visitor_t *visitor) const {
     visitor->on_reql_func(this);
-}
-
-void js_func_t::visit(func_visitor_t *visitor) const {
-    visitor->on_js_func(this);
 }
 
 func_term_t::func_term_t(compile_env_t *env, const raw_term_t &t)
@@ -301,22 +252,6 @@ std::string reql_func_t::print_js_function() const {
     ret += "; }";
     return ret;
 }
-
-std::string js_func_t::print_source() const {
-    std::string ret = strprintf("javascript timeout=%" PRIu64 "ms, source=", js_timeout_ms);
-    ret += js_source;
-    return ret;
-}
-
-std::string js_func_t::print_js_function() const {
-    return "r.js(" + js_source + ")";
-}
-
-bool js_func_t::filter_helper(env_t *env, datum_t arg) const {
-    datum_t d = call(env, make_vector(arg), NO_FLAGS)->as_datum();
-    return d.as_bool();
-}
-
 bool func_t::filter_call(env_t *env, datum_t arg, counted_t<const func_t> default_filter_val) const {
     // We have to catch every exception type and save it so we can rethrow it later
     // So we don't trigger a coroutine wait in a catch statement
@@ -420,22 +355,6 @@ counted_t<const func_t> new_page_func(datum_t method, backtrace_id_t bt) {
         }
     }
     return counted_t<const func_t>();
-}
-
-val_t *js_result_visitor_t::operator()(const std::string &err_val) const {
-    rfail_target(parent, base_exc_t::LOGIC, "%s", err_val.c_str());
-    unreachable();
-}
-val_t *js_result_visitor_t::operator()(
-    const ql::datum_t &datum) const {
-    return new val_t(datum, parent->backtrace());
-}
-// This JS evaluation resulted in an id for a js function
-val_t *js_result_visitor_t::operator()(UNUSED const js_id_t id_val) const {
-    counted_t<const func_t> func = make_counted<js_func_t>(code,
-                                                           timeout_ms,
-                                                           parent->backtrace());
-    return new val_t(func, parent->backtrace());
 }
 
 } // namespace ql

@@ -10,6 +10,7 @@
 		EE354C241EF3F4AB004CB846 /* web_assets.cc in Sources */ = {isa = PBXBuildFile; fileRef = EE35225B1EF3F38A004CB846 /* web_assets.cc */; };
 		EE354C271EF3F557004CB846 /* random.cc in Sources */ = {isa = PBXBuildFile; fileRef = EE354C251EF3F53E004CB846 /* random.cc */; };
 		EE354C2C1EF3F586004CB846 /* ql2.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = EE354C2A1EF3F582004CB846 /* ql2.pb.cc */; };
+		EEB1EF5F1F10EB7C008092DB /* js_pprint.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEB1EF5D1F10EA16008092DB /* js_pprint.cc */; };
 		EEE6D2A81EF3CDF6001A08E2 /* activity_logger.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6CDFF1EF3CD80001A08E2 /* activity_logger.cc */; };
 		EEE6D2A91EF3CDF6001A08E2 /* address.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6CE021EF3CD80001A08E2 /* address.cc */; };
 		EEE6D2AA1EF3CDF6001A08E2 /* arch.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6CE041EF3CD80001A08E2 /* arch.cc */; };
@@ -251,8 +252,6 @@
 		EEE6D3961EF3CDF6001A08E2 /* extproc_worker.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D0671EF3CD80001A08E2 /* extproc_worker.cc */; };
 		EEE6D3971EF3CDF6001A08E2 /* http_job.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D0691EF3CD80001A08E2 /* http_job.cc */; };
 		EEE6D3981EF3CDF6001A08E2 /* http_runner.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D06B1EF3CD80001A08E2 /* http_runner.cc */; };
-		EEE6D3991EF3CDF6001A08E2 /* js_job.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D06D1EF3CD80001A08E2 /* js_job.cc */; };
-		EEE6D39A1EF3CDF6001A08E2 /* js_runner.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D06F1EF3CD80001A08E2 /* js_runner.cc */; };
 		EEE6D39B1EF3CDF6001A08E2 /* file_app.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D0731EF3CD80001A08E2 /* file_app.cc */; };
 		EEE6D39C1EF3CDF6001A08E2 /* http.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D0751EF3CD80001A08E2 /* http.cc */; };
 		EEE6D39D1EF3CDF6001A08E2 /* http_parser.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D0771EF3CD80001A08E2 /* http_parser.cc */; };
@@ -267,7 +266,6 @@
 		EEE6D3A61EF3CDF6001A08E2 /* core.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D08D1EF3CD80001A08E2 /* core.cc */; };
 		EEE6D3A71EF3CDF6001A08E2 /* filter.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D08F1EF3CD80001A08E2 /* filter.cc */; };
 		EEE6D3A81EF3CDF6001A08E2 /* perfmon.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D0911EF3CD80001A08E2 /* perfmon.cc */; };
-		EEE6D3A91EF3CDF6001A08E2 /* js_pprint.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D0961EF3CD80001A08E2 /* js_pprint.cc */; };
 		EEE6D3AA1EF3CDF6001A08E2 /* pprint.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D0981EF3CD80001A08E2 /* pprint.cc */; };
 		EEE6D3AC1EF3CDF6001A08E2 /* protocol_api.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D09C1EF3CD80001A08E2 /* protocol_api.cc */; };
 		EEE6D3AE1EF3CDF6001A08E2 /* artificial_table.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D0C21EF3CD81001A08E2 /* artificial_table.cc */; };
@@ -373,7 +371,6 @@
 		EEE6D4121EF3CDF6001A08E2 /* error.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D1BF1EF3CD81001A08E2 /* error.cc */; };
 		EEE6D4131EF3CDF6001A08E2 /* geo.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D1C01EF3CD81001A08E2 /* geo.cc */; };
 		EEE6D4141EF3CDF6001A08E2 /* http.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D1C11EF3CD81001A08E2 /* http.cc */; };
-		EEE6D4151EF3CDF6001A08E2 /* js.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D1C21EF3CD81001A08E2 /* js.cc */; };
 		EEE6D4161EF3CDF6001A08E2 /* json.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D1C31EF3CD81001A08E2 /* json.cc */; };
 		EEE6D4171EF3CDF6001A08E2 /* obj.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D1C41EF3CD81001A08E2 /* obj.cc */; };
 		EEE6D4181EF3CDF6001A08E2 /* obj_or_seq.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D1C51EF3CD81001A08E2 /* obj_or_seq.cc */; };
@@ -446,6 +443,8 @@
 		EE354C2A1EF3F582004CB846 /* ql2.pb.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ql2.pb.cc; sourceTree = "<group>"; };
 		EE354C2B1EF3F582004CB846 /* ql2.pb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ql2.pb.h; sourceTree = "<group>"; };
 		EE7039BA1EF3CD11004BF657 /* rethinkdb */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rethinkdb; sourceTree = BUILT_PRODUCTS_DIR; };
+		EEB1EF5D1F10EA16008092DB /* js_pprint.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = js_pprint.cc; sourceTree = "<group>"; };
+		EEB1EF5E1F10EA16008092DB /* js_pprint.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = js_pprint.hpp; sourceTree = "<group>"; };
 		EEE6CDFF1EF3CD80001A08E2 /* activity_logger.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = activity_logger.cc; sourceTree = "<group>"; };
 		EEE6CE001EF3CD80001A08E2 /* activity_logger.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = activity_logger.hpp; sourceTree = "<group>"; };
 		EEE6CE021EF3CD80001A08E2 /* address.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = address.cc; sourceTree = "<group>"; };
@@ -1025,10 +1024,6 @@
 		EEE6D06A1EF3CD80001A08E2 /* http_job.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = http_job.hpp; sourceTree = "<group>"; };
 		EEE6D06B1EF3CD80001A08E2 /* http_runner.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = http_runner.cc; sourceTree = "<group>"; };
 		EEE6D06C1EF3CD80001A08E2 /* http_runner.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = http_runner.hpp; sourceTree = "<group>"; };
-		EEE6D06D1EF3CD80001A08E2 /* js_job.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = js_job.cc; sourceTree = "<group>"; };
-		EEE6D06E1EF3CD80001A08E2 /* js_job.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = js_job.hpp; sourceTree = "<group>"; };
-		EEE6D06F1EF3CD80001A08E2 /* js_runner.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = js_runner.cc; sourceTree = "<group>"; };
-		EEE6D0701EF3CD80001A08E2 /* js_runner.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = js_runner.hpp; sourceTree = "<group>"; };
 		EEE6D0731EF3CD80001A08E2 /* file_app.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = file_app.cc; sourceTree = "<group>"; };
 		EEE6D0741EF3CD80001A08E2 /* file_app.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = file_app.hpp; sourceTree = "<group>"; };
 		EEE6D0751EF3CD80001A08E2 /* http.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = http.cc; sourceTree = "<group>"; };
@@ -1060,8 +1055,6 @@
 		EEE6D0911EF3CD80001A08E2 /* perfmon.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = perfmon.cc; sourceTree = "<group>"; };
 		EEE6D0921EF3CD80001A08E2 /* perfmon.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = perfmon.hpp; sourceTree = "<group>"; };
 		EEE6D0931EF3CD80001A08E2 /* types.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = types.hpp; sourceTree = "<group>"; };
-		EEE6D0961EF3CD80001A08E2 /* js_pprint.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = js_pprint.cc; sourceTree = "<group>"; };
-		EEE6D0971EF3CD80001A08E2 /* js_pprint.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = js_pprint.hpp; sourceTree = "<group>"; };
 		EEE6D0981EF3CD80001A08E2 /* pprint.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = pprint.cc; sourceTree = "<group>"; };
 		EEE6D0991EF3CD80001A08E2 /* pprint.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = pprint.hpp; sourceTree = "<group>"; };
 		EEE6D09C1EF3CD80001A08E2 /* protocol_api.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = protocol_api.cc; sourceTree = "<group>"; };
@@ -1336,7 +1329,6 @@
 		EEE6D1BF1EF3CD81001A08E2 /* error.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = error.cc; sourceTree = "<group>"; };
 		EEE6D1C01EF3CD81001A08E2 /* geo.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = geo.cc; sourceTree = "<group>"; };
 		EEE6D1C11EF3CD81001A08E2 /* http.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = http.cc; sourceTree = "<group>"; };
-		EEE6D1C21EF3CD81001A08E2 /* js.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = js.cc; sourceTree = "<group>"; };
 		EEE6D1C31EF3CD81001A08E2 /* json.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = json.cc; sourceTree = "<group>"; };
 		EEE6D1C41EF3CD81001A08E2 /* obj.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = obj.cc; sourceTree = "<group>"; };
 		EEE6D1C51EF3CD81001A08E2 /* obj_or_seq.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = obj_or_seq.cc; sourceTree = "<group>"; };
@@ -1506,7 +1498,6 @@
 		EEE6D2771EF3CD81001A08E2 /* http.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = http.cc; sourceTree = "<group>"; };
 		EEE6D2781EF3CD81001A08E2 /* http_escaping.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = http_escaping.cc; sourceTree = "<group>"; };
 		EEE6D2791EF3CD81001A08E2 /* internal_node_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = internal_node_test.cc; sourceTree = "<group>"; };
-		EEE6D27A1EF3CD81001A08E2 /* jsproc.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = jsproc.cc; sourceTree = "<group>"; };
 		EEE6D27B1EF3CD81001A08E2 /* leaf_node_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = leaf_node_test.cc; sourceTree = "<group>"; };
 		EEE6D27C1EF3CD81001A08E2 /* log_message.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = log_message.cc; sourceTree = "<group>"; };
 		EEE6D27D1EF3CD81001A08E2 /* lru_cache_test.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lru_cache_test.cc; sourceTree = "<group>"; };
@@ -2566,10 +2557,6 @@
 				EEE6D06A1EF3CD80001A08E2 /* http_job.hpp */,
 				EEE6D06B1EF3CD80001A08E2 /* http_runner.cc */,
 				EEE6D06C1EF3CD80001A08E2 /* http_runner.hpp */,
-				EEE6D06D1EF3CD80001A08E2 /* js_job.cc */,
-				EEE6D06E1EF3CD80001A08E2 /* js_job.hpp */,
-				EEE6D06F1EF3CD80001A08E2 /* js_runner.cc */,
-				EEE6D0701EF3CD80001A08E2 /* js_runner.hpp */,
 			);
 			path = extproc;
 			sourceTree = "<group>";
@@ -2620,8 +2607,8 @@
 		EEE6D0941EF3CD80001A08E2 /* pprint */ = {
 			isa = PBXGroup;
 			children = (
-				EEE6D0961EF3CD80001A08E2 /* js_pprint.cc */,
-				EEE6D0971EF3CD80001A08E2 /* js_pprint.hpp */,
+				EEB1EF5D1F10EA16008092DB /* js_pprint.cc */,
+				EEB1EF5E1F10EA16008092DB /* js_pprint.hpp */,
 				EEE6D0981EF3CD80001A08E2 /* pprint.cc */,
 				EEE6D0991EF3CD80001A08E2 /* pprint.hpp */,
 			);
@@ -3050,7 +3037,6 @@
 				EEE6D1BF1EF3CD81001A08E2 /* error.cc */,
 				EEE6D1C01EF3CD81001A08E2 /* geo.cc */,
 				EEE6D1C11EF3CD81001A08E2 /* http.cc */,
-				EEE6D1C21EF3CD81001A08E2 /* js.cc */,
 				EEE6D1C31EF3CD81001A08E2 /* json.cc */,
 				EEE6D1C41EF3CD81001A08E2 /* obj.cc */,
 				EEE6D1C51EF3CD81001A08E2 /* obj_or_seq.cc */,
@@ -3290,7 +3276,6 @@
 				EEE6D2771EF3CD81001A08E2 /* http.cc */,
 				EEE6D2781EF3CD81001A08E2 /* http_escaping.cc */,
 				EEE6D2791EF3CD81001A08E2 /* internal_node_test.cc */,
-				EEE6D27A1EF3CD81001A08E2 /* jsproc.cc */,
 				EEE6D27B1EF3CD81001A08E2 /* leaf_node_test.cc */,
 				EEE6D27C1EF3CD81001A08E2 /* log_message.cc */,
 				EEE6D27D1EF3CD81001A08E2 /* lru_cache_test.cc */,
@@ -3460,7 +3445,6 @@
 				EEE6D3451EF3CDF6001A08E2 /* backfillee.cc in Sources */,
 				EEE6D34B1EF3CDF6001A08E2 /* remote_replicator_metadata.cc in Sources */,
 				EEE6D43E1EF3CDF7001A08E2 /* log_serializer.cc in Sources */,
-				EEE6D4151EF3CDF6001A08E2 /* js.cc in Sources */,
 				EEE6D3F21EF3CDF6001A08E2 /* optargs.cc in Sources */,
 				EEE6D4381EF3CDF7001A08E2 /* extent_manager.cc in Sources */,
 				EEE6D3B61EF3CDF6001A08E2 /* btree_store.cc in Sources */,
@@ -3548,7 +3532,6 @@
 				EEE6D36B1EF3CDF6001A08E2 /* cross_thread_signal.cc in Sources */,
 				EEE6D2DA1EF3CDF6001A08E2 /* leaf_node.cc in Sources */,
 				EEE6D2B81EF3CDF6001A08E2 /* timer_kqueue_provider.cc in Sources */,
-				EEE6D3A91EF3CDF6001A08E2 /* js_pprint.cc in Sources */,
 				EEE6D34F1EF3CDF6001A08E2 /* direct_query_server.cc in Sources */,
 				EEE6D3091EF3CDF6001A08E2 /* backend.cc in Sources */,
 				EEE6D2AD1EF3CDF6001A08E2 /* blocker_pool.cc in Sources */,
@@ -3580,6 +3563,7 @@
 				EEE6D2E51EF3CDF6001A08E2 /* evicter.cc in Sources */,
 				EEE6D2B91EF3CDF6001A08E2 /* timer_signal_provider.cc in Sources */,
 				EEE6D35C1EF3CDF6001A08E2 /* exec.cc in Sources */,
+				EEB1EF5F1F10EB7C008092DB /* js_pprint.cc in Sources */,
 				EEE6D4311EF3CDF6001A08E2 /* map_write_manager.cc in Sources */,
 				EEE6D4401EF3CDF7001A08E2 /* static_header.cc in Sources */,
 				EEE6D3401EF3CDF6001A08E2 /* table_status.cc in Sources */,
@@ -3752,7 +3736,6 @@
 				EEE6D2F61EF3CDF6001A08E2 /* permissions_artificial_table_backend.cc in Sources */,
 				EEE6D3251EF3CDF6001A08E2 /* migrate_v2_1.cc in Sources */,
 				EEE6D2B41EF3CDF6001A08E2 /* disk.cc in Sources */,
-				EEE6D39A1EF3CDF6001A08E2 /* js_runner.cc in Sources */,
 				EEE6D3181EF3CDF6001A08E2 /* version_check.cc in Sources */,
 				EEE6D2FB1EF3CDF6001A08E2 /* username.cc in Sources */,
 				EEE6D2F91EF3CDF6001A08E2 /* user.cc in Sources */,
@@ -3806,7 +3789,6 @@
 				EEE6D3F81EF3CDF6001A08E2 /* pseudo_geometry.cc in Sources */,
 				EEE6D3231EF3CDF6001A08E2 /* migrate_v1_14.cc in Sources */,
 				EEE6D3D71EF3CDF6001A08E2 /* s2edgeindex.cc in Sources */,
-				EEE6D3991EF3CDF6001A08E2 /* js_job.cc in Sources */,
 				EEE6D3421EF3CDF6001A08E2 /* nonoverlapping_regions.cc in Sources */,
 				EEE6D2F81EF3CDF6001A08E2 /* scram_authenticator.cc in Sources */,
 				EEE6D3141EF3CDF6001A08E2 /* names.cc in Sources */,
@@ -3898,7 +3880,6 @@
 					"$(SRCROOT)/build/external/protobuf_2.5.0/include",
 					"$(SRCROOT)/build/external/openssl_1.0.2l/include",
 					"$(SRCROOT)/build/external/re2_2015-11-01/include",
-					"$(SRCROOT)/build/external/v8_3.30.33.16-patched/include",
 					"$(SRCROOT)/build/external/curl_7.54.1/include",
 					"$(SRCROOT)/src",
 				);
@@ -3915,12 +3896,6 @@
 					"$(SRCROOT)/build/external/openssl_1.0.2l/lib/libssl.a",
 					"$(SRCROOT)/build/external/openssl_1.0.2l/lib/libcrypto.a",
 					"$(SRCROOT)/build/external/protobuf_2.5.0/lib/libprotobuf.a",
-					"$(SRCROOT)/build/external/v8_3.30.33.16-patched/lib/libicudata.a",
-					"$(SRCROOT)/build/external/v8_3.30.33.16-patched/lib/libicuuc.a",
-					"$(SRCROOT)/build/external/v8_3.30.33.16-patched/lib/libicui18n.a",
-					"$(SRCROOT)/build/external/v8_3.30.33.16-patched/lib/libv8_libplatform.a",
-					"$(SRCROOT)/build/external/v8_3.30.33.16-patched/lib/libv8_snapshot.a",
-					"$(SRCROOT)/build/external/v8_3.30.33.16-patched/lib/libv8_libbase.a",
 					"-framework",
 					CoreFoundation,
 					"-framework",
@@ -3989,7 +3964,6 @@
 					"$(SRCROOT)/build/external/protobuf_2.5.0/include",
 					"$(SRCROOT)/build/external/openssl_1.0.2l/include",
 					"$(SRCROOT)/build/external/re2_2015-11-01/include",
-					"$(SRCROOT)/build/external/v8_3.30.33.16-patched/include",
 					"$(SRCROOT)/build/external/curl_7.54.1/include",
 					"$(SRCROOT)/src",
 				);
@@ -4005,12 +3979,6 @@
 					"$(SRCROOT)/build/external/openssl_1.0.2l/lib/libssl.a",
 					"$(SRCROOT)/build/external/openssl_1.0.2l/lib/libcrypto.a",
 					"$(SRCROOT)/build/external/protobuf_2.5.0/lib/libprotobuf.a",
-					"$(SRCROOT)/build/external/v8_3.30.33.16-patched/lib/libicudata.a",
-					"$(SRCROOT)/build/external/v8_3.30.33.16-patched/lib/libicuuc.a",
-					"$(SRCROOT)/build/external/v8_3.30.33.16-patched/lib/libicui18n.a",
-					"$(SRCROOT)/build/external/v8_3.30.33.16-patched/lib/libv8_libplatform.a",
-					"$(SRCROOT)/build/external/v8_3.30.33.16-patched/lib/libv8_snapshot.a",
-					"$(SRCROOT)/build/external/v8_3.30.33.16-patched/lib/libv8_libbase.a",
 					"-framework",
 					CoreFoundation,
 					"-framework",

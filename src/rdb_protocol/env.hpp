@@ -12,7 +12,6 @@
 #include "concurrency/one_per_thread.hpp"
 #include "containers/counted.hpp"
 #include "containers/lru_cache.hpp"
-#include "extproc/js_runner.hpp"
 #include "rdb_protocol/configured_limits.hpp"
 #include "rdb_protocol/context.hpp"
 #include "rdb_protocol/datum_stream.hpp"
@@ -70,10 +69,6 @@ public:
     void maybe_yield();
 
     extproc_pool_t *get_extproc_pool();
-
-    // Returns js_runner, but first calls js_runner->begin() if it hasn't
-    // already been called.
-    js_runner_t *get_js_runner();
 
     reql_cluster_interface_t *reql_cluster_interface();
 
@@ -162,8 +157,6 @@ private:
     uint32_t evals_since_yield_;
 
     rdb_context_t *const rdb_ctx_;
-
-    js_runner_t js_runner_;
 
     eval_callback_t *eval_callback_;
 

@@ -72,16 +72,6 @@ public:
         serialize<W>(wm, backtrace);
     }
 
-    void on_js_func(const js_func_t *js_func) {
-        serialize<W>(wm, wire_func_type_t::JS);
-        const std::string &js_source = js_func->js_source;
-        serialize<W>(wm, js_source);
-        const uint64_t &js_timeout_ms = js_func->js_timeout_ms;
-        serialize<W>(wm, js_timeout_ms);
-        backtrace_id_t backtrace = js_func->backtrace();
-        serialize<W>(wm, backtrace);
-    }
-
 private:
     write_message_t *wm;
 };
@@ -132,22 +122,6 @@ archive_result_t deserialize(read_stream_t *s, wire_func_t *wf) {
                                              std::move(term_tree));
         return res;
     }
-    case wire_func_type_t::JS: {
-        std::string js_source;
-        res = deserialize<W>(s, &js_source);
-        if (bad(res)) { return res; }
-
-        uint64_t js_timeout_ms;
-        res = deserialize<W>(s, &js_timeout_ms);
-        if (bad(res)) { return res; }
-
-        res = deserialize_protobuf(s, &dummy_bt);
-        if (bad(res)) { return res; }
-
-        wf->func = make_counted<js_func_t>(js_source, js_timeout_ms,
-                                           backtrace_id_t::empty());
-        return res;
-    }
     default:
         unreachable();
     }
@@ -195,22 +169,6 @@ archive_result_t deserialize_wire_func(
         wf->func = make_counted<reql_func_t>(std::move(term_storage),
                                              scope, arg_names,
                                              std::move(term_tree));
-        return res;
-    }
-    case wire_func_type_t::JS: {
-        std::string js_source;
-        res = deserialize<W>(s, &js_source);
-        if (bad(res)) { return res; }
-
-        uint64_t js_timeout_ms;
-        res = deserialize<W>(s, &js_timeout_ms);
-        if (bad(res)) { return res; }
-
-        backtrace_id_t bt;
-        res = deserialize<W>(s, &bt);
-        if (bad(res)) { return res; }
-
-        wf->func = make_counted<js_func_t>(js_source, js_timeout_ms, bt);
         return res;
     }
     default:

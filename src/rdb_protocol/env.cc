@@ -2,7 +2,6 @@
 #include "rdb_protocol/env.hpp"
 
 #include "concurrency/cross_thread_watchable.hpp"
-#include "extproc/js_runner.hpp"
 #include "rdb_protocol/func.hpp"
 #include "rdb_protocol/minidriver.hpp"
 #include "rdb_protocol/term_walker.hpp"
@@ -46,15 +45,6 @@ extproc_pool_t *env_t::get_extproc_pool() {
     r_sanity_check(rdb_ctx_ != NULL);
     r_sanity_check(rdb_ctx_->extproc_pool != NULL);
     return rdb_ctx_->extproc_pool;
-}
-
-js_runner_t *env_t::get_js_runner() {
-    assert_thread();
-    extproc_pool_t *extproc_pool = get_extproc_pool();
-    if (!js_runner_.connected()) {
-        js_runner_.begin(extproc_pool, interruptor, limits());
-    }
-    return &js_runner_;
 }
 
 scoped_ptr_t<profile::trace_t> maybe_make_profile_trace(profile_bool_t profile) {

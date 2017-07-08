@@ -160,10 +160,6 @@ counted_t<term_t> make_get_nearest_term(
 counted_t<term_t> make_polygon_sub_term(
     compile_env_t *env, const raw_term_t &term);
 
-// js.cc
-counted_t<term_t> make_javascript_term(
-    compile_env_t *env, const raw_term_t &term);
-
 // uuid.cc
 counted_t<term_t> make_uuid_term(
     compile_env_t *env, const raw_term_t &term);

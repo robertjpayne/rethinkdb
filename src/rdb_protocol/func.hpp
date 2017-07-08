@@ -20,8 +20,6 @@
 #include "rdb_protocol/term_storage.hpp"
 #include "rpc/serialize_macros.hpp"
 
-class js_runner_t;
-
 namespace ql {
 
 class func_visitor_t;
@@ -129,42 +127,9 @@ private:
     DISABLE_COPYING(reql_func_t);
 };
 
-class js_func_t : public func_t {
-public:
-    js_func_t(const std::string &_js_source,
-              uint64_t timeout_ms,
-              backtrace_id_t backtrace);
-    ~js_func_t();
-
-    // Some queries, like filter, can take a shortcut object instead of a
-    // function as their argument.
-    scoped_ptr_t<val_t> call(env_t *env,
-                             const std::vector<datum_t> &args,
-                             eval_flags_t eval_flags) const;
-
-    optional<size_t> arity() const;
-
-    deterministic_t is_deterministic() const;
-
-    std::string print_source() const;
-    std::string print_js_function() const;
-
-    void visit(func_visitor_t *visitor) const;
-
-private:
-    template <cluster_version_t> friend class wire_func_serialization_visitor_t;
-    bool filter_helper(env_t *env, datum_t arg) const;
-
-    std::string js_source;
-    uint64_t js_timeout_ms;
-
-    DISABLE_COPYING(js_func_t);
-};
-
 class func_visitor_t {
 public:
     virtual void on_reql_func(const reql_func_t *reql_func) = 0;
-    virtual void on_js_func(const js_func_t *js_func) = 0;
 protected:
     func_visitor_t() { }
     virtual ~func_visitor_t() { }
@@ -178,31 +143,6 @@ counted_t<const func_t> new_pluck_func(datum_t obj, backtrace_id_t bt);
 counted_t<const func_t> new_get_field_func(datum_t obj, backtrace_id_t bt);
 counted_t<const func_t> new_eq_comparison_func(datum_t obj, backtrace_id_t bt);
 counted_t<const func_t> new_page_func(datum_t method, backtrace_id_t bt);
-
-class js_result_visitor_t : public boost::static_visitor<val_t *> {
-public:
-    js_result_visitor_t(const std::string &_code,
-                        uint64_t _timeout_ms,
-                        const bt_rcheckable_t *_parent)
-        : code(_code),
-          timeout_ms(_timeout_ms),
-          parent(_parent) { }
-
-    // The caller needs to take ownership of the return value.  Boost static_visitor
-    // can't handle movable types.
-
-    // This JS evaluation resulted in an error
-    val_t *operator()(const std::string &err_val) const;
-    // This JS call resulted in a JSON value
-    val_t *operator()(const datum_t &json_val) const;
-    // This JS evaluation resulted in an id for a js function
-    val_t *operator()(const js_id_t id_val) const;
-
-private:
-    std::string code;
-    uint64_t timeout_ms;
-    const bt_rcheckable_t *parent;
-};
 
 // Evaluating this returns a `func_t` wrapped in a `val_t`.
 class func_term_t : public term_t {
