@@ -34,8 +34,8 @@ version_checker_t::version_checker_t(
     server_config_client(_server_config_client),
     timer(day_in_ms, this) {
     rassert(rdb_ctx != nullptr);
-    coro_t::spawn_sometime(std::bind(&version_checker_t::do_check,
-                                     this, true, drainer.lock()));
+//    coro_t::spawn_sometime(std::bind(&version_checker_t::do_check,
+//                                     this, true, drainer.lock()));
 }
 
 void version_checker_t::do_check(bool is_initial, auto_drainer_t::lock_t keepalive) {

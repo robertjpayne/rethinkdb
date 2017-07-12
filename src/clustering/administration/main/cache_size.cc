@@ -261,70 +261,72 @@ bool osx_runtime_version_check() {
 #endif //__MACH___
 
 uint64_t get_avail_mem_size() {
-#if defined(_WIN32)
-    MEMORYSTATUSEX ms;
-    ms.dwLength = sizeof(ms);
-    BOOL res = GlobalMemoryStatusEx(&ms);
-    guarantee_winerr(res, "GlobalMemoryStatusEx failed");
-    return ms.ullAvailPhys;
-#elif defined(__MACH__)
-    uint64_t page_size = sysconf(_SC_PAGESIZE);
-    mach_msg_type_number_t count = HOST_VM_INFO64_COUNT;
-    vm_statistics64_data_t vmstat;
-    // We memset this struct to zero because of zero-knowledge paranoia that some old
-    // system might use a shorter version of the struct, where it would not set the
-    // vmstat.external_page_count field (which is relatively new) that we use below.
-    // (Probably, instead, the host_statistics64 call will fail, because count would
-    // be wrong.)
-    memset(&vmstat, 0, sizeof(vmstat));
-    if (KERN_SUCCESS != host_statistics64(mach_host_self(), HOST_VM_INFO64, (host_info64_t)&vmstat, &count)) {
-        logERR("Could not determine available RAM for the default cache size "
-            "(errno=%d).\n", get_errno());
-        return 1024 * MEGABYTE;
-    }
-#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
-    // We know the field we want showed up in 10.9.  It may have shown
-    // up in 10.8, but is definitely not in 10.7.  Per Availability.h,
-    // we use a raw number rather than the corresponding #define.
-    uint64_t ret;
-    if (!osx_runtime_version_check()) {
-        ret = vmstat.free_count * page_size;
-    } else {
-        // external_page_count is the number of pages that are file-backed (non-swap) --
-        // see /usr/include/mach/vm_statistics.h, see also vm_stat.c, the implementation
-        // of vm_stat, in Darwin.
-        // We use an offset here, rather than using the struct, to let us compile on 10.7,
-        // where the field doesn't exist in the struct.
-        const size_t external_page_count_offset = 136;
-#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1900
-        static_assert(offsetof(struct vm_statistics64, external_page_count)
-                      == external_page_count_offset,
-		      "OS X ABI changed.");
-#endif
-        ret = (vmstat.free_count +
-	       *(reinterpret_cast<natural_t*>((reinterpret_cast<char*>(&vmstat)
-                                               + external_page_count_offset)))) * page_size;
-    }
-#else
-#error "We don't support Mach kernels other than OS X, sorry."
-#endif // __MAC_OS_X_VERSION_MIN_REQUIRED
-    return ret;
-#else
-	uint64_t page_size = sysconf(_SC_PAGESIZE);
-	{
-        uint64_t memory;
-        if (get_proc_meminfo_available_memory_size(&memory)) {
-            return memory;
-        } else {
-            logERR("Could not parse /proc/meminfo, so we will treat cached file memory "
-                "as if it were unavailable.");
+    return 32 * MEGABYTE;
 
-            // This just returns what /proc/meminfo would report as "MemFree".
-            uint64_t avail_mem_pages = sysconf(_SC_AVPHYS_PAGES);
-            return avail_mem_pages * page_size;
-        }
-    }
-#endif
+//#if defined(_WIN32)
+//    MEMORYSTATUSEX ms;
+//    ms.dwLength = sizeof(ms);
+//    BOOL res = GlobalMemoryStatusEx(&ms);
+//    guarantee_winerr(res, "GlobalMemoryStatusEx failed");
+//    return ms.ullAvailPhys;
+//#elif defined(__MACH__)
+//    uint64_t page_size = sysconf(_SC_PAGESIZE);
+//    mach_msg_type_number_t count = HOST_VM_INFO64_COUNT;
+//    vm_statistics64_data_t vmstat;
+//    // We memset this struct to zero because of zero-knowledge paranoia that some old
+//    // system might use a shorter version of the struct, where it would not set the
+//    // vmstat.external_page_count field (which is relatively new) that we use below.
+//    // (Probably, instead, the host_statistics64 call will fail, because count would
+//    // be wrong.)
+//    memset(&vmstat, 0, sizeof(vmstat));
+//    if (KERN_SUCCESS != host_statistics64(mach_host_self(), HOST_VM_INFO64, (host_info64_t)&vmstat, &count)) {
+//        logERR("Could not determine available RAM for the default cache size "
+//            "(errno=%d).\n", get_errno());
+//        return 1024 * MEGABYTE;
+//    }
+//#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+//    // We know the field we want showed up in 10.9.  It may have shown
+//    // up in 10.8, but is definitely not in 10.7.  Per Availability.h,
+//    // we use a raw number rather than the corresponding #define.
+//    uint64_t ret;
+//    if (!osx_runtime_version_check()) {
+//        ret = vmstat.free_count * page_size;
+//    } else {
+//        // external_page_count is the number of pages that are file-backed (non-swap) --
+//        // see /usr/include/mach/vm_statistics.h, see also vm_stat.c, the implementation
+//        // of vm_stat, in Darwin.
+//        // We use an offset here, rather than using the struct, to let us compile on 10.7,
+//        // where the field doesn't exist in the struct.
+//        const size_t external_page_count_offset = 136;
+//#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1900
+//        static_assert(offsetof(struct vm_statistics64, external_page_count)
+//                      == external_page_count_offset,
+//              "OS X ABI changed.");
+//#endif
+//        ret = (vmstat.free_count +
+//           *(reinterpret_cast<natural_t*>((reinterpret_cast<char*>(&vmstat)
+//                                               + external_page_count_offset)))) * page_size;
+//    }
+//#else
+//#error "We don't support Mach kernels other than OS X, sorry."
+//#endif // __MAC_OS_X_VERSION_MIN_REQUIRED
+//    return ret;
+//#else
+//    uint64_t page_size = sysconf(_SC_PAGESIZE);
+//    {
+//        uint64_t memory;
+//        if (get_proc_meminfo_available_memory_size(&memory)) {
+//            return memory;
+//        } else {
+//            logERR("Could not parse /proc/meminfo, so we will treat cached file memory "
+//                "as if it were unavailable.");
+//
+//            // This just returns what /proc/meminfo would report as "MemFree".
+//            uint64_t avail_mem_pages = sysconf(_SC_AVPHYS_PAGES);
+//            return avail_mem_pages * page_size;
+//        }
+//    }
+//#endif
 }
 
 uint64_t get_max_total_cache_size() {

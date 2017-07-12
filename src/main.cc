@@ -12,7 +12,7 @@
 #include "config/args.hpp"
 #include "extproc/extproc_spawner.hpp"
 
-int main(int argc, char *argv[]) {
+int rethinkdb_main(int argc, char *argv[]) {
 
     startup_shutdown_t startup_shutdown;
     crypto::initialization_guard_t crypto_initialization_guard;
@@ -114,4 +114,6 @@ int main(int argc, char *argv[]) {
             return 1;
         }
     }
+
+    return 0;
 }

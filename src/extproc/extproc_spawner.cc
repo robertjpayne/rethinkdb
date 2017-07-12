@@ -140,25 +140,25 @@ public:
     }
 
     void main_loop() {
-        process_id_t spawner_pid = current_process();
-
-        while(true) {
-            fd_t worker_socket;
-            fd_recv_result_t recv_res = recv_fds(socket.get(), 1, &worker_socket);
-            if (recv_res != FD_RECV_OK) {
-                break;
-            }
-            pid_t res = ::fork();
-            if (res == 0) {
-                // Worker process here
-                socket.reset(); // Don't need the spawner's pipe
-                worker_run_t worker_runner(worker_socket, spawner_pid);
-                worker_runner.main_loop();
-                ::_exit(EXIT_FAILURE);
-            }
-            guarantee_err(res != -1, "could not fork worker process");
-            scoped_fd_t closer(worker_socket);
-        }
+//        process_id_t spawner_pid = current_process();
+//
+//        while(true) {
+//            fd_t worker_socket;
+//            fd_recv_result_t recv_res = recv_fds(socket.get(), 1, &worker_socket);
+//            if (recv_res != FD_RECV_OK) {
+//                break;
+//            }
+//            pid_t res = ::fork();
+//            if (res == 0) {
+//                // Worker process here
+//                socket.reset(); // Don't need the spawner's pipe
+//                worker_run_t worker_runner(worker_socket, spawner_pid);
+//                worker_runner.main_loop();
+//                ::_exit(EXIT_FAILURE);
+//            }
+//            guarantee_err(res != -1, "could not fork worker process");
+//            scoped_fd_t closer(worker_socket);
+//        }
     }
 
 private:
@@ -204,29 +204,29 @@ extproc_spawner_t *extproc_spawner_t::get_instance() {
 
 #ifndef _WIN32
 void extproc_spawner_t::fork_spawner() {
-    guarantee(spawner_socket.get() == INVALID_FD);
-
-    fd_t fds[2];
-    int res = socketpair(AF_UNIX, SOCK_STREAM, 0, fds);
-    guarantee_err(res == 0, "could not create socket pair for spawner process");
-
-    res = ::fork();
-    if (res == 0) {
-        // This is the spawner process, just instantiate ourselves and handle requests
-        do {
-            res = ::close(fds[0]);
-        } while (res == 0 && get_errno() == EINTR);
-
-        spawner_run_t spawner(fds[1]);
-        spawner.main_loop();
-        ::_exit(EXIT_SUCCESS);
-    }
-
-    spawner_pid = res;
-    guarantee_err(spawner_pid != -1, "could not fork spawner process");
-
-    scoped_fd_t closer(fds[1]);
-    spawner_socket.reset(fds[0]);
+//    guarantee(spawner_socket.get() == INVALID_FD);
+//
+//    fd_t fds[2];
+//    int res = socketpair(AF_UNIX, SOCK_STREAM, 0, fds);
+//    guarantee_err(res == 0, "could not create socket pair for spawner process");
+//
+//    res = ::fork();
+//    if (res == 0) {
+//        // This is the spawner process, just instantiate ourselves and handle requests
+//        do {
+//            res = ::close(fds[0]);
+//        } while (res == 0 && get_errno() == EINTR);
+//
+//        spawner_run_t spawner(fds[1]);
+//        spawner.main_loop();
+//        ::_exit(EXIT_SUCCESS);
+//    }
+//
+//    spawner_pid = res;
+//    guarantee_err(spawner_pid != -1, "could not fork spawner process");
+//
+//    scoped_fd_t closer(fds[1]);
+//    spawner_socket.reset(fds[0]);
 }
 #endif
 
