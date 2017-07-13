@@ -260,6 +260,9 @@ artificial_stack_t::artificial_stack_t(void (*initial_fun)(void), size_t _stack_
 #elif defined(__arm__)
     // This slot is used to store r12.
     const size_t min_frame = 1;
+#elif defined(__arm64__)
+    // These slots used to store x16 and x17
+    const size_t min_frame = 2;
 #endif
     // Zero the caller stack frame. Prevents Valgrind complaining about uninitialized
     // value errors when throwing an uncaught exception.
@@ -284,6 +287,10 @@ artificial_stack_t::artificial_stack_t(void (*initial_fun)(void), size_t _stack_
     // Note: r12 is also stored, in the 'caller frame' slot above the return
     // address.
     sp -= 8; // r4-r11.
+#elif defined(__arm64__)
+    // Note: x16-x17 is also stored, in the 'caller frame' slot above the return
+    // address.
+    sp -= 10; // x19-x29
 #elif defined(__s390x__)
     sp -= 16; // r6-r13 and f8-f15.
 #else
@@ -444,7 +451,7 @@ void context_switch(artificial_stack_context_ref_t *current_context_out, artific
 }
 
 asm(
-#if defined(__i386__) || defined(__x86_64__) || defined(__arm__) || defined (__s390x__)
+#if defined(__i386__) || defined(__x86_64__) || defined(__arm__) || defined (__s390x__) || defined(__arm64__) || defined(__aarch64__)
 // We keep architecture-specific code interleaved in order to enforce commonality.
 #if defined(__x86_64__)
 #if defined(__LP64__) || defined(__LLP64__)
@@ -488,6 +495,23 @@ asm(
     "push {r12}\n"
     "push {r14}\n"
     "push {r4-r11}\n"
+#elif defined(__arm64__) || defined(__aarch64__)
+    // Preserve x16-x17 and x19-x29 and the return address (x30). For consistency with x86 x16-x17 is
+    // pushed first, followed by x30 and then x19-x29
+    "stp x16, x17, [sp, #-16]!\n"
+    "stp x17, x18, [sp, #-16]!\n"
+    "stp x30, x31, [sp, #-16]!\n"
+    "stp x19, x20, [sp, #-16]!\n"
+    "stp x20, x21, [sp, #-16]!\n"
+    "stp x21, x22, [sp, #-16]!\n"
+    "stp x22, x23, [sp, #-16]!\n"
+    "stp x23, x24, [sp, #-16]!\n"
+    "stp x24, x25, [sp, #-16]!\n"
+    "stp x25, x26, [sp, #-16]!\n"
+    "stp x26, x27, [sp, #-16]!\n"
+    "stp x27, x28, [sp, #-16]!\n"
+    "stp x28, x29, [sp, #-16]!\n"
+    "stp x29, x30, [sp, #-16]!\n"
 #elif defined(__s390x__)
     // Preserve r6-r13, the return address (r14), and f8-f15.
     "aghi %r15, -136\n"
@@ -514,6 +538,9 @@ asm(
 #elif defined(__arm__)
     /* On ARM, the first argument is in `r0`. `r13` is the stack pointer. */
     "str r13, [r0]\n"
+#elif defined(__arm64__) || defined(__aarch64__)
+    /* On ARM64, the first argument is in `x0`. `x31` is the stack pointer. */
+    "str x31, [x0]\n"
 #elif defined(__s390x__)
     /* On s390x, the first argument is in r2. r15 is the stack pointer. */
     "stg %r15, 0(%r2)\n"
@@ -531,6 +558,9 @@ asm(
 #elif defined(__arm__)
     /* On ARM, the second argument is in `r1` */
     "mov r13, r1\n"
+#elif defined(__arm64__) || defined(__aarch64__)
+    /* On ARM64, the second argument is in `r1` */
+    "mov x31, x1\n"
 #elif defined(__s390x__)
     /* On s390x, the second argument is in r3 */
     "lgr %r15, %r3\n"
@@ -552,6 +582,21 @@ asm(
     "pop {r4-r11}\n"
     "pop {r14}\n"
     "pop {r12}\n"
+#elif defined(__arm64__) || defined(__aarch64__)
+    "ldr x19, [sp], 16\n"
+    "ldr x20, [sp], 16\n"
+    "ldr x21, [sp], 16\n"
+    "ldr x22, [sp], 16\n"
+    "ldr x23, [sp], 16\n"
+    "ldr x24, [sp], 16\n"
+    "ldr x25, [sp], 16\n"
+    "ldr x26, [sp], 16\n"
+    "ldr x27, [sp], 16\n"
+    "ldr x28, [sp], 16\n"
+    "ldr x29, [sp], 16\n"
+    "ldr x30, [sp], 16\n"
+    "ldr x16, [sp], 16\n"
+    "ldr x17, [sp], 16\n"
 #elif defined(__s390x__)
     "lmg %r6, %r14, 64(%r15)\n"
     "ld %f8, 0(%r15)\n"
@@ -565,7 +610,7 @@ asm(
     "aghi %r15, 136\n"
 #endif
 
-#if defined(__i386__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__) || defined(__arm64__) || defined(__aarch64__)
     /* The following ret should return to the address set with
     `artificial_stack_t()` or with the previous `lightweight_swapcontext`. The
     instruction pointer is saved on the stack from the previous call (or
