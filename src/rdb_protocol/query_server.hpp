@@ -25,7 +25,6 @@ public:
       rdb_context_t *_rdb_ctx, server_config_client_t *_server_config_client,
       const server_id_t &_server_id, tls_ctx_t *tls_ctx);
 
-    http_app_t *get_http_app();
     int get_port() const;
 
     void run_query(ql::query_params_t *query_params,
@@ -33,8 +32,6 @@ public:
                    signal_t *interruptor);
 private:
     void fill_server_info(ql::response_t *out);
-
-    static const uint32_t default_http_timeout_sec = 300;
 
     query_server_t server;
     rdb_context_t *rdb_ctx;

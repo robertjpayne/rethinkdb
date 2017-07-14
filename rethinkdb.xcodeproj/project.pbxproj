@@ -16,7 +16,6 @@
 		EE61E62B1F1787B900680CF5 /* rethinkdb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE7039BA1EF3CD11004BF657 /* rethinkdb.framework */; };
 		EE61E62C1F1787B900680CF5 /* rethinkdb.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EE7039BA1EF3CD11004BF657 /* rethinkdb.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EE61E6321F1788E600680CF5 /* rethinkdb.h in Headers */ = {isa = PBXBuildFile; fileRef = EE61E6301F17887600680CF5 /* rethinkdb.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		EE61E6461F1881CE00680CF5 /* http.cc in Sources */ = {isa = PBXBuildFile; fileRef = EE61E6421F1881B800680CF5 /* http.cc */; };
 		EE61E6471F18846C00680CF5 /* ql2.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = EE7290401F164CDB002A6A13 /* ql2.pb.cc */; };
 		EE7290351F163EA3002A6A13 /* libre2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EE728F291F163A8C002A6A13 /* libre2.a */; };
 		EE7293F91F164D34002A6A13 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EE7293F71F164D2E002A6A13 /* libcrypto.a */; };
@@ -223,7 +222,6 @@
 		EEE6D2FC1EF3CDF6001A08E2 /* users_artificial_table_backend.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6CECF1EF3CD80001A08E2 /* users_artificial_table_backend.cc */; };
 		EEE6D2FD1EF3CDF6001A08E2 /* cluster_config.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6CED11EF3CD80001A08E2 /* cluster_config.cc */; };
 		EEE6D2FE1EF3CDF6001A08E2 /* datum_adapter.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6CED31EF3CD80001A08E2 /* datum_adapter.cc */; };
-		EEE6D2FF1EF3CDF6001A08E2 /* server.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6CED71EF3CD80001A08E2 /* server.cc */; };
 		EEE6D3001EF3CDF6001A08E2 /* issue.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6CEDA1EF3CD80001A08E2 /* issue.cc */; };
 		EEE6D3011EF3CDF6001A08E2 /* issues_backend.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6CEDC1EF3CD80001A08E2 /* issues_backend.cc */; };
 		EEE6D3021EF3CDF6001A08E2 /* local.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6CEDE1EF3CD80001A08E2 /* local.cc */; };
@@ -370,9 +368,6 @@
 		EEE6D3901EF3CDF6001A08E2 /* saslprep.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D0591EF3CD80001A08E2 /* saslprep.cc */; };
 		EEE6D3911EF3CDF6001A08E2 /* debug.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D05B1EF3CD80001A08E2 /* debug.cc */; };
 		EEE6D3921EF3CDF6001A08E2 /* errors.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D05E1EF3CD80001A08E2 /* errors.cc */; };
-		EEE6D39B1EF3CDF6001A08E2 /* file_app.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D0731EF3CD80001A08E2 /* file_app.cc */; };
-		EEE6D39D1EF3CDF6001A08E2 /* http_parser.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D0771EF3CD80001A08E2 /* http_parser.cc */; };
-		EEE6D39E1EF3CDF6001A08E2 /* routing_app.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D0791EF3CD80001A08E2 /* routing_app.cc */; };
 		EEE6D39F1EF3CDF6001A08E2 /* main.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D07D1EF3CD80001A08E2 /* main.cc */; };
 		EEE6D3A01EF3CDF6001A08E2 /* math.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D07F1EF3CD80001A08E2 /* math.cc */; };
 		EEE6D3A11EF3CDF6001A08E2 /* memory_utils.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D0811EF3CD80001A08E2 /* memory_utils.cc */; };
@@ -654,10 +649,6 @@
 		EE61E6251F1787AA00680CF5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		EE61E6271F1787AA00680CF5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EE61E6301F17887600680CF5 /* rethinkdb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rethinkdb.h; sourceTree = "<group>"; };
-		EE61E6421F1881B800680CF5 /* http.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = http.cc; sourceTree = "<group>"; };
-		EE61E6431F1881B800680CF5 /* http.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = http.hpp; sourceTree = "<group>"; };
-		EE61E6441F1881C400680CF5 /* http_escaping.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = http_escaping.cc; sourceTree = "<group>"; };
-		EE61E6451F1881C400680CF5 /* http.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = http.cc; sourceTree = "<group>"; };
 		EE7039BA1EF3CD11004BF657 /* rethinkdb.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = rethinkdb.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE728F291F163A8C002A6A13 /* libre2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libre2.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE72903F1F164CDB002A6A13 /* ql2.pb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ql2.pb.h; sourceTree = "<group>"; };
@@ -1381,9 +1372,6 @@
 		EEE6CED21EF3CD80001A08E2 /* cluster_config.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = cluster_config.hpp; sourceTree = "<group>"; };
 		EEE6CED31EF3CD80001A08E2 /* datum_adapter.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = datum_adapter.cc; sourceTree = "<group>"; };
 		EEE6CED41EF3CD80001A08E2 /* datum_adapter.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = datum_adapter.hpp; sourceTree = "<group>"; };
-		EEE6CED61EF3CD80001A08E2 /* cyanide.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = cyanide.hpp; sourceTree = "<group>"; };
-		EEE6CED71EF3CD80001A08E2 /* server.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = server.cc; sourceTree = "<group>"; };
-		EEE6CED81EF3CD80001A08E2 /* server.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = server.hpp; sourceTree = "<group>"; };
 		EEE6CEDA1EF3CD80001A08E2 /* issue.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = issue.cc; sourceTree = "<group>"; };
 		EEE6CEDB1EF3CD80001A08E2 /* issue.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = issue.hpp; sourceTree = "<group>"; };
 		EEE6CEDC1EF3CD80001A08E2 /* issues_backend.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = issues_backend.cc; sourceTree = "<group>"; };
@@ -1750,13 +1738,6 @@
 		EEE6D05D1EF3CD80001A08E2 /* do_on_thread.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = do_on_thread.hpp; sourceTree = "<group>"; };
 		EEE6D05E1EF3CD80001A08E2 /* errors.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = errors.cc; sourceTree = "<group>"; };
 		EEE6D05F1EF3CD80001A08E2 /* errors.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = errors.hpp; sourceTree = "<group>"; };
-		EEE6D0731EF3CD80001A08E2 /* file_app.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = file_app.cc; sourceTree = "<group>"; };
-		EEE6D0741EF3CD80001A08E2 /* file_app.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = file_app.hpp; sourceTree = "<group>"; };
-		EEE6D0771EF3CD80001A08E2 /* http_parser.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = http_parser.cc; sourceTree = "<group>"; };
-		EEE6D0781EF3CD80001A08E2 /* http_parser.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = http_parser.hpp; sourceTree = "<group>"; };
-		EEE6D0791EF3CD80001A08E2 /* routing_app.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = routing_app.cc; sourceTree = "<group>"; };
-		EEE6D07A1EF3CD80001A08E2 /* routing_app.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = routing_app.hpp; sourceTree = "<group>"; };
-		EEE6D07B1EF3CD80001A08E2 /* web_assets.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = web_assets.hpp; sourceTree = "<group>"; };
 		EEE6D07C1EF3CD80001A08E2 /* logger.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = logger.hpp; sourceTree = "<group>"; };
 		EEE6D07D1EF3CD80001A08E2 /* main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
 		EEE6D07E1EF3CD80001A08E2 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
@@ -3113,7 +3094,6 @@
 				EEE6D05D1EF3CD80001A08E2 /* do_on_thread.hpp */,
 				EEE6D05E1EF3CD80001A08E2 /* errors.cc */,
 				EEE6D05F1EF3CD80001A08E2 /* errors.hpp */,
-				EEE6D0711EF3CD80001A08E2 /* http */,
 				EEE6D07C1EF3CD80001A08E2 /* logger.hpp */,
 				EEE6D07D1EF3CD80001A08E2 /* main.cc */,
 				EEE6D07E1EF3CD80001A08E2 /* Makefile */,
@@ -3445,7 +3425,6 @@
 				EEE6CED21EF3CD80001A08E2 /* cluster_config.hpp */,
 				EEE6CED31EF3CD80001A08E2 /* datum_adapter.cc */,
 				EEE6CED41EF3CD80001A08E2 /* datum_adapter.hpp */,
-				EEE6CED51EF3CD80001A08E2 /* http */,
 				EEE6CED91EF3CD80001A08E2 /* issues */,
 				EEE6CEEC1EF3CD80001A08E2 /* jobs */,
 				EEE6CEF41EF3CD80001A08E2 /* logs */,
@@ -3495,16 +3474,6 @@
 				EEE6CED01EF3CD80001A08E2 /* users_artificial_table_backend.hpp */,
 			);
 			path = auth;
-			sourceTree = "<group>";
-		};
-		EEE6CED51EF3CD80001A08E2 /* http */ = {
-			isa = PBXGroup;
-			children = (
-				EEE6CED61EF3CD80001A08E2 /* cyanide.hpp */,
-				EEE6CED71EF3CD80001A08E2 /* server.cc */,
-				EEE6CED81EF3CD80001A08E2 /* server.hpp */,
-			);
-			path = http;
 			sourceTree = "<group>";
 		};
 		EEE6CED91EF3CD80001A08E2 /* issues */ = {
@@ -4017,22 +3986,6 @@
 				EEE6D05A1EF3CD80001A08E2 /* saslprep.hpp */,
 			);
 			path = crypto;
-			sourceTree = "<group>";
-		};
-		EEE6D0711EF3CD80001A08E2 /* http */ = {
-			isa = PBXGroup;
-			children = (
-				EE61E6421F1881B800680CF5 /* http.cc */,
-				EE61E6431F1881B800680CF5 /* http.hpp */,
-				EEE6D0731EF3CD80001A08E2 /* file_app.cc */,
-				EEE6D0741EF3CD80001A08E2 /* file_app.hpp */,
-				EEE6D0771EF3CD80001A08E2 /* http_parser.cc */,
-				EEE6D0781EF3CD80001A08E2 /* http_parser.hpp */,
-				EEE6D0791EF3CD80001A08E2 /* routing_app.cc */,
-				EEE6D07A1EF3CD80001A08E2 /* routing_app.hpp */,
-				EEE6D07B1EF3CD80001A08E2 /* web_assets.hpp */,
-			);
-			path = http;
 			sourceTree = "<group>";
 		};
 		EEE6D0831EF3CD80001A08E2 /* parsing */ = {
@@ -4683,8 +4636,6 @@
 		EEE6D2451EF3CD81001A08E2 /* unittest */ = {
 			isa = PBXGroup;
 			children = (
-				EE61E6441F1881C400680CF5 /* http_escaping.cc */,
-				EE61E6451F1881C400680CF5 /* http.cc */,
 				EEE6D2461EF3CD81001A08E2 /* archive_test.cc */,
 				EEE6D2471EF3CD81001A08E2 /* auth_key_test.cc */,
 				EEE6D2481EF3CD81001A08E2 /* barrier_test.cc */,
@@ -5110,7 +5061,6 @@
 				EEE6D41A1EF3CDF6001A08E2 /* random.cc in Sources */,
 				EEE6D2F01EF3CDF6001A08E2 /* protocols.cc in Sources */,
 				EEE6D2BA1EF3CDF6001A08E2 /* timer_windows_provider.cc in Sources */,
-				EE61E6461F1881CE00680CF5 /* http.cc in Sources */,
 				EEE6D3CF1EF3CDF6001A08E2 /* strtoint.cc in Sources */,
 				EEE6D4411EF3CDF7001A08E2 /* merger.cc in Sources */,
 				EEE6D37B1EF3CDF6001A08E2 /* socket_stream.cc in Sources */,
@@ -5275,12 +5225,10 @@
 				EEE6D30D1EF3CDF6001A08E2 /* log_writer.cc in Sources */,
 				EEE6D42B1EF3CDF6001A08E2 /* repli_timestamp.cc in Sources */,
 				EEE6D3EE1EF3CDF6001A08E2 /* geo_traversal.cc in Sources */,
-				EEE6D39D1EF3CDF6001A08E2 /* http_parser.cc in Sources */,
 				EEE6D2B01EF3CDF6001A08E2 /* filestat.cc in Sources */,
 				EEE6D42A1EF3CDF6001A08E2 /* region.cc in Sources */,
 				EEE6D3CA1EF3CDF6001A08E2 /* lon_lat_types.cc in Sources */,
 				EEE6D43D1EF3CDF7001A08E2 /* lba_list.cc in Sources */,
-				EEE6D39E1EF3CDF6001A08E2 /* routing_app.cc in Sources */,
 				EEE6D3771EF3CDF6001A08E2 /* watchdog_timer.cc in Sources */,
 				EEE6D30B1EF3CDF6001A08E2 /* report.cc in Sources */,
 				EEE6D3D21EF3CDF6001A08E2 /* s2.cc in Sources */,
@@ -5325,7 +5273,6 @@
 				EEE6D2D41EF3CDF6001A08E2 /* backfill_debug.cc in Sources */,
 				EEE6D3AC1EF3CDF6001A08E2 /* protocol_api.cc in Sources */,
 				EEE6D2C61EF3CDF6001A08E2 /* runtime.cc in Sources */,
-				EEE6D2FF1EF3CDF6001A08E2 /* server.cc in Sources */,
 				EEE6D3281EF3CDF6001A08E2 /* semilattice.cc in Sources */,
 				EEE6D3E71EF3CDF6001A08E2 /* stringprintf.cc in Sources */,
 				EEE6D2F21EF3CDF6001A08E2 /* artificial_reql_cluster_interface.cc in Sources */,
@@ -5413,7 +5360,6 @@
 				EEE6D2F81EF3CDF6001A08E2 /* scram_authenticator.cc in Sources */,
 				EEE6D3141EF3CDF6001A08E2 /* names.cc in Sources */,
 				EEE6D3BA1EF3CDF6001A08E2 /* datum.cc in Sources */,
-				EEE6D39B1EF3CDF6001A08E2 /* file_app.cc in Sources */,
 				EEE6D3BF1EF3CDF6001A08E2 /* env.cc in Sources */,
 				EEE6D3E41EF3CDF6001A08E2 /* s2regionunion.cc in Sources */,
 				EEE6D36E1EF3CDF6001A08E2 /* interruptor.cc in Sources */,

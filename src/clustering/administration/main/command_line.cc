@@ -407,35 +407,6 @@ void initialize_logfile(const std::map<std::string, options::values_t> &opts,
     install_fallback_log_writer(filename);
 }
 
-std::string get_web_path(optional<std::string> web_static_directory) {
-    path_t result;
-
-    if (web_static_directory) {
-        result = parse_as_path(*web_static_directory);
-    } else {
-        return std::string();
-    }
-
-    // Make sure we return an absolute path
-    base_path_t abs_path(render_as_path(result));
-
-    if (!check_existence(abs_path)) {
-        throw std::runtime_error(strprintf("ERROR: web assets directory not found '%s'",
-                                           abs_path.path().c_str()).c_str());
-    }
-
-    abs_path.make_absolute();
-    return abs_path.path();
-}
-
-std::string get_web_path(const std::map<std::string, options::values_t> &opts) {
-    if (!exists_option(opts, "--no-http-admin")) {
-        optional<std::string> web_static_directory = get_optional_option(opts, "--web-static-directory");
-        return get_web_path(web_static_directory);
-    }
-    return std::string();
-}
-
 optional<int> parse_join_delay_secs_option(
         const std::map<std::string, options::values_t> &opts) {
     if (exists_option(opts, "--join-delay")) {
@@ -720,14 +691,9 @@ service_address_ports_t get_service_address_ports(const std::map<std::string, op
         get_local_addresses(all_options(opts, "--bind-driver"),
                             default_options,
                             filter),
-        get_local_addresses(all_options(opts, "--bind-http"),
-                            default_options,
-                            filter),
         get_canonical_addresses(opts, cluster_port),
         cluster_port,
         get_single_int(opts, "--client-port"),
-        exists_option(opts, "--no-http-admin"),
-        offseted_port(get_single_int(opts, "--http-port"), port_offset),
         offseted_port(get_single_int(opts, "--driver-port"), port_offset),
         port_offset);
 }
@@ -751,19 +717,6 @@ bool load_tls_key_and_cert(
     }
 
     return true;
-}
-
-bool configure_web_tls(
-    const std::map<std::string, options::values_t> &opts, SSL_CTX *web_tls) {
-    optional<std::string> key_file = get_optional_option(opts, "--http-tls-key");
-    optional<std::string> cert_file = get_optional_option(opts, "--http-tls-cert");
-
-    if (!(key_file && cert_file)) {
-        logERR("--http-tls-key and --http-tls-cert must be specified together.");
-        return false;
-    }
-
-    return load_tls_key_and_cert(web_tls, *key_file, *cert_file);
 }
 
 bool configure_driver_tls(
@@ -1001,16 +954,6 @@ bool initialize_tls_ctx(
 bool configure_tls(
     const std::map<std::string, options::values_t> &opts,
     tls_configs_t *tls_configs_out) {
-
-    if(!exists_option(opts, "--no-http-admin") &&
-            (exists_option(opts, "--http-tls-key")
-             || exists_option(opts, "--http-tls-cert"))) {
-        if (!(initialize_tls_ctx(opts, &(tls_configs_out->web)) &&
-              configure_web_tls(opts, tls_configs_out->web.get())
-            )) {
-            return false;
-        }
-    }
 
     if (exists_option(opts, "--driver-tls-key")
         || exists_option(opts, "--driver-tls-cert")
@@ -1490,21 +1433,6 @@ std::string parse_initial_password_option(
     }
 }
 
-options::help_section_t get_web_options(std::vector<options::option_t> *options_out) {
-    options::help_section_t help("Web options");
-    options_out->push_back(options::option_t(options::names_t("--web-static-directory"),
-                                             options::OPTIONAL));
-    help.add("--web-static-directory directory", "the directory containing web resources for the http interface");
-    options_out->push_back(options::option_t(options::names_t("--http-port"),
-                                             options::OPTIONAL,
-                                             strprintf("%d", port_defaults::http_port)));
-    help.add("--http-port port", "port for web administration console");
-    options_out->push_back(options::option_t(options::names_t("--no-http-admin"),
-                                             options::OPTIONAL_NO_PARAMETER));
-    help.add("--no-http-admin", "disable web administration console");
-    return help;
-}
-
 options::help_section_t get_network_options(const bool join_required, std::vector<options::option_t> *options_out) {
     options::help_section_t help("Network options");
     options_out->push_back(options::option_t(options::names_t("--bind"),
@@ -1513,12 +1441,9 @@ options::help_section_t get_network_options(const bool join_required, std::vecto
                                              options::OPTIONAL_REPEAT));
     options_out->push_back(options::option_t(options::names_t("--bind-driver"),
                                              options::OPTIONAL_REPEAT));
-    options_out->push_back(options::option_t(options::names_t("--bind-http"),
-                                             options::OPTIONAL_REPEAT));
     help.add("--bind {all | addr}", "add the address of a local interface to listen on when accepting connections, loopback addresses are enabled by default. Can be overridden by the following three options.");
     help.add("--bind-cluster {all | addr}", "override the behavior specified by --bind for cluster connections.");
     help.add("--bind-driver {all | addr}", "override the behavior specified by --bind for client driver connections.");
-    help.add("--bind-http {all | addr}", "override the behavior specified by --bind for web console connections.");
     options_out->push_back(options::option_t(options::names_t("--no-default-bind"),
                                              options::OPTIONAL_NO_PARAMETER));
     help.add("--no-default-bind", "disable automatic listening on loopback addresses");
@@ -1569,26 +1494,6 @@ options::help_section_t get_network_options(const bool join_required, std::vecto
     return help;
 }
 
-options::help_section_t get_cpu_options(std::vector<options::option_t> *options_out) {
-    options::help_section_t help("CPU options");
-    options_out->push_back(options::option_t(options::names_t("--cores", "-c"),
-                                             options::OPTIONAL,
-                                             strprintf("%d", get_cpu_count())));
-    help.add("-c [ --cores ] n", "the number of cores to use");
-    return help;
-}
-
-MUST_USE bool parse_cores_option(const std::map<std::string, options::values_t> &opts,
-                                 int *num_workers_out) {
-    int num_workers = get_single_int(opts, "--cores");
-    if (num_workers <= 0 || num_workers > MAX_THREADS) {
-        fprintf(stderr, "ERROR: number specified for cores to use must be between 1 and %d\n", MAX_THREADS);
-        return false;
-    }
-    *num_workers_out = num_workers;
-    return true;
-}
-
 options::help_section_t get_service_options(std::vector<options::option_t> *options_out) {
     options::help_section_t help("Service options");
     options_out->push_back(options::option_t(options::names_t("--pid-file"),
@@ -1616,18 +1521,6 @@ options::help_section_t get_setuser_options(std::vector<options::option_t> *opti
 #ifdef ENABLE_TLS
 options::help_section_t get_tls_options(std::vector<options::option_t> *options_out) {
     options::help_section_t help("TLS options");
-
-    // Web TLS options.
-    options_out->push_back(options::option_t(options::names_t("--http-tls-key"),
-                                             options::OPTIONAL));
-    options_out->push_back(options::option_t(options::names_t("--http-tls-cert"),
-                                             options::OPTIONAL));
-    help.add(
-        "--http-tls-key key_filename",
-        "private key to use for web administration console TLS");
-    help.add(
-        "--http-tls-cert cert_filename",
-        "certificate to use for web administration console TLS");
 
     // Client Driver TLS options.
     options_out->push_back(options::option_t(options::names_t("--driver-tls-key"),
@@ -1721,8 +1614,6 @@ void get_rethinkdb_serve_options(std::vector<options::help_section_t> *help_out,
     help_out->push_back(get_tls_options(options_out));
 #endif
     help_out->push_back(get_auth_options(options_out));
-    help_out->push_back(get_web_options(options_out));
-    help_out->push_back(get_cpu_options(options_out));
     help_out->push_back(get_service_options(options_out));
     help_out->push_back(get_setuser_options(options_out));
     help_out->push_back(get_help_options(options_out));
@@ -1737,7 +1628,6 @@ void get_rethinkdb_proxy_options(std::vector<options::help_section_t> *help_out,
     help_out->push_back(get_tls_options(options_out));
 #endif
     help_out->push_back(get_auth_options(options_out));
-    help_out->push_back(get_web_options(options_out));
     help_out->push_back(get_service_options(options_out));
     help_out->push_back(get_setuser_options(options_out));
     help_out->push_back(get_help_options(options_out));
@@ -1754,8 +1644,6 @@ void get_rethinkdb_porcelain_options(std::vector<options::help_section_t> *help_
     help_out->push_back(get_tls_options(options_out));
 #endif
     help_out->push_back(get_auth_options(options_out));
-    help_out->push_back(get_web_options(options_out));
-    help_out->push_back(get_cpu_options(options_out));
     help_out->push_back(get_service_options(options_out));
     help_out->push_back(get_setuser_options(options_out));
     help_out->push_back(get_help_options(options_out));
@@ -1865,7 +1753,7 @@ int main_rethinkdb_create(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
 
-        const int num_workers = get_cpu_count();
+        const int num_workers = MAX_THREADS - 1;
 
         bool is_new_directory = false;
         directory_lock_t data_directory_lock(base_path, true, &is_new_directory);
@@ -1981,12 +1869,7 @@ int main_rethinkdb_serve(int argc, char *argv[]) {
 
         service_address_ports_t address_ports = get_service_address_ports(opts);
 
-        std::string web_path = get_web_path(opts);
-
-        int num_workers;
-        if (!parse_cores_option(opts, &num_workers)) {
-            return EXIT_FAILURE;
-        }
+        int num_workers = MAX_THREADS - 1;
 
         int max_concurrent_io_requests;
         if (!parse_io_threads_option(opts, &max_concurrent_io_requests)) {
@@ -2031,7 +1914,6 @@ int main_rethinkdb_serve(int argc, char *argv[]) {
 #endif
 
         serve_info_t serve_info(std::move(joins),
-                                std::move(web_path),
                                 address_ports,
                                 get_optional_option(opts, "--config-file"),
                                 std::vector<std::string>(argv, argv + argc),
@@ -2106,8 +1988,7 @@ int main_rethinkdb_proxy(int argc, char *argv[]) {
         base_path_t base_path(".");
         initialize_logfile(opts, base_path);
 
-        std::string web_path = get_web_path(opts);
-        const int num_workers = get_cpu_count();
+        const int num_workers = MAX_THREADS - 1;
 
         if (check_pid_file(opts) != EXIT_SUCCESS) {
             return EXIT_FAILURE;
@@ -2130,7 +2011,6 @@ int main_rethinkdb_proxy(int argc, char *argv[]) {
 #endif
 
         serve_info_t serve_info(std::move(joins),
-                                std::move(web_path),
                                 address_ports,
                                 get_optional_option(opts, "--config-file"),
                                 std::vector<std::string>(argv, argv + argc),
@@ -2242,12 +2122,7 @@ int main_rethinkdb_porcelain(int argc, char *argv[]) {
 
         const service_address_ports_t address_ports = get_service_address_ports(opts);
 
-        std::string web_path = get_web_path(opts);
-
-        int num_workers;
-        if (!parse_cores_option(opts, &num_workers)) {
-            return EXIT_FAILURE;
-        }
+        int num_workers = MAX_THREADS - 1;
 
         int max_concurrent_io_requests;
         if (!parse_io_threads_option(opts, &max_concurrent_io_requests)) {
@@ -2314,7 +2189,6 @@ int main_rethinkdb_porcelain(int argc, char *argv[]) {
 #endif
 
         serve_info_t serve_info(std::move(joins),
-                                std::move(web_path),
                                 address_ports,
                                 get_optional_option(opts, "--config-file"),
                                 std::vector<std::string>(argv, argv + argc),

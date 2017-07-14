@@ -21,14 +21,13 @@ RDB_IMPL_SERIALIZABLE_1_SINCE_v2_1(heartbeat_semilattice_metadata_t, heartbeat_t
 RDB_IMPL_SEMILATTICE_JOINABLE_1(heartbeat_semilattice_metadata_t, heartbeat_timeout);
 RDB_IMPL_EQUALITY_COMPARABLE_1(heartbeat_semilattice_metadata_t, heartbeat_timeout);
 
-RDB_IMPL_SERIALIZABLE_9_FOR_CLUSTER(proc_directory_metadata_t,
+RDB_IMPL_SERIALIZABLE_8_FOR_CLUSTER(proc_directory_metadata_t,
     version,
     time_started,
     pid,
     hostname,
     cluster_port,
     reql_port,
-    http_admin_port,
     canonical_addresses,
     argv);
 

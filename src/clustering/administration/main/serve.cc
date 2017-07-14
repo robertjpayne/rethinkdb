@@ -8,7 +8,6 @@
 #include "arch/os_signal.hpp"
 #include "buffer_cache/cache_balancer.hpp"
 #include "clustering/administration/artificial_reql_cluster_interface.hpp"
-#include "clustering/administration/http/server.hpp"
 #include "clustering/administration/issues/local.hpp"
 #include "clustering/administration/jobs/manager.hpp"
 #include "clustering/administration/logs/log_writer.hpp"
@@ -438,13 +437,10 @@ bool do_serve(io_backender_t *io_backender,
                 current_microtime(),
                 getpid(),
                 str_gethostname(),
-                /* Note we'll update `reql_port` and `http_port` later, once final values
+                /* Note we'll update `reql_port` later, once final values
                 are available */
                 static_cast<uint16_t>(connectivity_cluster_run->get_port()),
                 static_cast<uint16_t>(serve_info.ports.reql_port),
-                serve_info.ports.http_admin_is_disabled
-                    ? optional<uint16_t>()
-                    : optional<uint16_t>(serve_info.ports.http_port),
                 connectivity_cluster_run->get_canonical_addresses(),
                 serve_info.argv };
             cluster_directory_metadata_t initial_directory(
@@ -574,32 +570,6 @@ bool do_serve(io_backender_t *io_backender,
                 }
 
                 {
-                    /* The `administrative_http_server_manager_t` serves the web UI. */
-                    scoped_ptr_t<administrative_http_server_manager_t> admin_server_ptr;
-                    if (serve_info.ports.http_admin_is_disabled) {
-                        logNTC("Administrative HTTP connections are disabled.\n");
-                    } else {
-                        // TODO: Pardon me what, but is this how we fail here?
-                        guarantee(serve_info.ports.http_port < 65536);
-                        admin_server_ptr.init(
-                            new administrative_http_server_manager_t(
-                                serve_info.ports.local_addresses_http,
-                                serve_info.ports.http_port,
-                                rdb_query_server.get_http_app(),
-                                serve_info.web_assets,
-                                serve_info.tls_configs.web.get()));
-                        logNTC("Listening for administrative HTTP connections on port %d\n",
-                               admin_server_ptr->get_port());
-                        /* If `serve_info.ports.http_port` was zero then the OS assigned
-                        us a port, so we need to update the directory. */
-                        our_root_directory_variable.apply_atomic_op(
-                            [&](cluster_directory_metadata_t *md) -> bool {
-                                *md->proc.http_admin_port = admin_server_ptr->get_port();
-                                return (*md->proc.http_admin_port !=
-                                    serve_info.ports.http_port);
-                            });
-                    }
-
                     std::string addresses_string =
                         serve_info.ports.get_addresses_string(
                             serve_info.ports.local_addresses_cluster);
@@ -612,13 +582,6 @@ bool do_serve(io_backender_t *io_backender,
                             serve_info.ports.local_addresses_driver);
                     logNTC("Listening on driver address%s: %s\n",
                            serve_info.ports.local_addresses_driver.size() == 1 ? "" : "es",
-                           addresses_string.c_str());
-
-                    addresses_string =
-                        serve_info.ports.get_addresses_string(
-                            serve_info.ports.local_addresses_http);
-                    logNTC("Listening on http address%s: %s\n",
-                           serve_info.ports.local_addresses_http.size() == 1 ? "" : "es",
                            addresses_string.c_str());
 
                     if (!serve_info.ports.is_bind_all(serve_info.ports.local_addresses)) {
