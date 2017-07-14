@@ -61,3 +61,4 @@ last_tested_versions
 xcuserdata/
 Pods/
 Rome/
+vendor/
