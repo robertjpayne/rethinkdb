@@ -29,7 +29,7 @@
 // Defines the maximum size of the batch of IO events to process on
 // each loop iteration. A larger number will increase throughput but
 // decrease concurrency
-#define MAX_IO_EVENT_PROCESSING_BATCH_SIZE        50
+#define MAX_IO_EVENT_PROCESSING_BATCH_SIZE        10
 
 // The io batch factor ensures a minimum number of i/o operations
 // which are picked from any specific i/o account consecutively.
@@ -97,7 +97,7 @@
 
 // Maximum number of threads we support
 // TODO: make this dynamic where possible
-#define MAX_THREADS                               128
+#define MAX_THREADS                               4
 
 // Ticks (in milliseconds) the internal timed tasks are performed at
 #define TIMER_TICKS_IN_MS                         5
@@ -136,13 +136,13 @@
 // How many bytes of buffering space we can use per disk when reading the LBA. If it's set
 // too high, then RethinkDB will eat a lot of memory at startup. This is bad because tcmalloc
 // doesn't return memory to the OS. If it's set too low, startup will take a longer time.
-#define LBA_READ_BUFFER_SIZE                      (128 * MEGABYTE)
+#define LBA_READ_BUFFER_SIZE                      (16 * MEGABYTE)
 
 // After the LBA has been read, we reconstruct the in-memory LBA index.
 // For huge tables, this can take some considerable CPU time. We break the reconstruction
 // up into smaller batches, each batch reconstructing up to `LBA_RECONSTRUCTION_BATCH_SIZE`
 // block infos.
-#define LBA_RECONSTRUCTION_BATCH_SIZE             1024
+#define LBA_RECONSTRUCTION_BATCH_SIZE             128
 
 #define COROUTINE_STACK_SIZE                      131072
 

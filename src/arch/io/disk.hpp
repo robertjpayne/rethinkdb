@@ -11,7 +11,7 @@
 #include "perfmon/core.hpp"
 
 // The maximum concurrent IO requests per event queue.. the default value.
-const int DEFAULT_MAX_CONCURRENT_IO_REQUESTS = 64;
+const int DEFAULT_MAX_CONCURRENT_IO_REQUESTS = 16;
 
 // The maximum user-specifiable value how many concurrent I/O requests may be done per event
 // queue.  (A million is a ridiculously high value, but also safely nowhere near INT_MAX.)

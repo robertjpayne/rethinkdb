@@ -29,12 +29,12 @@ size_t coro_stack_size = COROUTINE_STACK_SIZE;
 
 // How many unused coroutine stacks to keep around (at most), before they are
 // freed. This value is per thread.
-const size_t COROUTINE_FREE_LIST_SIZE = 64;
+const size_t COROUTINE_FREE_LIST_SIZE = 8;
 
 // In debug mode, we print a warning if more than this many coroutines have been
 // allocated on one thread.
 #ifndef NDEBUG
-const int COROS_PER_THREAD_WARN_LEVEL = 10000;
+const int COROS_PER_THREAD_WARN_LEVEL = 1000;
 #endif
 
 // The maximum (global) number of stack-protected coroutine stacks.
@@ -45,9 +45,9 @@ const int COROS_PER_THREAD_WARN_LEVEL = 10000;
 // Exception: debug-mode, where we use a smaller value to exercise the code path more
 // often.
 #ifdef NDEBUG
-const size_t MAX_PROTECTED_COROS = 16384;
+const size_t MAX_PROTECTED_COROS = 32;
 #else
-const size_t MAX_PROTECTED_COROS = 128;
+const size_t MAX_PROTECTED_COROS = 32;
 #endif
 
 

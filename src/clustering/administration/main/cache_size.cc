@@ -353,7 +353,7 @@ uint64_t get_default_total_cache_size() {
     const int64_t signed_res =
         std::min<int64_t>(available_mem - GIGABYTE, get_max_total_cache_size()) /
         DEFAULT_MAX_CACHE_RATIO;
-    const uint64_t res = std::max<int64_t>(signed_res, 100 * MEGABYTE);
+    const uint64_t res = std::max<int64_t>(signed_res, 16 * MEGABYTE);
     return res;
 }
 
@@ -366,7 +366,7 @@ void log_warnings_for_cache_size(uint64_t bytes) {
                "overhead (available memory: %" PRIu64 " MB).",
                available_memory / static_cast<uint64_t>(MEGABYTE));
     }
-    if (bytes <= 100 * MEGABYTE) {
+    if (bytes <= 16 * MEGABYTE) {
         logWRN("Cache size is very low and may impact performance.");
     }
 }

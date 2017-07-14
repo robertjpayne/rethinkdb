@@ -16,7 +16,7 @@
 #include "serializer/log/log_serializer.hpp"
 #include "serializer/merger.hpp"
 
-const uint64_t METADATA_CACHE_SIZE = 32 * MEGABYTE;
+const uint64_t METADATA_CACHE_SIZE = 4 * MEGABYTE;
 
 ATTR_PACKED(struct metadata_disk_superblock_t {
     block_magic_t magic;
