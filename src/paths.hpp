@@ -19,7 +19,7 @@ public:
     explicit base_path_t(const std::string& path);
     const std::string& path() const;
 
-    // Make this base_path_t into an absolute path (useful for daemonizing)
+    // Make this base_path_t into an absolute path
     // This can only be done if the path already exists, which is why we don't do it at construction
     void make_absolute();
 private:

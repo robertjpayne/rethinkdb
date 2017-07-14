@@ -85,56 +85,6 @@ MUST_USE bool numwrite(const char *path, int number) {
     return true;
 }
 
-static std::string pid_file;
-
-void remove_pid_file() {
-    if (!pid_file.empty()) {
-        remove(pid_file.c_str());
-        pid_file.clear();
-    }
-}
-
-int check_pid_file(const std::string &pid_filepath) {
-    guarantee(pid_filepath.size() > 0);
-
-    if (access(pid_filepath.c_str(), F_OK) == 0) {
-        logERR("The pid-file specified already exists. This might mean that an instance is already running.");
-        return EXIT_FAILURE;
-    }
-
-    if (access(strdirname(pid_filepath).c_str(), W_OK) == -1) {
-        logERR("Cannot access the pid-file directory.");
-        return EXIT_FAILURE;
-    }
-
-    return EXIT_SUCCESS;
-}
-
-int write_pid_file(const std::string &pid_filepath) {
-    guarantee(pid_filepath.size() > 0);
-
-    // Be very careful about modifying this. It is important that the code that removes the
-    // pid-file only run if the checks here pass. Right now, this is guaranteed by the return on
-    // failure here.
-    if (!pid_file.empty()) {
-        logERR("Attempting to write pid-file twice.");
-        return EXIT_FAILURE;
-    }
-
-    if (check_pid_file(pid_filepath) == EXIT_FAILURE) {
-        return EXIT_FAILURE;
-    }
-
-    if (!numwrite(pid_filepath.c_str(), getpid())) {
-        logERR("Writing to the specified pid-file failed.");
-        return EXIT_FAILURE;
-    }
-    pid_file = pid_filepath;
-    atexit(remove_pid_file);
-
-    return EXIT_SUCCESS;
-}
-
 // Extracts an option that appears either zero or once.  Multiple appearances are not allowed (or
 // expected).
 optional<std::string> get_optional_option(const std::map<std::string, options::values_t> &opts,
@@ -163,192 +113,6 @@ optional<std::string> get_optional_option(const std::map<std::string, options::v
                                                  const std::string &name) {
     std::string source;
     return get_optional_option(opts, name, &source);
-}
-
-#ifndef _WIN32
-// Returns false if the group was not found.  This function replaces a call to
-// getgrnam(3).  That's right, getgrnam_r's interface is such that you have to
-// go through these shenanigans.
-bool get_group_id(const char *name, gid_t *group_id_out) {
-    // On Linux we can use sysconf to learn what the bufsize should be but on OS
-    // X we just have to guess.
-    size_t bufsize = 4096;
-    // I think 128 MB ought to be enough.
-    while (bufsize <= (1 << 17)) {
-        scoped_array_t<char> buf(bufsize);
-
-        struct group g;
-        struct group *result;
-        int res;
-        do {
-            res = getgrnam_r(name, &g, buf.data(), bufsize, &result);
-        } while (res == EINTR);
-
-        if (res == 0) {
-            if (result == nullptr) {
-                return false;
-            } else {
-                *group_id_out = result->gr_gid;
-                return true;
-            }
-        } else if (res == ERANGE) {
-            bufsize *= 2;
-        } else {
-            // Here's what the man page says about error codes of getgrnam_r:
-            // 0 or ENOENT or ESRCH or EBADF or EPERM or ...
-            //        The given name or uid was not found.
-            //
-            // So let's just return false here.  I'm sure EMFILE and ENFILE and
-            // EIO will turn up again somewhere else.
-            return false;
-        }
-    }
-
-    rassert(false, "get_group_id bufsize overflow");
-    return false;
-}
-
-// Returns false if the user was not found.  This function replaces a call to
-// getpwnam(3).  That's right, getpwnam_r's interface is such that you have to
-// go through these shenanigans.
-bool get_user_ids(const char *name, uid_t *user_id_out, gid_t *user_group_id_out) {
-    // On Linux we can use sysconf to learn what the bufsize should be but on OS
-    // X we just have to guess.
-    size_t bufsize = 4096;
-    // I think 128 MB ought to be enough.
-    while (bufsize <= (1 << 17)) {
-        scoped_array_t<char> buf(bufsize);
-
-        struct passwd p;
-        struct passwd *result;
-        int res;
-        do {
-            res = getpwnam_r(name, &p, buf.data(), bufsize, &result);
-        } while (res == EINTR);
-
-        if (res == 0) {
-            if (result == nullptr) {
-                return false;
-            } else {
-                *user_id_out = result->pw_uid;
-                *user_group_id_out = result->pw_gid;
-                return true;
-            }
-        } else if (res == ERANGE) {
-            bufsize *= 2;
-        } else {
-            // Here's what the man page says about error codes of getpwnam_r:
-            // 0 or ENOENT or ESRCH or EBADF or EPERM or ...
-            //        The given name or uid was not found.
-            //
-            // So let's just return false here.  I'm sure EMFILE and ENFILE and
-            // EIO will turn up again somewhere else.
-            //
-            // (Yes, this is the same situation as with getgrnam_r, not some
-            // copy/paste.)
-            return false;
-        }
-    }
-
-    rassert(false, "get_user_ids bufsize overflow");
-    return false;
-}
-
-void get_user_group(const std::map<std::string, options::values_t> &opts,
-                    gid_t *group_id_out, std::string *group_name_out,
-                    uid_t *user_id_out, std::string *user_name_out) {
-    optional<std::string> rungroup = get_optional_option(opts, "--rungroup");
-    optional<std::string> runuser = get_optional_option(opts, "--runuser");
-    group_name_out->clear();
-    user_name_out->clear();
-
-    if (rungroup) {
-        group_name_out->assign(*rungroup);
-        if (!get_group_id(rungroup->c_str(), group_id_out)) {
-            throw std::runtime_error(strprintf("Group '%s' not found: %s",
-                                               rungroup->c_str(),
-                                               errno_string(get_errno()).c_str()).c_str());
-        }
-    } else {
-        *group_id_out = INVALID_GID;
-    }
-
-    if (runuser) {
-        user_name_out->assign(*runuser);
-        gid_t user_group_id;
-        if (!get_user_ids(runuser->c_str(), user_id_out, &user_group_id)) {
-            throw std::runtime_error(strprintf("User '%s' not found: %s",
-                                               runuser->c_str(),
-                                               errno_string(get_errno()).c_str()).c_str());
-        }
-        if (!rungroup) {
-            // No group specified, use the user's group
-            group_name_out->assign(*runuser);
-            *group_id_out = user_group_id;
-        }
-    } else {
-        *user_id_out = INVALID_UID;
-    }
-}
-
-void set_user_group(gid_t group_id, const std::string &group_name,
-                    uid_t user_id, const std::string user_name) {
-    if (group_id != INVALID_GID) {
-        if (setgid(group_id) != 0) {
-            throw std::runtime_error(strprintf("Could not set group to '%s': %s",
-                                               group_name.c_str(),
-                                               errno_string(get_errno()).c_str()).c_str());
-        }
-    }
-
-    if (user_id != INVALID_UID) {
-        if (setuid(user_id) != 0) {
-            throw std::runtime_error(strprintf("Could not set user account to '%s': %s",
-                                               user_name.c_str(),
-                                               errno_string(get_errno()).c_str()).c_str());
-        }
-    }
-}
-
-void get_and_set_user_group(const std::map<std::string, options::values_t> &opts) {
-    std::string group_name, user_name;
-    gid_t group_id;
-    uid_t user_id;
-
-    get_user_group(opts, &group_id, &group_name, &user_id, &user_name);
-    set_user_group(group_id, group_name, user_id, user_name);
-}
-
-void get_and_set_user_group_and_directory(
-        const std::map<std::string, options::values_t> &opts,
-        directory_lock_t *directory_lock) {
-    std::string group_name, user_name;
-    gid_t group_id;
-    uid_t user_id;
-
-    get_user_group(opts, &group_id, &group_name, &user_id, &user_name);
-    directory_lock->change_ownership(group_id, group_name, user_id, user_name);
-    set_user_group(group_id, group_name, user_id, user_name);
-}
-#endif
-
-int check_pid_file(const std::map<std::string, options::values_t> &opts) {
-    optional<std::string> pid_filepath = get_optional_option(opts, "--pid-file");
-    if (!pid_filepath || pid_filepath->empty()) {
-        return EXIT_SUCCESS;
-    }
-
-    return check_pid_file(*pid_filepath);
-}
-
-// Maybe writes a pid file, using the --pid-file option, if it's present.
-int write_pid_file(const std::map<std::string, options::values_t> &opts) {
-    optional<std::string> pid_filepath = get_optional_option(opts, "--pid-file");
-    if (!pid_filepath || pid_filepath->empty()) {
-        return EXIT_SUCCESS;
-    }
-
-    return write_pid_file(*pid_filepath);
 }
 
 // Extracts an option that must appear exactly once.  (This is often used for optional arguments
@@ -1494,30 +1258,6 @@ options::help_section_t get_network_options(const bool join_required, std::vecto
     return help;
 }
 
-options::help_section_t get_service_options(std::vector<options::option_t> *options_out) {
-    options::help_section_t help("Service options");
-    options_out->push_back(options::option_t(options::names_t("--pid-file"),
-                                             options::OPTIONAL));
-    help.add("--pid-file path", "a file in which to write the process id when the process is running");
-    options_out->push_back(options::option_t(options::names_t("--daemon"),
-                                             options::OPTIONAL_NO_PARAMETER));
-    help.add("--daemon", "daemonize this rethinkdb process");
-    return help;
-}
-
-options::help_section_t get_setuser_options(std::vector<options::option_t> *options_out) {
-    options::help_section_t help("Set User/Group options");
-#ifndef _WIN32
-    options_out->push_back(options::option_t(options::names_t("--runuser"),
-                                             options::OPTIONAL));
-    help.add("--runuser user", "run as the specified user");
-    options_out->push_back(options::option_t(options::names_t("--rungroup"),
-                                             options::OPTIONAL));
-    help.add("--rungroup group", "run with the specified group");
-#endif
-    return help;
-}
-
 #ifdef ENABLE_TLS
 options::help_section_t get_tls_options(std::vector<options::option_t> *options_out) {
     options::help_section_t help("TLS options");
@@ -1600,7 +1340,6 @@ void get_rethinkdb_create_options(std::vector<options::help_section_t> *help_out
     help_out->push_back(get_file_options(options_out));
     help_out->push_back(get_server_options(options_out));
     help_out->push_back(get_auth_options(options_out));
-    help_out->push_back(get_setuser_options(options_out));
     help_out->push_back(get_help_options(options_out));
     help_out->push_back(get_log_options(options_out));
     help_out->push_back(get_config_file_options(options_out));
@@ -1614,8 +1353,6 @@ void get_rethinkdb_serve_options(std::vector<options::help_section_t> *help_out,
     help_out->push_back(get_tls_options(options_out));
 #endif
     help_out->push_back(get_auth_options(options_out));
-    help_out->push_back(get_service_options(options_out));
-    help_out->push_back(get_setuser_options(options_out));
     help_out->push_back(get_help_options(options_out));
     help_out->push_back(get_log_options(options_out));
     help_out->push_back(get_config_file_options(options_out));
@@ -1628,8 +1365,6 @@ void get_rethinkdb_proxy_options(std::vector<options::help_section_t> *help_out,
     help_out->push_back(get_tls_options(options_out));
 #endif
     help_out->push_back(get_auth_options(options_out));
-    help_out->push_back(get_service_options(options_out));
-    help_out->push_back(get_setuser_options(options_out));
     help_out->push_back(get_help_options(options_out));
     help_out->push_back(get_log_options(options_out));
     help_out->push_back(get_config_file_options(options_out));
@@ -1644,8 +1379,6 @@ void get_rethinkdb_porcelain_options(std::vector<options::help_section_t> *help_
     help_out->push_back(get_tls_options(options_out));
 #endif
     help_out->push_back(get_auth_options(options_out));
-    help_out->push_back(get_service_options(options_out));
-    help_out->push_back(get_setuser_options(options_out));
     help_out->push_back(get_help_options(options_out));
     help_out->push_back(get_log_options(options_out));
     help_out->push_back(get_config_file_options(options_out));
@@ -1763,10 +1496,6 @@ int main_rethinkdb_create(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
 
-#ifndef _WIN32
-        get_and_set_user_group_and_directory(opts, &data_directory_lock);
-#endif
-
         initialize_logfile(opts, base_path);
 
         recreate_temporary_directory(base_path);
@@ -1803,46 +1532,6 @@ int main_rethinkdb_create(int argc, char *argv[]) {
     return EXIT_FAILURE;
 }
 
-bool maybe_daemonize(const std::map<std::string, options::values_t> &opts) {
-    if (exists_option(opts, "--daemon")) {
-#ifdef _WIN32
-        // TODO WINDOWS
-        fail_due_to_user_error("--daemon not implemented on windows");
-#else
-        pid_t pid = fork();
-        if (pid < 0) {
-            throw std::runtime_error(strprintf("Failed to fork daemon: %s\n", errno_string(get_errno()).c_str()).c_str());
-        }
-
-        if (pid > 0) {
-            return false;
-        }
-
-        umask(0);
-
-        pid_t sid = setsid();
-        if (sid == 0) {
-            throw std::runtime_error(strprintf("Failed to create daemon session: %s\n", errno_string(get_errno()).c_str()).c_str());
-        }
-
-        if (chdir("/") < 0) {
-            throw std::runtime_error(strprintf("Failed to change directory: %s\n", errno_string(get_errno()).c_str()).c_str());
-        }
-
-        if (freopen("/dev/null", "r", stdin) == nullptr) {
-            throw std::runtime_error(strprintf("Failed to redirect stdin for daemon: %s\n", errno_string(get_errno()).c_str()).c_str());
-        }
-        if (freopen("/dev/null", "w", stdout) == nullptr) {
-            throw std::runtime_error(strprintf("Failed to redirect stdin for daemon: %s\n", errno_string(get_errno()).c_str()).c_str());
-        }
-        if (freopen("/dev/null", "w", stderr) == nullptr) {
-            throw std::runtime_error(strprintf("Failed to redirect stderr for daemon: %s\n", errno_string(get_errno()).c_str()).c_str());
-        }
-#endif
-    }
-    return true;
-}
-
 int main_rethinkdb_serve(int argc, char *argv[]) {
     std::vector<options::option_t> options;
     std::vector<options::help_section_t> help;
@@ -1856,10 +1545,6 @@ int main_rethinkdb_serve(int argc, char *argv[]) {
         }
 
         options::verify_option_counts(options, opts);
-
-#ifndef _WIN32
-        get_and_set_user_group(opts);
-#endif
 
         base_path_t base_path(get_single_option(opts, "--directory"));
 
@@ -1892,19 +1577,6 @@ int main_rethinkdb_serve(int argc, char *argv[]) {
         initialize_logfile(opts, base_path);
 
         recreate_temporary_directory(base_path);
-
-        if (check_pid_file(opts) != EXIT_SUCCESS) {
-            return EXIT_FAILURE;
-        }
-
-        if (!maybe_daemonize(opts)) {
-            // This is the parent process of the daemon, just exit
-            return EXIT_SUCCESS;
-        }
-
-        if (write_pid_file(opts) != EXIT_SUCCESS) {
-            return EXIT_FAILURE;
-        }
 
         tls_configs_t tls_configs;
 #ifdef ENABLE_TLS
@@ -1980,28 +1652,11 @@ int main_rethinkdb_proxy(int argc, char *argv[]) {
         optional<int> node_reconnect_timeout_secs =
             parse_node_reconnect_timeout_secs_option(opts);
 
-#ifndef _WIN32
-        get_and_set_user_group(opts);
-#endif
-
         // Default to putting the log file in the current working directory
         base_path_t base_path(".");
         initialize_logfile(opts, base_path);
 
         const int num_workers = MAX_THREADS - 1;
-
-        if (check_pid_file(opts) != EXIT_SUCCESS) {
-            return EXIT_FAILURE;
-        }
-
-        if (!maybe_daemonize(opts)) {
-            // This is the parent process of the daemon, just exit
-            return EXIT_SUCCESS;
-        }
-
-        if (write_pid_file(opts) != EXIT_SUCCESS) {
-            return EXIT_FAILURE;
-        }
 
         tls_configs_t tls_configs;
 #ifdef ENABLE_TLS
@@ -2139,14 +1794,6 @@ int main_rethinkdb_porcelain(int argc, char *argv[]) {
         bool is_new_directory = false;
         directory_lock_t data_directory_lock(base_path, true, &is_new_directory);
 
-#ifndef _WIN32
-        if (is_new_directory) {
-            get_and_set_user_group_and_directory(opts, &data_directory_lock);
-        } else {
-            get_and_set_user_group(opts);
-        }
-#endif
-
         base_path.make_absolute();
         initialize_logfile(opts, base_path);
 
@@ -2164,22 +1811,6 @@ int main_rethinkdb_porcelain(int argc, char *argv[]) {
 
         optional<optional<uint64_t> > total_cache_size =
             parse_total_cache_size_option(opts);
-
-        if (check_pid_file(opts) != EXIT_SUCCESS) {
-            return EXIT_FAILURE;
-        }
-
-        if (!maybe_daemonize(opts)) {
-            // This is the parent process of the daemon, just exit
-            // Make sure the parent process doesn't remove the directory,
-            //  the child process will handle it from here
-            data_directory_lock.directory_initialized();
-            return EXIT_SUCCESS;
-        }
-
-        if (write_pid_file(opts) != EXIT_SUCCESS) {
-            return EXIT_FAILURE;
-        }
 
         tls_configs_t tls_configs;
 #ifdef ENABLE_TLS
