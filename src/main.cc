@@ -12,8 +12,11 @@
 #include "config/args.hpp"
 #include "extproc/extproc_spawner.hpp"
 
-int rethinkdb_main(int argc, char *argv[]) {
+extern "C" {
+    int rethinkdb_main(int argc, char *argv[]);
+}
 
+int rethinkdb_main(int argc, char *argv[]) {
     startup_shutdown_t startup_shutdown;
     crypto::initialization_guard_t crypto_initialization_guard;
 
@@ -27,10 +30,9 @@ int rethinkdb_main(int argc, char *argv[]) {
     subcommands_that_look_like_flags.insert("--help");
     subcommands_that_look_like_flags.insert("-h");
 
-    if (argc == 1 || (argv[1][0] == '-' && subcommands_that_look_like_flags.count(argv[1]) == 0)) {
+    if (argc == 1 || (argv && argv[1][0] == '-' && subcommands_that_look_like_flags.count(argv[1]) == 0)) {
         return main_rethinkdb_porcelain(argc, argv);
-
-    } else {
+    } else if(argv) {
         std::string subcommand = argv[1];
 
         if (subcommand == "create") {
