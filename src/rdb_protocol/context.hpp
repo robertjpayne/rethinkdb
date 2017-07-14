@@ -44,7 +44,6 @@ ARCHIVE_PRIM_MAKE_RANGED_SERIALIZABLE(
 
 class auth_semilattice_metadata_t;
 class ellipsoid_spec_t;
-class extproc_pool_t;
 class name_string_t;
 class namespace_interface_t;
 template <class> class cross_thread_watchable_variable_t;
@@ -455,29 +454,23 @@ public:
     // Used by unit tests.
     rdb_context_t();
     // Also used by unit tests.
-    rdb_context_t(extproc_pool_t *_extproc_pool,
-                  reql_cluster_interface_t *_cluster_interface,
+    rdb_context_t(reql_cluster_interface_t *_cluster_interface,
                   std::shared_ptr<semilattice_read_view_t<auth_semilattice_metadata_t>>
                       auth_semilattice_view);
 
     // The "real" constructor used outside of unit tests.
     rdb_context_t(
-        extproc_pool_t *_extproc_pool,
         mailbox_manager_t *_mailbox_manager,
         reql_cluster_interface_t *_cluster_interface,
         std::shared_ptr<semilattice_read_view_t<auth_semilattice_metadata_t>>
             auth_semilattice_view,
-        perfmon_collection_t *global_stats,
-        const std::string &_reql_http_proxy);
+        perfmon_collection_t *global_stats);
 
     ~rdb_context_t();
 
-    extproc_pool_t *extproc_pool;
     reql_cluster_interface_t *cluster_interface;
 
     mailbox_manager_t *manager;
-
-    const std::string reql_http_proxy;
 
     class stats_t {
     public:

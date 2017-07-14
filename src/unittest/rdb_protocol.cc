@@ -9,8 +9,6 @@
 #include "clustering/administration/artificial_reql_cluster_interface.hpp"
 #include "clustering/administration/metadata.hpp"
 #include "clustering/administration/tables/name_resolver.hpp"
-#include "extproc/extproc_pool.hpp"
-#include "extproc/extproc_spawner.hpp"
 #include "rdb_protocol/changefeed.hpp"
 #include "rdb_protocol/datum_stream/vector.hpp"
 #include "rdb_protocol/minidriver.hpp"
@@ -74,9 +72,8 @@ void run_with_namespace_interface(
         serializers[i].init(new merger_serializer_t(std::move(log_ser), 1));
     }
 
-    extproc_pool_t extproc_pool(2);
     dummy_semilattice_controller_t<auth_semilattice_metadata_t> auth_manager;
-    rdb_context_t ctx(&extproc_pool, nullptr, auth_manager.get_view());
+    rdb_context_t ctx(nullptr, auth_manager.get_view());
 
     for (int rep = 0; rep < num_restarts; ++rep) {
         const bool do_create = rep == 0;
@@ -885,9 +882,8 @@ TPTEST(RDBProtocol, ArtificialChangefeeds) {
     using ql::changefeed::keyspec_t;
     using ql::changefeed::msg_t;
 
-    extproc_pool_t extproc_pool(2);
     dummy_semilattice_controller_t<auth_semilattice_metadata_t> auth_manager;
-    rdb_context_t rdb_context(&extproc_pool, nullptr, auth_manager.get_view());
+    rdb_context_t rdb_context(nullptr, auth_manager.get_view());
     artificial_reql_cluster_interface_t artificial_reql_cluster_interface(
         auth_manager.get_view(),
         &rdb_context);

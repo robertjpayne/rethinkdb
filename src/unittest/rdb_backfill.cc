@@ -9,8 +9,6 @@
 #include "clustering/immediate_consistency/remote_replicator_client.hpp"
 #include "clustering/immediate_consistency/remote_replicator_server.hpp"
 #include "clustering/table_manager/backfill_progress_tracker.hpp"
-#include "extproc/extproc_pool.hpp"
-#include "extproc/extproc_spawner.hpp"
 #include "rapidjson/document.h"
 #include "rdb_protocol/minidriver.hpp"
 #include "rdb_protocol/env.hpp"
@@ -218,9 +216,8 @@ void run_backfill_test(const backfill_test_config_t &cfg) {
     order_source_t order_source;
     simple_mailbox_cluster_t cluster;
     io_backender_t io_backender(file_direct_io_mode_t::buffered_desired);
-    extproc_pool_t extproc_pool(2);
     dummy_semilattice_controller_t<auth_semilattice_metadata_t> auth_manager;
-    rdb_context_t ctx(&extproc_pool, nullptr, auth_manager.get_view());
+    rdb_context_t ctx(nullptr, auth_manager.get_view());
     cond_t non_interruptor;
 
     in_memory_branch_history_manager_t bhm;

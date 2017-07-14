@@ -17,8 +17,6 @@
 #include "clustering/administration/auth/permission_error.hpp"
 #include "concurrency/cross_thread_watchable.hpp"
 #include "concurrency/watchable.hpp"
-#include "extproc/extproc_pool.hpp"
-#include "extproc/extproc_spawner.hpp"
 #include "rdb_protocol/env.hpp"
 #include "rpc/directory/read_manager.hpp"
 #include "rpc/directory/write_manager.hpp"
@@ -358,7 +356,6 @@ public:
                     *configs_and_statuses_out);
 
     private:
-        extproc_pool_t extproc_pool;
         dummy_semilattice_controller_t<auth_semilattice_metadata_t> auth_manager;
         rdb_context_t rdb_ctx;
         std::map<name_string_t, database_id_t> databases;

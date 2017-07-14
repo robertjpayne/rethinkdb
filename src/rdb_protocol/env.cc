@@ -35,18 +35,6 @@ reql_cluster_interface_t *env_t::reql_cluster_interface() {
     return rdb_ctx_->cluster_interface;
 }
 
-std::string env_t::get_reql_http_proxy() {
-    r_sanity_check(rdb_ctx_ != NULL);
-    return rdb_ctx_->reql_http_proxy;
-}
-
-extproc_pool_t *env_t::get_extproc_pool() {
-    assert_thread();
-    r_sanity_check(rdb_ctx_ != NULL);
-    r_sanity_check(rdb_ctx_->extproc_pool != NULL);
-    return rdb_ctx_->extproc_pool;
-}
-
 scoped_ptr_t<profile::trace_t> maybe_make_profile_trace(profile_bool_t profile) {
     return profile == profile_bool_t::PROFILE
         ? make_scoped<profile::trace_t>()

@@ -22,8 +22,6 @@
 #include "rdb_protocol/var_types.hpp"
 #include "rdb_protocol/wire_func.hpp"
 
-class extproc_pool_t;
-
 namespace re2 {
 class RE2;
 }
@@ -67,8 +65,6 @@ public:
 
     // Will yield after EVALS_BEFORE_YIELD calls
     void maybe_yield();
-
-    extproc_pool_t *get_extproc_pool();
 
     reql_cluster_interface_t *reql_cluster_interface();
 

@@ -44,14 +44,12 @@
 #include "arch/runtime/starter.hpp"
 #include "arch/filesystem.hpp"
 
-#include "extproc/extproc_spawner.hpp"
 #include "clustering/administration/main/cache_size.hpp"
 #include "clustering/administration/main/names.hpp"
 #include "clustering/administration/main/options.hpp"
 #include "clustering/administration/main/ports.hpp"
 #include "clustering/administration/main/serve.hpp"
 #include "clustering/administration/main/directory_lock.hpp"
-#include "clustering/administration/main/version_check.hpp"
 #include "clustering/administration/main/windows_service.hpp"
 #include "clustering/administration/metadata.hpp"
 #include "clustering/administration/logs/log_writer.hpp"
@@ -1492,58 +1490,6 @@ std::string parse_initial_password_option(
     }
 }
 
-std::string get_reql_http_proxy_option(const std::map<std::string, options::values_t> &opts) {
-    std::string source;
-    optional<std::string> proxy = get_optional_option(opts, "--reql-http-proxy", &source);
-    if (!proxy.has_value()) {
-        return std::string();
-    }
-
-    // We verify the correct format here, as we won't be configuring libcurl until later,
-    // in the extprocs.  At the moment, we do not support specifying IPv6 addresses.
-    //
-    // protocol = proxy protocol recognized by libcurl: (http, socks4, socks4a, socks5, socks5h)
-    // host = hostname or ip address
-    // port = integer in range [0-65535]
-    // [protocol://]host[:port]
-    //
-    // The chunks in the regex used to parse and verify the format are:
-    //   protocol - (?:([A-z][A-z0-9+-.]*)(?:://))? - captures the protocol, adhering to
-    //     RFC 3986, discarding the '://' from the end
-    //   host - ([A-z0-9.-]+) - captures the hostname or ip address, consisting of letters,
-    //     numbers, dashes, and dots
-    //   port - (?::(\d+))? - captures the numeric port, discarding the preceding ':'
-    RE2 re2_parser("(?:([A-z][A-z0-9+-.]*)(?:://))?([A-z0-9_.-]+)(?::(\\d+))?",
-                   RE2::Quiet);
-    std::string protocol, host, port_str;
-    if (!RE2::FullMatch(proxy.get(), re2_parser, &protocol, &host, &port_str)) {
-        throw std::runtime_error(strprintf("--reql-http-proxy format unrecognized, "
-                                           "expected [protocol://]host[:port]: %s",
-                                           proxy.get().c_str()));
-    }
-
-    if (!protocol.empty() &&
-        protocol != "http" &&
-        protocol != "socks4" &&
-        protocol != "socks4a" &&
-        protocol != "socks5" &&
-        protocol != "socks5h") {
-        throw std::runtime_error(strprintf("--reql-http-proxy protocol unrecognized (%s), "
-                                           "must be one of http, socks4, socks4a, socks5, "
-                                           "and socks5h", protocol.c_str()));
-    }
-
-    if (!port_str.empty()) {
-        int port = atoi(port_str.c_str());
-        if (port_str.length() > 5 || port <= 0 || port > MAX_PORT) {
-            throw std::runtime_error(strprintf("--reql-http-proxy port (%s) is not in "
-                                               "the valid range (0-65535)",
-                                               port_str.c_str()));
-        }
-    }
-    return proxy.get();
-}
-
 options::help_section_t get_web_options(std::vector<options::option_t> *options_out) {
     options::help_section_t help("Web options");
     options_out->push_back(options::option_t(options::names_t("--web-static-directory"),
@@ -1602,10 +1548,6 @@ options::help_section_t get_network_options(const bool join_required, std::vecto
     options_out->push_back(options::option_t(options::names_t("--join", "-j"),
                                              join_required ? options::MANDATORY_REPEAT : options::OPTIONAL_REPEAT));
     help.add("-j [ --join ] host[:port]", "host and port of a rethinkdb server to connect to");
-
-    options_out->push_back(options::option_t(options::names_t("--reql-http-proxy"),
-                                             options::OPTIONAL));
-    help.add("--reql-http-proxy [protocol://]host[:port]", "HTTP proxy to use for performing `r.http(...)` queries, default port is 1080");
 
     options_out->push_back(options::option_t(options::names_t("--canonical-address"),
                                              options::OPTIONAL_REPEAT));
@@ -1887,12 +1829,6 @@ MUST_USE bool parse_io_threads_option(const std::map<std::string, options::value
     return true;
 }
 
-update_check_t parse_update_checking_option(const std::map<std::string, options::values_t> &opts) {
-    return exists_option(opts, "--no-update-check")
-        ? update_check_t::do_not_perform
-        : update_check_t::perform;
-}
-
 file_direct_io_mode_t parse_direct_io_mode_option(const std::map<std::string, options::values_t> &opts) {
     return exists_option(opts, "--direct-io") ?
         file_direct_io_mode_t::direct_desired :
@@ -2057,8 +1993,6 @@ int main_rethinkdb_serve(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
 
-        update_check_t do_update_checking = parse_update_checking_option(opts);
-
         optional<optional<uint64_t> > total_cache_size =
             parse_total_cache_size_option(opts);
 
@@ -2089,8 +2023,6 @@ int main_rethinkdb_serve(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
 
-        extproc_spawner_t extproc_spawner;
-
         tls_configs_t tls_configs;
 #ifdef ENABLE_TLS
         if (!configure_tls(opts, &tls_configs)) {
@@ -2099,9 +2031,7 @@ int main_rethinkdb_serve(int argc, char *argv[]) {
 #endif
 
         serve_info_t serve_info(std::move(joins),
-                                get_reql_http_proxy_option(opts),
                                 std::move(web_path),
-                                do_update_checking,
                                 address_ports,
                                 get_optional_option(opts, "--config-file"),
                                 std::vector<std::string>(argv, argv + argc),
@@ -2192,8 +2122,6 @@ int main_rethinkdb_proxy(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
 
-        extproc_spawner_t extproc_spawner;
-
         tls_configs_t tls_configs;
 #ifdef ENABLE_TLS
         if (!configure_tls(opts, &tls_configs)) {
@@ -2202,9 +2130,7 @@ int main_rethinkdb_proxy(int argc, char *argv[]) {
 #endif
 
         serve_info_t serve_info(std::move(joins),
-                                get_reql_http_proxy_option(opts),
                                 std::move(web_path),
-                                update_check_t::do_not_perform,
                                 address_ports,
                                 get_optional_option(opts, "--config-file"),
                                 std::vector<std::string>(argv, argv + argc),
@@ -2328,8 +2254,6 @@ int main_rethinkdb_porcelain(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
 
-        update_check_t do_update_checking = parse_update_checking_option(opts);
-
         optional<int> join_delay_secs = parse_join_delay_secs_option(opts);
         optional<int> node_reconnect_timeout_secs =
             parse_node_reconnect_timeout_secs_option(opts);
@@ -2382,8 +2306,6 @@ int main_rethinkdb_porcelain(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
 
-        extproc_spawner_t extproc_spawner;
-
         tls_configs_t tls_configs;
 #ifdef ENABLE_TLS
         if (!configure_tls(opts, &tls_configs)) {
@@ -2392,9 +2314,7 @@ int main_rethinkdb_porcelain(int argc, char *argv[]) {
 #endif
 
         serve_info_t serve_info(std::move(joins),
-                                get_reql_http_proxy_option(opts),
                                 std::move(web_path),
-                                do_update_checking,
                                 address_ports,
                                 get_optional_option(opts, "--config-file"),
                                 std::vector<std::string>(argv, argv + argc),

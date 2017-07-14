@@ -164,10 +164,6 @@ counted_t<term_t> make_polygon_sub_term(
 counted_t<term_t> make_uuid_term(
     compile_env_t *env, const raw_term_t &term);
 
-// http.cc
-counted_t<term_t> make_http_term(
-    compile_env_t *env, const raw_term_t &term);
-
 // json.cc
 counted_t<term_t> make_json_term(
     compile_env_t *env, const raw_term_t &term);

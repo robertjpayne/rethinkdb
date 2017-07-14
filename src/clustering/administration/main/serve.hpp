@@ -10,7 +10,6 @@
 
 #include "clustering/administration/metadata.hpp"
 #include "clustering/administration/persist/file.hpp"
-#include "clustering/administration/main/version_check.hpp"
 #include "arch/address.hpp"
 #include "arch/io/openssl.hpp"
 
@@ -112,9 +111,7 @@ peer_address_set_t look_up_peers_addresses(const std::vector<host_and_port_t> &n
 class serve_info_t {
 public:
     serve_info_t(std::vector<host_and_port_t> &&_joins,
-                 std::string &&_reql_http_proxy,
                  std::string &&_web_assets,
-                 update_check_t _do_version_checking,
                  service_address_ports_t _ports,
                  optional<std::string> _config_file,
                  std::vector<std::string> &&_argv,
@@ -122,9 +119,7 @@ public:
                  const int _node_reconnect_timeout_secs,
                  tls_configs_t _tls_configs) :
         joins(std::move(_joins)),
-        reql_http_proxy(std::move(_reql_http_proxy)),
         web_assets(std::move(_web_assets)),
-        do_version_checking(_do_version_checking),
         ports(_ports),
         config_file(_config_file),
         argv(std::move(_argv)),
@@ -140,9 +135,7 @@ public:
 
     const std::vector<host_and_port_t> joins;
     peer_address_set_t peers;
-    std::string reql_http_proxy;
     std::string web_assets;
-    update_check_t do_version_checking;
     service_address_ports_t ports;
     optional<std::string> config_file;
     /* The original arguments, so we can display them in `server_status`. All the

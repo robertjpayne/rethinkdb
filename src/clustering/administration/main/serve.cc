@@ -16,7 +16,6 @@
 #include "clustering/administration/main/ports.hpp"
 #include "clustering/administration/main/memory_checker.hpp"
 #include "clustering/administration/main/watchable_fields.hpp"
-#include "clustering/administration/main/version_check.hpp"
 #include "clustering/administration/metadata.hpp"
 #include "clustering/administration/perfmon_collection_repo.hpp"
 #include "clustering/administration/persist/file_keys.hpp"
@@ -33,7 +32,6 @@
 #include "containers/incremental_lenses.hpp"
 #include "containers/lifetime.hpp"
 #include "containers/optional.hpp"
-#include "extproc/extproc_pool.hpp"
 #include "rdb_protocol/query_server.hpp"
 #include "rpc/connectivity/cluster.hpp"
 #include "rpc/directory/map_read_manager.hpp"
@@ -111,11 +109,6 @@ bool do_serve(io_backender_t *io_backender,
     std::string uname = run_uname("ms");
 #endif
     try {
-        /* `extproc_pool` spawns several subprocesses that can be used to run tasks that
-        we don't want to run in the main RethinkDB process, such as Javascript
-        evaluations. */
-        extproc_pool_t extproc_pool(get_num_threads());
-
         /* `thread_pool_log_writer_t` automatically registers itself. While it exists,
         log messages will be written using the event loop instead of blocking. */
         thread_pool_log_writer_t log_writer;
@@ -278,12 +271,10 @@ bool do_serve(io_backender_t *io_backender,
         /* We thread the `rdb_context_t` through every function that evaluates ReQL
         terms. It contains pointers to all the things that the ReQL term evaluation code
         needs. */
-        rdb_context_t rdb_ctx(&extproc_pool,
-                              &mailbox_manager,
+        rdb_context_t rdb_ctx(&mailbox_manager,
                               nullptr,   /* we'll fill this in later */
                               semilattice_manager_auth.get_root_view(),
-                              &get_global_perfmon_collection(),
-                              serve_info.reql_http_proxy);
+                              &get_global_perfmon_collection());
         {
             /* Extract a subview of the directory with all the table meta manager
             business cards. */
@@ -649,15 +640,6 @@ bool do_serve(io_backender_t *io_backender,
                                server_id.print().c_str());
                     } else {
                         logNTC("Proxy ready, %s", server_id.print().c_str());
-                    }
-
-                    /* `checker` periodically phones home to RethinkDB HQ to check if
-                    there are later versions of RethinkDB available. */
-                    scoped_ptr_t<version_checker_t> checker;
-                    if (i_am_a_server
-                        && serve_info.do_version_checking == update_check_t::perform) {
-                        checker.init(new version_checker_t(
-                            &rdb_ctx, uname, &table_meta_client, &server_config_client));
                     }
 
                     /* This is the end of the startup process. `stop_cond` will be pulsed

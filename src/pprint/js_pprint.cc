@@ -586,9 +586,6 @@ private:
 
     void term_name(const ql::raw_term_t &t) {
         switch (static_cast<int>(t.type())) {
-        case Term::JAVASCRIPT:
-            stream.add(js);
-            break;
         default:
             push_text(to_js_name(t));
             break;
@@ -609,7 +606,6 @@ private:
         switch (static_cast<int>(t.type())) {
         case Term::ERROR:
         case Term::UUID:
-        case Term::HTTP:
         case Term::DB:
         case Term::EQ:
         case Term::NE:
@@ -667,7 +663,6 @@ private:
         case Term::MAKE_ARRAY:
         case Term::MAKE_OBJ:
         case Term::ARGS:
-        case Term::JAVASCRIPT:
         case Term::ASC:
         case Term::DESC:
         case Term::MINVAL:
@@ -899,8 +894,6 @@ static void pprint_update_reminder() {
     case Term::MAKE_OBJ:
     case Term::BINARY:
     case Term::VAR:
-    case Term::JAVASCRIPT:
-    case Term::HTTP:
     case Term::ERROR:
     case Term::IMPLICIT_VAR:
     case Term::RANDOM:

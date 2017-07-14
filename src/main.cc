@@ -10,7 +10,6 @@
 #include "crypto/initialization_guard.hpp"
 #include "utils.hpp"
 #include "config/args.hpp"
-#include "extproc/extproc_spawner.hpp"
 
 extern "C" {
     int rethinkdb_main(int argc, char *argv[]);
@@ -19,10 +18,6 @@ extern "C" {
 int rethinkdb_main(int argc, char *argv[]) {
     startup_shutdown_t startup_shutdown;
     crypto::initialization_guard_t crypto_initialization_guard;
-
-#ifdef _WIN32
-    extproc_maybe_run_worker(argc, argv);
-#endif
 
     std::set<std::string> subcommands_that_look_like_flags;
     subcommands_that_look_like_flags.insert("--version");
