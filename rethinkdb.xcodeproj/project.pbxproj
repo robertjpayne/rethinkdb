@@ -7,9 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		EE354C241EF3F4AB004CB846 /* web_assets.cc in Sources */ = {isa = PBXBuildFile; fileRef = EE35225B1EF3F38A004CB846 /* web_assets.cc */; };
 		EE354C271EF3F557004CB846 /* random.cc in Sources */ = {isa = PBXBuildFile; fileRef = EE354C251EF3F53E004CB846 /* random.cc */; };
-		EE354C2C1EF3F586004CB846 /* ql2.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = EE354C2A1EF3F582004CB846 /* ql2.pb.cc */; };
 		EEE6D2A81EF3CDF6001A08E2 /* activity_logger.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6CDFF1EF3CD80001A08E2 /* activity_logger.cc */; };
 		EEE6D2A91EF3CDF6001A08E2 /* address.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6CE021EF3CD80001A08E2 /* address.cc */; };
 		EEE6D2AA1EF3CDF6001A08E2 /* arch.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6CE041EF3CD80001A08E2 /* arch.cc */; };
@@ -440,11 +438,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		EE35225B1EF3F38A004CB846 /* web_assets.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = web_assets.cc; sourceTree = "<group>"; };
 		EE354C251EF3F53E004CB846 /* random.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = random.cc; sourceTree = "<group>"; };
 		EE354C261EF3F53E004CB846 /* random.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = random.hpp; sourceTree = "<group>"; };
-		EE354C2A1EF3F582004CB846 /* ql2.pb.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ql2.pb.cc; sourceTree = "<group>"; };
-		EE354C2B1EF3F582004CB846 /* ql2.pb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ql2.pb.h; sourceTree = "<group>"; };
 		EE7039BA1EF3CD11004BF657 /* rethinkdb */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rethinkdb; sourceTree = BUILT_PRODUCTS_DIR; };
 		EEE6CDFF1EF3CD80001A08E2 /* activity_logger.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = activity_logger.cc; sourceTree = "<group>"; };
 		EEE6CE001EF3CD80001A08E2 /* activity_logger.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = activity_logger.hpp; sourceTree = "<group>"; };
@@ -1568,44 +1563,9 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		EE3522591EF3F38A004CB846 /* build */ = {
-			isa = PBXGroup;
-			children = (
-				EE354C281EF3F582004CB846 /* proto */,
-				EE35225A1EF3F38A004CB846 /* bundle_assets */,
-			);
-			path = build;
-			sourceTree = "<group>";
-		};
-		EE35225A1EF3F38A004CB846 /* bundle_assets */ = {
-			isa = PBXGroup;
-			children = (
-				EE35225B1EF3F38A004CB846 /* web_assets.cc */,
-			);
-			path = bundle_assets;
-			sourceTree = "<group>";
-		};
-		EE354C281EF3F582004CB846 /* proto */ = {
-			isa = PBXGroup;
-			children = (
-				EE354C291EF3F582004CB846 /* rdb_protocol */,
-			);
-			path = proto;
-			sourceTree = "<group>";
-		};
-		EE354C291EF3F582004CB846 /* rdb_protocol */ = {
-			isa = PBXGroup;
-			children = (
-				EE354C2A1EF3F582004CB846 /* ql2.pb.cc */,
-				EE354C2B1EF3F582004CB846 /* ql2.pb.h */,
-			);
-			path = rdb_protocol;
-			sourceTree = "<group>";
-		};
 		EE7039AF1EF3CCEE004BF657 = {
 			isa = PBXGroup;
 			children = (
-				EE3522591EF3F38A004CB846 /* build */,
 				EEE6CDFD1EF3CD80001A08E2 /* src */,
 				EE7039BB1EF3CD11004BF657 /* Products */,
 				EEE6D4981EF3CFE3001A08E2 /* Frameworks */,
@@ -3530,7 +3490,6 @@
 				EEE6D3EA1EF3CDF6001A08E2 /* varint.cc in Sources */,
 				EEE6D41D1EF3CDF6001A08E2 /* sindex.cc in Sources */,
 				EEE6D3731EF3CDF6001A08E2 /* semaphore.cc in Sources */,
-				EE354C241EF3F4AB004CB846 /* web_assets.cc in Sources */,
 				EEE6D4261EF3CDF6001A08E2 /* val.cc in Sources */,
 				EEE6D2B61EF3CDF6001A08E2 /* io_utils.cc in Sources */,
 				EEE6D4241EF3CDF6001A08E2 /* write_hook.cc in Sources */,
@@ -3688,7 +3647,6 @@
 				EEE6D3AF1EF3CDF6001A08E2 /* backend.cc in Sources */,
 				EEE6D2C21EF3CDF6001A08E2 /* kqueue.cc in Sources */,
 				EEE6D3F41EF3CDF6001A08E2 /* pathspec.cc in Sources */,
-				EE354C2C1EF3F586004CB846 /* ql2.pb.cc in Sources */,
 				EEE6D3E51EF3CDF6001A08E2 /* ascii_ctype.cc in Sources */,
 				EEE6D3121EF3CDF6001A08E2 /* initial_join.cc in Sources */,
 				EEE6D3FC1EF3CDF6001A08E2 /* query_params.cc in Sources */,
