@@ -6,6 +6,20 @@
 	objectVersion = 48;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		EE3973E71F237CC600890217 /* deps */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = EE3973EA1F237CC600890217 /* Build configuration list for PBXAggregateTarget "deps" */;
+			buildPhases = (
+				EE3973EB1F237CCB00890217 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = deps;
+			productName = deps;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		EE354C271EF3F557004CB846 /* random.cc in Sources */ = {isa = PBXBuildFile; fileRef = EE354C251EF3F53E004CB846 /* random.cc */; };
 		EEE6D2A81EF3CDF6001A08E2 /* activity_logger.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6CDFF1EF3CD80001A08E2 /* activity_logger.cc */; };
@@ -3333,6 +3347,9 @@
 			attributes = {
 				LastUpgradeCheck = 0900;
 				TargetAttributes = {
+					EE3973E71F237CC600890217 = {
+						CreatedOnToolsVersion = 9.0;
+					};
 					EE7039B91EF3CD11004BF657 = {
 						CreatedOnToolsVersion = 9.0;
 					};
@@ -3352,9 +3369,26 @@
 			projectRoot = "";
 			targets = (
 				EE7039B91EF3CD11004BF657 /* rethinkdb */,
+				EE3973E71F237CC600890217 /* deps */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		EE3973EB1F237CCB00890217 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd $SRCROOT\n./configure --fetch all\nmake support -j8";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		EE7039B61EF3CD11004BF657 /* Sources */ = {
@@ -3783,6 +3817,20 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		EE3973E81F237CC600890217 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		EE3973E91F237CC600890217 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		EE7039B41EF3CCEE004BF657 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3983,6 +4031,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		EE3973EA1F237CC600890217 /* Build configuration list for PBXAggregateTarget "deps" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EE3973E81F237CC600890217 /* Debug */,
+				EE3973E91F237CC600890217 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		EE7039B31EF3CCEE004BF657 /* Build configuration list for PBXProject "rethinkdb" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
