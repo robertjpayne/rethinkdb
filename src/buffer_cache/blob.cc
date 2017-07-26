@@ -20,7 +20,7 @@
 const int64_t BLOB_TRAVERSAL_CONCURRENCY = 8;
 
 template <class T>
-void clear_and_delete(std::vector<T *> *vec) {
+void clear_and_delete(vector_t<T *> *vec) {
     while (!vec->empty()) {
         T *back = vec->back();
         vec->pop_back();

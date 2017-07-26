@@ -7,7 +7,7 @@
 
 #include <map>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "containers/scoped.hpp"
 
@@ -84,7 +84,7 @@ public:
     std::string print_frames(bool use_addr2line) const;
 private:
     static const int max_frames = 100;
-    std::vector<backtrace_frame_t> frames;
+    vector_t<backtrace_frame_t> frames;
 };
 
 // Stores the backtrace from when it was constructed for later printing.

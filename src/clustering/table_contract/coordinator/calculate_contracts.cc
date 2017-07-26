@@ -328,7 +328,7 @@ contract_t calculate_contract(
         they are. Note that we use the server ID as a secondary sorting key. This mean we
         tend to pick the same server if we run the algorithm twice; this helps to reduce
         unnecessary fragmentation. */
-        std::vector<std::pair<state_timestamp_t, server_id_t> > sorted_candidates;
+        vector_t<std::pair<state_timestamp_t, server_id_t> > sorted_candidates;
         for (const server_id_t &server : new_c.voters) {
             if (acks.count(server) == 1 && acks.at(server).state ==
                     contract_ack_t::state_t::secondary_need_primary) {
@@ -340,7 +340,7 @@ contract_t calculate_contract(
 
         /* Second, determine which servers are eligible to become primary on the basis of
         their data and their visibility to their peers. */
-        std::vector<server_id_t> eligible_candidates;
+        vector_t<server_id_t> eligible_candidates;
         for (size_t i = 0; i < sorted_candidates.size(); ++i) {
             server_id_t server = sorted_candidates[i].second;
             /* If the server is not visible to more than half of its peers, then it is
@@ -543,8 +543,8 @@ void calculate_all_contracts(
         remove_branches_out->insert(pair.first);
     }
 
-    std::vector<region_t> new_contract_region_vector;
-    std::vector<contract_t> new_contract_vector;
+    vector_t<region_t> new_contract_region_vector;
+    vector_t<contract_t> new_contract_vector;
 
     /* We want to break the key-space into sub-regions small enough that the contract,
     table config, and ack versions are all constant across the sub-region. First we

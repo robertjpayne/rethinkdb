@@ -19,19 +19,19 @@ public:
     virtual ~readgen_t() { }
 
     virtual read_t terminal_read(
-        const std::vector<transform_variant_t> &transform,
+        const vector_t<transform_variant_t> &transform,
         const terminal_variant_t &_terminal,
         const batchspec_t &batchspec) const = 0;
     // This has to be on `readgen_t` because we sort differently depending on
     // the kinds of reads we're doing.
-    virtual void sindex_sort(std::vector<rget_item_t> *vec,
+    virtual void sindex_sort(vector_t<rget_item_t> *vec,
                              const batchspec_t &batchspec) const = 0;
 
     virtual read_t next_read(
         const optional<active_ranges_t> &active_ranges,
         const optional<reql_version_t> &reql_version,
         optional<changefeed_stamp_t> stamp,
-        std::vector<transform_variant_t> transform,
+        vector_t<transform_variant_t> transform,
         const batchspec_t &batchspec) const = 0;
 
     virtual key_range_t original_keyrange(reql_version_t rv) const = 0;
@@ -40,7 +40,7 @@ public:
     virtual optional<std::string> sindex_name() const = 0;
 
     virtual changefeed::keyspec_t::range_t get_range_spec(
-        std::vector<transform_variant_t>) const = 0;
+        vector_t<transform_variant_t>) const = 0;
 
     const std::string &get_table_name() const { return table_name; }
     read_mode_t get_read_mode() const { return read_mode; }
@@ -66,7 +66,7 @@ public:
         require_sindexes_t require_sindex_val);
 
     virtual read_t terminal_read(
-        const std::vector<transform_variant_t> &transform,
+        const vector_t<transform_variant_t> &transform,
         const terminal_variant_t &_terminal,
         const batchspec_t &batchspec) const;
 
@@ -74,7 +74,7 @@ public:
         const optional<active_ranges_t> &active_ranges,
         const optional<reql_version_t> &reql_version,
         optional<changefeed_stamp_t> stamp,
-        std::vector<transform_variant_t> transform,
+        vector_t<transform_variant_t> transform,
         const batchspec_t &batchspec) const;
 
 private:
@@ -82,7 +82,7 @@ private:
         const optional<active_ranges_t> &active_ranges,
         const optional<reql_version_t> &reql_version,
         optional<changefeed_stamp_t> stamp,
-        std::vector<transform_variant_t> transforms,
+        vector_t<transform_variant_t> transforms,
         const batchspec_t &batchspec) const = 0;
 
 protected:
@@ -110,9 +110,9 @@ private:
         const optional<active_ranges_t> &active_ranges,
         const optional<reql_version_t> &reql_version,
         optional<changefeed_stamp_t> stamp,
-        std::vector<transform_variant_t> transform,
+        vector_t<transform_variant_t> transform,
         const batchspec_t &batchspec) const;
-    virtual void sindex_sort(std::vector<rget_item_t> *vec,
+    virtual void sindex_sort(vector_t<rget_item_t> *vec,
                              const batchspec_t &batchspec) const;
     virtual key_range_t original_keyrange(reql_version_t rv) const;
     virtual optional<std::string> sindex_name() const;
@@ -120,7 +120,7 @@ private:
         sorting_t sorting, active_ranges_t *active_ranges_inout) const final;
 
     virtual changefeed::keyspec_t::range_t get_range_spec(
-            std::vector<transform_variant_t> transforms) const;
+            vector_t<transform_variant_t> transforms) const;
 
     optional<std::map<store_key_t, uint64_t> > store_keys;
 };
@@ -136,7 +136,7 @@ public:
         sorting_t sorting = sorting_t::UNORDERED,
         require_sindexes_t require_sindex_val = require_sindexes_t::NO);
 
-    virtual void sindex_sort(std::vector<rget_item_t> *vec,
+    virtual void sindex_sort(vector_t<rget_item_t> *vec,
                              const batchspec_t &batchspec) const;
     virtual key_range_t original_keyrange(reql_version_t rv) const;
     virtual optional<std::string> sindex_name() const;
@@ -155,11 +155,11 @@ private:
         const optional<active_ranges_t> &active_ranges,
         const optional<reql_version_t> &reql_version,
         optional<changefeed_stamp_t> stamp,
-        std::vector<transform_variant_t> transform,
+        vector_t<transform_variant_t> transform,
         const batchspec_t &batchspec) const;
 
     virtual changefeed::keyspec_t::range_t get_range_spec(
-        std::vector<transform_variant_t> transforms) const;
+        vector_t<transform_variant_t> transforms) const;
 
     const std::string sindex;
     bool sent_first_read;
@@ -176,7 +176,7 @@ public:
         const datum_t &query_geometry);
 
     virtual read_t terminal_read(
-        const std::vector<transform_variant_t> &transform,
+        const vector_t<transform_variant_t> &transform,
         const terminal_variant_t &_terminal,
         const batchspec_t &batchspec) const;
 
@@ -184,17 +184,17 @@ public:
         const optional<active_ranges_t> &active_ranges,
         const optional<reql_version_t> &reql_version,
         optional<changefeed_stamp_t> stamp,
-        std::vector<transform_variant_t> transform,
+        vector_t<transform_variant_t> transform,
         const batchspec_t &batchspec) const;
 
-    virtual void sindex_sort(std::vector<rget_item_t> *vec,
+    virtual void sindex_sort(vector_t<rget_item_t> *vec,
                              const batchspec_t &batchspec) const;
     virtual key_range_t original_keyrange(reql_version_t rv) const;
     virtual optional<std::string> sindex_name() const;
     void restrict_active_ranges(sorting_t, active_ranges_t *) const final { }
 
     virtual changefeed::keyspec_t::range_t get_range_spec(
-        std::vector<transform_variant_t>) const;
+        vector_t<transform_variant_t>) const;
 
 private:
     intersecting_readgen_t(
@@ -211,7 +211,7 @@ private:
         const optional<active_ranges_t> &active_ranges,
         const optional<reql_version_t> &reql_version,
         optional<changefeed_stamp_t> stamp,
-        std::vector<transform_variant_t> transforms,
+        vector_t<transform_variant_t> transforms,
         const batchspec_t &batchspec) const;
 
     const std::string sindex;

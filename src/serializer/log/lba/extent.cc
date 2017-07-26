@@ -1,7 +1,7 @@
 // Copyright 2010-2014 RethinkDB, all rights reserved.
 #include "serializer/log/lba/extent.hpp"
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "arch/arch.hpp"
 #include "math.hpp"
@@ -15,7 +15,7 @@ struct extent_block_t :
     scoped_device_block_aligned_ptr_t<char> data;
     extent_t *parent;
     size_t offset;
-    std::vector< extent_t::sync_callback_t* > sync_cbs;
+    vector_t< extent_t::sync_callback_t* > sync_cbs;
     bool waiting_for_prev, have_finished_sync, is_last_block;
 
     extent_block_t(extent_t *_parent, size_t _offset)

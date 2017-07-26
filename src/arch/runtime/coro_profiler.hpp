@@ -12,7 +12,7 @@
 #include <map>
 #include <string>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "backtrace.hpp"
 #include "arch/spinlock.hpp"
@@ -98,7 +98,7 @@ private:
     struct per_execution_point_samples_t {
         per_execution_point_samples_t() : num_samples_total(0) { }
         int num_samples_total;
-        std::vector<coro_sample_t> samples;
+        vector_t<coro_sample_t> samples;
     };
     struct per_thread_samples_t {
         per_thread_samples_t() : ticks_at_last_report(get_ticks()) { }
@@ -121,7 +121,7 @@ private:
     struct per_execution_point_collected_report_t {
         per_execution_point_collected_report_t() : num_samples(0) { }
         void compute_stats();
-        std::vector<coro_sample_t> collected_samples;
+        vector_t<coro_sample_t> collected_samples;
         size_t num_samples;
         data_distribution_t time_since_previous;
         data_distribution_t time_since_resume;

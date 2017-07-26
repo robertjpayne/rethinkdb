@@ -352,7 +352,7 @@ scoped_ptr_t<LeafNodeTracker> test_random_out_of_order(
 
     rng_t rng;
 
-    std::vector<store_key_t> key_pool(num_keys);
+    vector_t<store_key_t> key_pool(num_keys);
     for (int i = 0; i < num_keys; ++i) {
         do {
             key_pool[i] = store_key_t(random_letter_string(&rng, 0, 159));
@@ -470,7 +470,7 @@ TEST(LeafNodeTest, DeletionTimestamp) {
     /* The parameters for the initial setup phase are tuned so that the call to
     `erase_deletions()` usually affects at least one deletion entry. */
 
-    std::vector<store_key_t> keys;
+    vector_t<store_key_t> keys;
     const int num_ops = 50;
     for (int i = 0; i < num_ops; ++i) {
         if (rng.randint(2) == 1 || keys.size() == 0) {

@@ -166,7 +166,7 @@ void page_cache_t::have_read_ahead_cb_destroyed() {
 void page_cache_t::consider_evicting_all_current_pages(page_cache_t *page_cache,
                                                        auto_drainer_t::lock_t lock) {
     // Atomically grab a list of block IDs that currently exist in current_pages.
-    std::vector<block_id_t> current_block_ids;
+    vector_t<block_id_t> current_block_ids;
     current_block_ids.reserve(page_cache->current_pages_.size());
     for (const auto &current_page : page_cache->current_pages_) {
         current_block_ids.push_back(current_page.first);
@@ -1076,7 +1076,7 @@ void page_txn_t::announce_waiting_for_flush() {
 }
 
 std::map<block_id_t, page_cache_t::block_change_t>
-page_cache_t::compute_changes(const std::vector<page_txn_t *> &txns) {
+page_cache_t::compute_changes(const vector_t<page_txn_t *> &txns) {
     // We combine changes, using the block_version_t value to see which change
     // happened later.  This even works if a single transaction acquired the same
     // block twice.
@@ -1139,7 +1139,7 @@ page_cache_t::compute_changes(const std::vector<page_txn_t *> &txns) {
 }
 
 void page_cache_t::remove_txn_set_from_graph(page_cache_t *page_cache,
-                                             const std::vector<page_txn_t *> &txns) {
+                                             const vector_t<page_txn_t *> &txns) {
     page_cache->assert_thread();
 
     for (auto it = txns.begin(); it != txns.end(); ++it) {
@@ -1223,14 +1223,14 @@ struct ancillary_info_t {
 
 void page_cache_t::do_flush_changes(page_cache_t *page_cache,
                                     std::map<block_id_t, block_change_t> &&changes,
-                                    const std::vector<page_txn_t *> &txns,
+                                    const vector_t<page_txn_t *> &txns,
                                     fifo_enforcer_write_token_t index_write_token) {
     rassert(!changes.empty());
-    std::vector<block_token_tstamp_t> blocks_by_tokens;
+    vector_t<block_token_tstamp_t> blocks_by_tokens;
     blocks_by_tokens.reserve(changes.size());
 
-    std::vector<ancillary_info_t> ancillary_infos;
-    std::vector<buf_write_info_t> write_infos;
+    vector_t<ancillary_info_t> ancillary_infos;
+    vector_t<buf_write_info_t> write_infos;
     ancillary_infos.reserve(changes.size());
     write_infos.reserve(changes.size());
 
@@ -1296,7 +1296,7 @@ void page_cache_t::do_flush_changes(page_cache_t *page_cache,
             }
         } blocks_written_cb;
 
-        std::vector<counted_t<standard_block_token_t> > tokens
+        vector_t<counted_t<standard_block_token_t> > tokens
             = page_cache->serializer_->block_writes(write_infos,
                                                     /* disk account is overridden
                                                      * by merger_serializer_t */
@@ -1315,7 +1315,7 @@ void page_cache_t::do_flush_changes(page_cache_t *page_cache,
 
         // KSI: Unnecessary copying between blocks_by_tokens and write_ops, inelegant
         // representation of deletion/touched blocks in blocks_by_tokens.
-        std::vector<index_write_op_t> write_ops;
+        vector_t<index_write_op_t> write_ops;
         write_ops.reserve(blocks_by_tokens.size());
 
         for (auto it = blocks_by_tokens.begin(); it != blocks_by_tokens.end();
@@ -1402,7 +1402,7 @@ void page_cache_t::do_flush_changes(page_cache_t *page_cache,
 
 void page_cache_t::do_flush_txn_set(page_cache_t *page_cache,
                                     std::map<block_id_t, block_change_t> *changes_ptr,
-                                    const std::vector<page_txn_t *> &txns) {
+                                    const vector_t<page_txn_t *> &txns) {
     // This is called with spawn_now_dangerously!  The reason is partly so that we
     // don't put a zillion coroutines on the message loop when doing a bunch of
     // reads.  The other reason is that passing changes through a std::bind without
@@ -1430,7 +1430,7 @@ void page_cache_t::do_flush_txn_set(page_cache_t *page_cache,
     page_cache_t::remove_txn_set_from_graph(page_cache, txns);
 }
 
-std::vector<page_txn_t *> page_cache_t::maximal_flushable_txn_set(page_txn_t *base) {
+vector_t<page_txn_t *> page_cache_t::maximal_flushable_txn_set(page_txn_t *base) {
     // Returns all transactions that can presently be flushed, given the newest
     // transaction that has had began_waiting_for_flush_ set.  (We assume all
     // previous such sets of transactions had flushing begin on them.)
@@ -1460,10 +1460,10 @@ std::vector<page_txn_t *> page_cache_t::maximal_flushable_txn_set(page_txn_t *ba
 
     ASSERT_NO_CORO_WAITING;
     // An element is marked blue iff it's in `blue`.
-    std::vector<page_txn_t *> blue;
+    vector_t<page_txn_t *> blue;
     // All elements marked red, green, or blue are in `colored` -- we unmark them and
     // construct the return vector at the end of the function.
-    std::vector<page_txn_t *> colored;
+    vector_t<page_txn_t *> colored;
 
     rassert(!base->spawned_flush_);
     rassert(base->began_waiting_for_flush_);
@@ -1547,7 +1547,7 @@ void page_cache_t::im_waiting_for_flush(page_txn_t *base) {
     rassert(!base->spawned_flush_);
     ASSERT_FINITE_CORO_WAITING;
 
-    std::vector<page_txn_t *> flush_set
+    vector_t<page_txn_t *> flush_set
         = page_cache_t::maximal_flushable_txn_set(base);
     if (!flush_set.empty()) {
         for (auto it = flush_set.begin(); it != flush_set.end(); ++it) {

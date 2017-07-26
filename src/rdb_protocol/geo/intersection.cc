@@ -1,7 +1,7 @@
 // Copyright 2010-2014 RethinkDB, all rights reserved.
 #include "rdb_protocol/geo/intersection.hpp"
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/geo/geojson.hpp"
 #include "rdb_protocol/geo/geo_visitor.hpp"
@@ -110,7 +110,7 @@ bool geo_does_intersect(const S2Polyline &line,
     if (other_polygon.num_vertices() == 0) {
         return false;
     }
-    std::vector<S2Polyline *> intersecting_pieces;
+    vector_t<S2Polyline *> intersecting_pieces;
     other_polygon.IntersectWithPolyline(&line, &intersecting_pieces);
     // We're not interested in the actual line pieces that intersect
     for (size_t i = 0; i < intersecting_pieces.size(); ++i) {

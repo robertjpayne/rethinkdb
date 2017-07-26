@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 #include <cmath>
 
 #include "arch/runtime/coroutines.hpp"
@@ -163,7 +163,7 @@ void coro_profiler_t::generate_report() {
     // We assume that the global report_interval_spinlock has already been locked by our caller.
     {
         // Proceed to locking all thread sample structures
-        std::vector<scoped_ptr_t<spinlock_acq_t> > thread_locks;
+        vector_t<scoped_ptr_t<spinlock_acq_t> > thread_locks;
         for (auto thread_samples = per_thread_samples.begin();
              thread_samples != per_thread_samples.end();
              ++thread_samples) {
@@ -189,7 +189,7 @@ void coro_profiler_t::generate_report() {
                  ++execution_point_samples) {
                 // Collect samples
                 if (!execution_point_samples->second.samples.empty()) {
-                    std::vector<coro_sample_t> &sample_collection =
+                    vector_t<coro_sample_t> &sample_collection =
                         execution_point_reports[execution_point_samples->first].collected_samples;
                     sample_collection.insert(sample_collection.end(),
                                              execution_point_samples->second.samples.begin(),

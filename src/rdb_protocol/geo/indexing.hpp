@@ -3,7 +3,7 @@
 #define RDB_PROTOCOL_GEO_INDEXING_HPP_
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "btree/concurrent_traversal.hpp"
 #include "containers/counted.hpp"
@@ -26,15 +26,15 @@ See the comments in s2regioncoverer.h for further explanation and for statistics
 on the effects of different choices of this parameter.*/
 extern const int GEO_INDEX_GOAL_GRID_CELLS;
 
-std::vector<std::string> compute_index_grid_keys(
+vector_t<std::string> compute_index_grid_keys(
         const ql::datum_t &key,
         int goal_cells);
-std::vector<geo::S2CellId> compute_cell_covering(
+vector_t<geo::S2CellId> compute_cell_covering(
         const ql::datum_t &key,
         int goal_cells);
-std::vector<geo::S2CellId> compute_interior_cell_covering(
+vector_t<geo::S2CellId> compute_interior_cell_covering(
         const ql::datum_t &key,
-        const std::vector<geo::S2CellId> &exterior_covering);
+        const vector_t<geo::S2CellId> &exterior_covering);
 
 // TODO (daniel): Support compound indexes somehow.
 class geo_index_traversal_helper_t : public concurrent_traversal_callback_t {
@@ -43,8 +43,8 @@ public:
         ql::skey_version_t skey_version, const signal_t *interruptor);
 
     void init_query(
-        const std::vector<geo::S2CellId> &query_cell_covering,
-        const std::vector<geo::S2CellId> &query_interior_cell_covering);
+        const vector_t<geo::S2CellId> &query_cell_covering,
+        const vector_t<geo::S2CellId> &query_interior_cell_covering);
 
     /* Called for every pair that could potentially intersect with query_grid_keys.
     Note that this might be called multiple times for the same value.
@@ -81,14 +81,14 @@ private:
                                            const geo::S2CellId right_max);
     bool any_query_cell_intersects(const btree_key_t *left_excl_or_null,
                                    const btree_key_t *right_incl) const;
-    static bool any_cell_intersects(const std::vector<geo::S2CellId> &cells,
+    static bool any_cell_intersects(const vector_t<geo::S2CellId> &cells,
                                     const geo::S2CellId left_min,
                                     const geo::S2CellId right_max);
-    static bool any_cell_contains(const std::vector<geo::S2CellId> &cells,
+    static bool any_cell_contains(const vector_t<geo::S2CellId> &cells,
                                   const geo::S2CellId key);
 
-    std::vector<geo::S2CellId> query_cells_;
-    std::vector<geo::S2CellId> query_interior_cells_;
+    vector_t<geo::S2CellId> query_cells_;
+    vector_t<geo::S2CellId> query_interior_cells_;
     bool is_initialized_;
     const ql::skey_version_t skey_version_;
     const signal_t *interruptor_;

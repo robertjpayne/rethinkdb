@@ -220,7 +220,7 @@ void small_value_boundary_test(cache_t *cache) {
     txn.commit();
 }
 
-void general_journey_test(cache_t *cache, const std::vector<int64_t>& steps) {
+void general_journey_test(cache_t *cache, const vector_t<int64_t>& steps) {
     cache_conn_t cache_conn(cache);
     txn_t txn(&cache_conn, write_durability_t::SOFT, 0);
     blob_tracker_t tk(251);
@@ -258,7 +258,7 @@ void combinations_test(cache_t *cache) {
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
             SCOPED_TRACE(strprintf("i,j = %d,%d", i, j));
-            std::vector<int64_t> steps;
+            vector_t<int64_t> steps;
             steps.push_back(szs[i]);
             steps.push_back(szs[j]);
             {

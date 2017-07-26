@@ -128,7 +128,7 @@ ql::grouped_t<ql::stream_t> read_row_via_sindex(
     scoped_ptr_t<sindex_superblock_t> sindex_sb;
     uuid_u sindex_uuid;
 
-    std::vector<char> opaque_definition;
+    vector_t<char> opaque_definition;
     bool sindex_exists = store->acquire_sindex_superblock_for_read(
             sindex_name,
             "",
@@ -161,7 +161,7 @@ ql::grouped_t<ql::stream_t> read_row_via_sindex(
         sindex_sb.get(),
         &dummy_env, // env_t
         ql::batchspec_t::default_for(ql::batch_type_t::NORMAL),
-        std::vector<ql::transform_variant_t>(),
+        vector_t<ql::transform_variant_t>(),
         optional<ql::terminal_variant_t>(),
         key_range_t::universe(),
         sorting_t::ASCENDING,
@@ -350,7 +350,7 @@ TPTEST(RDBBtree, SindexEraseRange) {
                 access_t::write);
 
             rdb_live_deletion_context_t deletion_context;
-            std::vector<rdb_modification_report_t> mod_reports;
+            vector_t<rdb_modification_report_t> mod_reports;
             key_range_t deleted_range;
             rdb_erase_small_range(
                 store.btree.get(),

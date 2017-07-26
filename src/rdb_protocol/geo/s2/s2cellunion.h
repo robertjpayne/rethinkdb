@@ -3,7 +3,7 @@
 #ifndef UTIL_GEOMETRY_S2CELLUNION_H_
 #define UTIL_GEOMETRY_S2CELLUNION_H_
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/geo/s2/base/integral_types.h"
 #include "rdb_protocol/geo/s2/base/logging.h"
@@ -13,7 +13,6 @@
 #include "utils.hpp"
 
 namespace geo {
-using std::vector;
 
 class S1Angle;
 class S2Cell;
@@ -33,30 +32,30 @@ class S2CellUnion : public S2Region {
   // then calls Normalize().  The InitSwap() version takes ownership of the
   // vector data without copying and clears the given vector.  These methods
   // may be called multiple times.
-  void Init(vector<S2CellId> const& cell_ids);
-  void Init(vector<uint64> const& cell_ids);
-  void InitSwap(vector<S2CellId>* cell_ids);
+  void Init(vector_t<S2CellId> const& cell_ids);
+  void Init(vector_t<uint64> const& cell_ids);
+  void InitSwap(vector_t<S2CellId>* cell_ids);
 
   // Like Init(), but does not call Normalize().  The cell union *must* be
   // normalized before doing any calculations with it, so it is the caller's
   // responsibility to make sure that the input is normalized.  This method is
   // useful when converting cell unions to another representation and back.
   // These methods may be called multiple times.
-  void InitRaw(vector<S2CellId> const& cell_ids);
-  void InitRaw(vector<uint64> const& cell_ids);
-  void InitRawSwap(vector<S2CellId>* cell_ids);
+  void InitRaw(vector_t<S2CellId> const& cell_ids);
+  void InitRaw(vector_t<uint64> const& cell_ids);
+  void InitRawSwap(vector_t<S2CellId>* cell_ids);
 
   // Gives ownership of the vector data to the client without copying, and
   // clears the content of the cell union.  The original data in cell_ids
   // is lost if there was any.  This is the opposite of InitRawSwap().
-  void Detach(vector<S2CellId>* cell_ids);
+  void Detach(vector_t<S2CellId>* cell_ids);
 
   // Convenience methods for accessing the individual cell ids.
   int num_cells() const { return cell_ids_.size(); }
   S2CellId const& cell_id(int i) const { return cell_ids_[i]; }
 
   // Direct access to the underlying vector for STL algorithms.
-  vector<S2CellId> const& cell_ids() const { return cell_ids_; }
+  vector_t<S2CellId> const& cell_ids() const { return cell_ids_; }
 
   // Normalizes the cell union by discarding cells that are contained by other
   // cells, replacing groups of 4 child cells by their parent cell whenever
@@ -79,7 +78,7 @@ class S2CellUnion : public S2Region {
   // converted back to the original list of cell ids that satisfies the
   // desired constraints.
   void Denormalize(int min_level, int level_mod,
-                   vector<S2CellId>* output) const;
+                   vector_t<S2CellId>* output) const;
 
   // If there are more than "excess" elements of the cell_ids() vector that
   // are allocated but unused, reallocate the array to eliminate the excess
@@ -199,7 +198,7 @@ class S2CellUnion : public S2Region {
   bool Contains(S2Point const& p) const;
 
  private:
-  vector<S2CellId> cell_ids_;
+  vector_t<S2CellId> cell_ids_;
 
   DISALLOW_EVIL_CONSTRUCTORS(S2CellUnion);
 };

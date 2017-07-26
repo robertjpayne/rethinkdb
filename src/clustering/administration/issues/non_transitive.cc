@@ -46,9 +46,9 @@ non_transitive_issue_tracker_t::non_transitive_issue_tracker_t(
 
 non_transitive_issue_tracker_t::~non_transitive_issue_tracker_t() { }
 
-std::vector<scoped_ptr_t<issue_t> > non_transitive_issue_tracker_t::get_issues(
+vector_t<scoped_ptr_t<issue_t> > non_transitive_issue_tracker_t::get_issues(
     signal_t *interruptor) const {
-    std::vector<scoped_ptr_t<issue_t> > issues;
+    vector_t<scoped_ptr_t<issue_t> > issues;
 
     const server_connectivity_t &server_connectivity =
         server_config_client->get_server_connectivity();

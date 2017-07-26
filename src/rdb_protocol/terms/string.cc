@@ -153,7 +153,7 @@ It find_non_combining(It start, It end) {
         [](char32_t ch) { return !is_combining_character(ch); });
 }
 template <typename It>
-void push_datum(std::vector<datum_t> *res, It &&begin, It &&end) {
+void push_datum(vector_t<datum_t> *res, It &&begin, It &&end) {
     res->push_back(datum_t(datum_string_t(
         std::string(std::forward<It>(begin), std::forward<It>(end)))));
 }
@@ -163,11 +163,11 @@ public:
     split_term_t(compile_env_t *env, const raw_term_t &term)
         : op_term_t(env, term, argspec_t(1, 3)) { }
 private:
-    std::vector<datum_t> utf8_aware_split(const std::string &s,
+    vector_t<datum_t> utf8_aware_split(const std::string &s,
                                           const optional<std::string> &delim,
                                           size_t maxnum) const {
         const bool is_delim_empty = (delim && delim->size() == 0);
-        std::vector<datum_t> res;
+        vector_t<datum_t> res;
         std::string::const_iterator current = s.cbegin();
         std::string::const_iterator end = s.cend();
         bool done = false;
@@ -222,13 +222,13 @@ private:
         }
         return res;
     }
-    std::vector<datum_t> old_split(const std::string &s,
+    vector_t<datum_t> old_split(const std::string &s,
                                     const optional<std::string> &delim,
                                     size_t maxnum) const {
         const char *const splitchars = " \t\n\r\x0B\x0C";
         // This logic is extremely finicky so as to mimick the behavior of
         // Python's `split` in edge cases.
-        std::vector<datum_t> res;
+        vector_t<datum_t> res;
         size_t last = 0;
         while (last != std::string::npos) {
             size_t next = res.size() == maxnum
@@ -274,7 +274,7 @@ private:
         }
         size_t maxnum = (n < 0 ? std::numeric_limits<decltype(maxnum)>::max() : n);
 
-        std::vector<datum_t> res;
+        vector_t<datum_t> res;
 
         switch (env->env->reql_version()) {
         case reql_version_t::v1_16:

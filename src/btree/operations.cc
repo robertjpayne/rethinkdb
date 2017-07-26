@@ -317,7 +317,7 @@ void check_and_handle_underfull(value_sizer_t *sizer,
                 //  nodes: use the supplied value_deleter_t (which might either
                 //  detach the children as well or do nothing))
                 if (is_internal) {
-                    std::vector<block_id_t> moved_children;
+                    vector_t<block_id_t> moved_children;
                     leveled = internal_node::level(sizer->block_size(),
                             static_cast<internal_node_t *>(buf_write.get_data_write()),
                             static_cast<internal_node_t *>(sib_buf_write.get_data_write()),
@@ -327,7 +327,7 @@ void check_and_handle_underfull(value_sizer_t *sizer,
                         sib_buf.detach_child(moved_children[i]);
                     }
                 } else {
-                    std::vector<const void *> moved_values;
+                    vector_t<const void *> moved_values;
                     leveled = leaf::level(sizer, nodecmp_node_with_sib,
                             static_cast<leaf_node_t *>(buf_write.get_data_write()),
                             static_cast<leaf_node_t *>(sib_buf_write.get_data_write()),

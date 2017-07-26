@@ -6,7 +6,7 @@
 #include <set>
 #include <string>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "arch/types.hpp"
 #include "arch/io/openssl.hpp"
@@ -434,7 +434,7 @@ protected:
     calls `on_message()`. Override to optimize for the local case. */
     virtual void on_local_message(connectivity_cluster_t::connection_t *conn,
                                   auto_drainer_t::lock_t keepalive,
-                                  std::vector<char> &&data);
+                                  vector_t<char> &&data);
 
 private:
     friend class connectivity_cluster_t;

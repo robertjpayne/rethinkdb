@@ -34,7 +34,7 @@ bool artificial_table_backend_t::read_all_rows_as_stream(
         counted_t<ql::datum_stream_t> *rows_out,
         admin_err_t *error_out) {
     /* Fetch the rows from the backend */
-    std::vector<ql::datum_t> rows;
+    vector_t<ql::datum_t> rows;
     if (!read_all_rows_as_vector(user_context, interruptor, &rows, error_out)) {
         return false;
     }
@@ -43,7 +43,7 @@ bool artificial_table_backend_t::read_all_rows_as_stream(
 
     /* Apply range filter */
     if (!datumspec.is_universe()) {
-        std::vector<ql::datum_t> filter_rows;
+        vector_t<ql::datum_t> filter_rows;
         for (const auto &row : rows) {
             ql::datum_t key = row.get_field(primary_key.c_str(), ql::NOTHROW);
             guarantee(key.has());
@@ -93,7 +93,7 @@ bool artificial_table_backend_t::read_all_rows_as_stream(
 bool artificial_table_backend_t::read_all_rows_as_vector(
         UNUSED auth::user_context_t const &user_context,
         UNUSED signal_t *interruptor,
-        UNUSED std::vector<ql::datum_t> *rows_out,
+        UNUSED vector_t<ql::datum_t> *rows_out,
         UNUSED admin_err_t *error_out) {
     crash("Oops, the default implementation of `artificial_table_backend_t::"
           "read_all_rows_as_vector()` was called. The `artificial_table_backend_t` "

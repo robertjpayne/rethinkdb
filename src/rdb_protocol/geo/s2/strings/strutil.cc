@@ -21,7 +21,7 @@
 #include <limits>
 #include <set>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 
 #include "errors.hpp"
@@ -50,7 +50,6 @@ using std::unordered_set;
 using std::numeric_limits;
 using std::set;
 using std::multiset;
-using std::vector;
 
 
 // ----------------------------------------------------------------------
@@ -207,11 +206,11 @@ uint64 ParseLeadingUDec64Value(const char *str, uint64 deflt) {
 }
 
 bool DictionaryParse(const std::string& encoded_str,
-                      vector<pair<std::string, std::string> >* items) {
-  vector<std::string> entries;
+                      vector_t<pair<std::string, std::string> >* items) {
+  vector_t<std::string> entries;
   SplitStringUsing(encoded_str, ",", &entries);
   for (size_t i = 0; i < entries.size(); ++i) {
-    vector<std::string> fields;
+    vector_t<std::string> fields;
     SplitStringAllowEmpty(entries[i], ":", &fields);
     if (fields.size() != 2) // parsing error
       return false;

@@ -16,8 +16,8 @@ public:
 };
 region_map_t<version_t> quick_version_map(
         std::initializer_list<quick_version_map_args_t> qvms) {
-    std::vector<region_t> region_vector;
-    std::vector<version_t> version_vector;
+    vector_t<region_t> region_vector;
+    vector_t<version_t> version_vector;
     for (const quick_version_map_args_t &qvm : qvms) {
         region_vector.push_back(region_t(quick_range(qvm.quick_range_spec)));
         version_vector.push_back(

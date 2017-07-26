@@ -114,7 +114,7 @@ void table_raft_storage_interface_t::erase(
     txn->erase(
         mdprefix_table_raft_snapshot().suffix(uuid_to_str(table_id)),
         &non_interruptor);
-    std::vector<std::string> log_keys;
+    vector_t<std::string> log_keys;
     txn->read_many<raft_log_entry_t<table_raft_state_t> >(
         mdprefix_table_raft_log().suffix(uuid_to_str(table_id) + "/"),
         [&](const std::string &index_str, const raft_log_entry_t<table_raft_state_t> &) {

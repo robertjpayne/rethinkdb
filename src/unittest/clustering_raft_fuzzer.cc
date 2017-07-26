@@ -238,7 +238,7 @@ private:
     }
 
     rng_t rng;
-    std::vector<raft_member_id_t> member_ids;
+    vector_t<raft_member_id_t> member_ids;
     dummy_raft_cluster_t cluster;
     raft_complex_config_t active_config;
 };

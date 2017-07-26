@@ -4,7 +4,7 @@
 
 #include <set>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "clustering/administration/admin_op_exc.hpp"
 #include "containers/name_string.hpp"
@@ -114,7 +114,7 @@ ql::datum_t convert_microtime_to_datum(
 template<class T>
 ql::datum_t convert_vector_to_datum(
         const std::function<ql::datum_t(const T&)> &conv,
-        const std::vector<T> &vector) {
+        const vector_t<T> &vector) {
     ql::datum_array_builder_t builder((ql::configured_limits_t::unlimited));
     builder.reserve(vector.size());
     for (const T &elem : vector) {
@@ -127,7 +127,7 @@ template<class T>
 bool convert_vector_from_datum(
         const std::function<bool(ql::datum_t, T *, admin_err_t *)> &conv,
         ql::datum_t datum,
-        std::vector<T> *vector_out,
+        vector_t<T> *vector_out,
         admin_err_t *error_out) {
     if (datum.get_type() != ql::datum_t::R_ARRAY) {
         *error_out = admin_err_t{

@@ -29,12 +29,12 @@ public:
     }
 
 private:
-    virtual std::vector<changespec_t> get_changespecs() {
-        return std::vector<changespec_t>{changespec_t(
+    virtual vector_t<changespec_t> get_changespecs() {
+        return vector_t<changespec_t>{changespec_t(
                 reader->get_changespec(), counted_from_this())};
     }
 
-    std::vector<datum_t >
+    vector_t<datum_t >
     next_batch_impl(env_t *env, const batchspec_t &batchspec);
 
     virtual void add_transformation(transform_variant_t &&tv,
@@ -46,7 +46,7 @@ private:
     // things that are most easily written in terms of `next` that would
     // otherwise have to do this caching themselves.
     size_t current_batch_offset;
-    std::vector<datum_t> current_batch;
+    vector_t<datum_t> current_batch;
 
     scoped_ptr_t<reader_t> reader;
 };

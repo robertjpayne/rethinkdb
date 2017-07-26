@@ -2,13 +2,12 @@
 
 #include "rdb_protocol/geo/s2/util/math/mathutil.h"
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/geo/s2/base/integral_types.h"
 #include "rdb_protocol/geo/s2/base/logging.h"
 
 namespace geo {
-using std::vector;
 
 MathUtil::QuadraticRootType MathUtil::DegenerateQuadraticRoots(
     long double b,
@@ -106,8 +105,8 @@ unsigned int MathUtil::ExtendedGCD(unsigned int x, unsigned int y,
 }
 
 
-void MathUtil::ShardsToRead(const vector<bool>& shards_to_write,
-                            vector<bool>* shards_to_read) {
+void MathUtil::ShardsToRead(const vector_t<bool>& shards_to_write,
+                            vector_t<bool>* shards_to_read) {
   const int N = shards_to_read->size();
   const int M = shards_to_write.size();
   CHECK(N > 0 || M == 0) << ": have shards to write but not to read";

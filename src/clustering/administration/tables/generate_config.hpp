@@ -35,7 +35,7 @@ void table_generate_config(
 
         signal_t *interruptor,
 
-        std::vector<table_config_t::shard_t> *config_shards_out,
+        vector_t<table_config_t::shard_t> *config_shards_out,
         server_name_map_t *server_names_out)
 
         THROWS_ONLY(interrupted_exc_t, no_such_table_exc_t, failed_table_op_exc_t,

@@ -25,7 +25,7 @@ state. */
 dummy_raft_cluster_t::dummy_raft_cluster_t(
         size_t num,
         const dummy_raft_state_t &initial_state,
-        std::vector<raft_member_id_t> *member_ids_out) :
+        vector_t<raft_member_id_t> *member_ids_out) :
     mailbox_manager(&connectivity_cluster, 'M'),
     connectivity_cluster_run(&connectivity_cluster),
     check_invariants_timer(100, [this]() {
@@ -352,7 +352,7 @@ void dummy_raft_cluster_t::add_member(
 
 void dummy_raft_cluster_t::check_invariants(UNUSED auto_drainer_t::lock_t keepalive) {
     std::set<dummy_raft_member_t *> member_ptrs;
-    std::vector<auto_drainer_t::lock_t> keepalives;
+    vector_t<auto_drainer_t::lock_t> keepalives;
     for (auto &pair : members) {
         if (pair.second->member_drainer.has()) {
             keepalives.push_back(pair.second->member_drainer->lock());

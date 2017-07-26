@@ -495,7 +495,7 @@ bool test_rdb_env_t::instance_t::table_estimate_doc_counts(
         UNUSED counted_t<const ql::db_t> db,
         UNUSED const name_string_t &name,
         UNUSED ql::env_t *local_env,
-        UNUSED std::vector<int64_t> *doc_counts_out,
+        UNUSED vector_t<int64_t> *doc_counts_out,
         admin_err_t *error_out) {
     *error_out = admin_err_t{
         "test_rdb_env_t::instance_t doesn't support info()",

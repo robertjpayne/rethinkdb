@@ -140,7 +140,7 @@ void merge(block_size_t block_size, const internal_node_t *node, internal_node_t
 bool level(block_size_t block_size, internal_node_t *node,
            internal_node_t *sibling, btree_key_t *replacement_key,
            const internal_node_t *parent,
-           std::vector<block_id_t> *moved_children_out) {
+           vector_t<block_id_t> *moved_children_out) {
     validate(block_size, node);
     validate(block_size, sibling);
     if (moved_children_out != nullptr) {

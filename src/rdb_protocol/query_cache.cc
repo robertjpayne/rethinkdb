@@ -317,7 +317,7 @@ void query_cache_t::ref_t::serve(env_t *env, response_t *res) {
     batch_type_t batch_type = entry->has_sent_batch
                                   ? batch_type_t::NORMAL
                                   : batch_type_t::NORMAL_FIRST;
-    std::vector<datum_t> ds = entry->stream->next_batch(
+    vector_t<datum_t> ds = entry->stream->next_batch(
             env, batchspec_t::user(batch_type, env));
     entry->has_sent_batch = true;
     res->set_data(std::move(ds));

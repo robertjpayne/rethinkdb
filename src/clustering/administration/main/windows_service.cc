@@ -128,7 +128,7 @@ bool install_windows_service(
     const std::string &service_name,
     const std::string &display_name,
     const std::string &bin_path,
-    const std::vector<std::string> &arguments,
+    const vector_t<std::string> &arguments,
     const char *account_name,
     const char *account_password) {
 

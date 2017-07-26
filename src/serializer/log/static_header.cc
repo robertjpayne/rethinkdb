@@ -2,7 +2,7 @@
 #include "serializer/log/static_header.hpp"
 
 #include <functional>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "arch/arch.hpp"
 #include "arch/runtime/coroutines.hpp"
@@ -116,7 +116,7 @@ void migrate_static_header(file_t *file, size_t data_size) {
     logNTC("Migrating file to serializer version %s.",
            CURRENT_SERIALIZER_VERSION_STRING);
 
-    std::vector<char> data(data_size);
+    vector_t<char> data(data_size);
 
     struct noop_cb_t : public static_header_read_callback_t {
         void on_static_header_read() { }

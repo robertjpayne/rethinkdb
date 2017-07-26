@@ -47,8 +47,8 @@ TEST(CoroutinesTest, OnThreadOrdering) {
     int num_coros = 1000; // 100 per thread
     run_in_thread_pool([&]() {
         auto_drainer_t drainer;
-        std::vector<int> c(num_threads, 0);
-        std::vector<int> return_c(num_threads, 0);
+        vector_t<int> c(num_threads, 0);
+        vector_t<int> return_c(num_threads, 0);
         for (int i = 0; i < num_coros; ++i) {
             int my_priority =
                 i % (MESSAGE_SCHEDULER_MAX_PRIORITY - MESSAGE_SCHEDULER_MIN_PRIORITY)

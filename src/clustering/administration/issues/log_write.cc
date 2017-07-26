@@ -56,8 +56,8 @@ RDB_IMPL_SERIALIZABLE_3_FOR_CLUSTER(log_write_issue_t,
 RDB_IMPL_EQUALITY_COMPARABLE_3(log_write_issue_t,
     issue_id, reporting_server_ids, message);
 
-std::vector<log_write_issue_t> log_write_issue_tracker_t::get_issues() {
-    std::vector<log_write_issue_t> issues;
+vector_t<log_write_issue_t> log_write_issue_tracker_t::get_issues() {
+    vector_t<log_write_issue_t> issues;
     if (static_cast<bool>(error_message)) {
         issues.push_back(log_write_issue_t(*error_message));
     }
@@ -75,8 +75,8 @@ void log_write_issue_tracker_t::report_error(const std::string &message) {
 }
 
 void log_write_issue_tracker_t::combine(
-        std::vector<log_write_issue_t> &&issues,
-        std::vector<scoped_ptr_t<issue_t> > *issues_out) {
+        vector_t<log_write_issue_t> &&issues,
+        vector_t<scoped_ptr_t<issue_t> > *issues_out) {
     std::map<std::string, log_write_issue_t*> combined_issues;
     for (auto &issue : issues) {
         auto combined_it = combined_issues.find(issue.message);

@@ -122,7 +122,7 @@ public:
     js_env_t();
 
     js_result_t eval(const std::string &source, const ql::configured_limits_t &limits);
-    js_result_t call(js_id_t id, const std::vector<ql::datum_t> &args,
+    js_result_t call(js_id_t id, const vector_t<ql::datum_t> &args,
                      const ql::configured_limits_t &limits);
     void release(js_id_t id);
     void run_other_tasks(uint64_t task_counter);
@@ -184,7 +184,7 @@ js_result_t js_job_t::eval(const std::string &source) {
     return result;
 }
 
-js_result_t js_job_t::call(js_id_t id, const std::vector<ql::datum_t> &args) {
+js_result_t js_job_t::call(js_id_t id, const vector_t<ql::datum_t> &args) {
     js_task_t task = js_task_t::TASK_CALL;
     write_message_t wm;
     wm.append(&task, sizeof(task));
@@ -316,7 +316,7 @@ bool run_call(read_stream_t *stream_in,
               js_env_t *js_env,
               uint64_t task_counter) {
     js_id_t id;
-    std::vector<ql::datum_t> args;
+    vector_t<ql::datum_t> args;
     ql::configured_limits_t limits;
     {
         archive_result_t res
@@ -487,7 +487,7 @@ const std::shared_ptr<persistent_value_t> js_env_t::find_value(js_id_t id) {
 }
 
 v8::Local<v8::Value> run_js_func(v8::Handle<v8::Function> fn,
-                                 const std::vector<ql::datum_t> &args,
+                                 const vector_t<ql::datum_t> &args,
                                  std::string *err_out) {
     v8::Isolate *isolate = js_instance_t::isolate();
 
@@ -516,7 +516,7 @@ v8::Local<v8::Value> run_js_func(v8::Handle<v8::Function> fn,
 }
 
 js_result_t js_env_t::call(js_id_t id,
-                           const std::vector<ql::datum_t> &args,
+                           const vector_t<ql::datum_t> &args,
                            const ql::configured_limits_t &limits) {
     js_context_t clean_context;
     js_result_t result("");
@@ -590,7 +590,7 @@ ql::datum_t js_make_datum(const v8::Handle<v8::Value> &value,
 
         if (value->IsArray()) {
             v8::Handle<v8::Array> arrayh = v8::Handle<v8::Array>::Cast(value);
-            std::vector<ql::datum_t> datum_array;
+            vector_t<ql::datum_t> datum_array;
             datum_array.reserve(arrayh->Length());
 
             for (uint32_t i = 0; i < arrayh->Length(); ++i) {

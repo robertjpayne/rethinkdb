@@ -54,7 +54,7 @@ public:
 private:
     virtual scoped_ptr_t<val_t>
     eval_impl(scope_env_t *env, args_t *args, eval_flags_t) const {
-        std::vector<std::pair<order_direction_t, counted_t<const func_t> > > comparisons
+        vector_t<std::pair<order_direction_t, counted_t<const func_t> > > comparisons
             = build_comparisons_from_raw_term(this, env, args, get_src());
         raw_term_t raw_term = get_src();
         lt_cmp_t lt_cmp(comparisons);
@@ -105,10 +105,10 @@ private:
             }
             rcheck(!comparisons.empty(), base_exc_t::LOGIC,
                    "Must specify something to order by.");
-            std::vector<datum_t> to_sort;
+            vector_t<datum_t> to_sort;
             batchspec_t batchspec = batchspec_t::user(batch_type_t::TERMINAL, env->env);
             for (;;) {
-                std::vector<datum_t> data
+                vector_t<datum_t> data
                     = seq->next_batch(env->env, batchspec);
                 if (data.size() == 0) {
                     break;
@@ -149,7 +149,7 @@ private:
                 auto row = minidriver_t::dummy_var_t::DISTINCT_ROW;
                 minidriver_t r(backtrace());
                 map_wire_func_t mwf(r.var(row)[idx_str].root_term(),
-                    std::vector<sym_t>(1, minidriver_t::dummy_var_to_sym(row)));
+                    vector_t<sym_t>(1, minidriver_t::dummy_var_to_sym(row)));
 
                 counted_t<datum_stream_t> s = tbl_slice->as_seq(env->env, backtrace());
                 s->add_transformation(std::move(mwf), backtrace());
@@ -180,7 +180,7 @@ private:
                 sampler.new_sample();
             }
         }
-        std::vector<datum_t> toret;
+        vector_t<datum_t> toret;
         std::move(results.begin(), results.end(), std::back_inserter(toret));
         return new_val(datum_t(std::move(toret), env->env->limits()));
     }

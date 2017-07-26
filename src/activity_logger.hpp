@@ -5,7 +5,7 @@
 #include <time.h>
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "backtrace.hpp"
 #include "containers/scoped.hpp"
@@ -37,7 +37,7 @@ public:
 
 private:
     bool log_bt_;
-    std::vector<scoped_ptr_t<log_event_t> > events;
+    vector_t<scoped_ptr_t<log_event_t> > events;
 
     DISABLE_COPYING(activity_logger_t);
 };
@@ -50,7 +50,7 @@ struct fake_activity_logger_t : private home_thread_mixin_t {
     }
 
 private:
-    std::vector<std::string> events;
+    vector_t<std::string> events;
 
     DISABLE_COPYING(fake_activity_logger_t);
 };

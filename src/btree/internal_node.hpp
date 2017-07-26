@@ -2,7 +2,7 @@
 #ifndef BTREE_INTERNAL_NODE_HPP_
 #define BTREE_INTERNAL_NODE_HPP_
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "arch/compiler.hpp"
 #include "btree/keys.hpp"
@@ -38,7 +38,7 @@ void split(block_size_t block_size, internal_node_t *node, internal_node_t *rnod
 void merge(block_size_t block_size, const internal_node_t *node, internal_node_t *rnode, const internal_node_t *parent);
 bool level(block_size_t block_size, internal_node_t *node, internal_node_t *sibling,
            btree_key_t *replacement_key, const internal_node_t *parent,
-           std::vector<block_id_t> *moved_children_out);
+           vector_t<block_id_t> *moved_children_out);
 int sibling(const internal_node_t *node, const btree_key_t *key, block_id_t *sib_id, store_key_t *key_in_middle_out);
 void update_key(internal_node_t *node, const btree_key_t *key_to_replace, const btree_key_t *replacement_key);
 int nodecmp(const internal_node_t *node1, const internal_node_t *node2);

@@ -118,7 +118,7 @@ ql::datum_t make_row_replacement_stats(
             // Add an empty array even if there are no changes to report.
             UNUSED bool b = resp.add(
                 "changes",
-                ql::datum_t(std::vector<ql::datum_t>(),
+                ql::datum_t(vector_t<ql::datum_t>(),
                             ql::configured_limits_t::unlimited));
             break;
         }
@@ -171,7 +171,7 @@ ql::datum_t make_row_replacement_error_stats(
         // Add an empty array even though there are no changes to report.
         UNUSED bool b = resp.add(
             "changes",
-            ql::datum_t(std::vector<ql::datum_t>(), ql::configured_limits_t::unlimited));
+            ql::datum_t(vector_t<ql::datum_t>(), ql::configured_limits_t::unlimited));
     } break;
     case return_changes_t::ALWAYS: {
         // This is to make the ordering work for insert with return_changes = always.
@@ -212,7 +212,7 @@ ql::datum_t resolve_insert_conflict(
     } else if (conflict_behavior == conflict_behavior_t::UPDATE) {
         return old_row.merge(insert_row);
     } else if (conflict_behavior == conflict_behavior_t::FUNCTION) {
-        std::vector<ql::datum_t> args;
+        vector_t<ql::datum_t> args;
         args.push_back(ql::datum_t(datum_string_t(primary_key)));
         args.push_back(old_row);
         args.push_back(insert_row);

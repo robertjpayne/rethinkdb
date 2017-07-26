@@ -318,7 +318,7 @@ void lba_list_t::gc(int lba_shard, auto_drainer_t::lock_t) {
     ++extent_manager->stats->pm_serializer_lba_gcs;
 
     // Start a transaction
-    std::vector<scoped_ptr_t<extent_transaction_t> > txns;
+    vector_t<scoped_ptr_t<extent_transaction_t> > txns;
     txns.push_back(make_scoped<extent_transaction_t>());
     extent_manager->begin_transaction(txns.back().get());
 

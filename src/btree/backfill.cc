@@ -20,7 +20,7 @@ RDB_IMPL_SERIALIZABLE_3_FOR_CLUSTER(backfill_item_t,
 
 void backfill_item_t::mask_in_place(const key_range_t &m) {
     range = range.intersection(m);
-    std::vector<pair_t> new_pairs;
+    vector_t<pair_t> new_pairs;
     for (auto &&pair : pairs) {
         if (m.contains_key(pair.key)) {
             new_pairs.push_back(std::move(pair));
@@ -101,7 +101,7 @@ continue_bool_t btree_send_backfill_pre(
                     "pre-item leaf %" PRIu64, min_deletion_timestamp.longtime));
                 return pre_item_consumer->on_pre_item(std::move(pre_item));
             } else {
-                std::vector<const btree_key_t *> keys;
+                vector_t<const btree_key_t *> keys;
                 leaf::visit_entries(
                     sizer, lnode, buf->lock.get_recency(),
                     [&](const btree_key_t *key, repli_timestamp_t timestamp,
@@ -412,7 +412,7 @@ private:
                         /* Store `value_or_null` in the `value` field as a sequence of
                         8 (or 4 or whatever) `char`s describing its actual pointer value.
                         */
-                        item.pairs[i].value.set(std::vector<char>(
+                        item.pairs[i].value.set(vector_t<char>(
                             reinterpret_cast<const char *>(&value_or_null),
                             reinterpret_cast<const char *>(1 + &value_or_null)));
                     }
@@ -520,7 +520,7 @@ private:
                         /* Store `value_or_null` in the `value` field as a sequence of
                         8 (or 4 or whatever) `char`s describing its actual pointer value.
                         */
-                        item->pairs[i].value.set(std::vector<char>(
+                        item->pairs[i].value.set(vector_t<char>(
                             reinterpret_cast<const char *>(&value_or_null),
                             reinterpret_cast<const char *>(1 + &value_or_null)));
                     }
@@ -638,7 +638,7 @@ private:
         key_range_t::right_bound_t cursor = convert_to_right_bound(left_excl_or_null);
         key_range_t::right_bound_t end = convert_to_right_bound(right_incl);
         while (cursor != end) {
-            std::vector<backfill_item_t> items;
+            vector_t<backfill_item_t> items;
             continue_bool_t cont = pre_item_producer->consume_range(
                 &cursor, end,
                 [&](const backfill_pre_item_t &pre_item) {

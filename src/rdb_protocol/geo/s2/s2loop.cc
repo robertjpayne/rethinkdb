@@ -3,7 +3,7 @@
 #include <algorithm>
 
 #include <set>
-#include <vector>
+#include "containers/vector.hpp"
 #include <unordered_map>
 #include <utility>
 
@@ -24,7 +24,6 @@ using std::swap;
 using std::reverse;
 using std::set;
 using std::multiset;
-using std::vector;
 using std::unordered_map;
 using std::pair;
 using std::make_pair;
@@ -55,7 +54,7 @@ S2Loop::S2Loop()
     num_find_vertex_calls_(0) {
 }
 
-S2Loop::S2Loop(vector<S2Point> const& vertices)
+S2Loop::S2Loop(vector_t<S2Point> const& vertices)
   : num_vertices_(0),
     vertices_(NULL),
     owns_vertices_(false),
@@ -72,7 +71,7 @@ void S2Loop::ResetMutableFields() {
   vertex_to_index_.clear();
 }
 
-void S2Loop::Init(vector<S2Point> const& vertices) {
+void S2Loop::Init(vector_t<S2Point> const& vertices) {
   ResetMutableFields();
 
   if (owns_vertices_) delete[] vertices_;
@@ -148,7 +147,7 @@ bool S2Loop::IsValid() const {
   return !crosses;
 }
 
-bool S2Loop::IsValid(vector<S2Point> const& vertices, UNUSED int max_adjacent) {
+bool S2Loop::IsValid(vector_t<S2Point> const& vertices, UNUSED int max_adjacent) {
   if (vertices.size() < 3) return false;
 
   S2Loop loop(vertices);
@@ -766,7 +765,7 @@ static bool MatchBoundaries(S2Loop const* a, S2Loop const* b, int a_offset,
   // backtracking.  We also keep track of which states have already been
   // explored to avoid duplicating work.
 
-  vector<pair<int, int> > pending;
+  vector_t<pair<int, int> > pending;
   set<pair<int, int> > done;
   pending.push_back(make_pair(0, 0));
   while (!pending.empty()) {

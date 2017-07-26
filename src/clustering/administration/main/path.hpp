@@ -2,10 +2,10 @@
 #define CLUSTERING_ADMINISTRATION_MAIN_PATH_HPP_
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 struct path_t {
-    std::vector<std::string> nodes;
+    vector_t<std::string> nodes;
     bool is_absolute;
 };
 

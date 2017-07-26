@@ -21,7 +21,7 @@ TPTEST(ClusteringRaft, Basic) {
 }
 
 void failover_test(dummy_raft_cluster_t::live_t failure_type) {
-    std::vector<raft_member_id_t> member_ids;
+    vector_t<raft_member_id_t> member_ids;
     dummy_raft_cluster_t cluster(5, dummy_raft_state_t(), &member_ids);
     dummy_raft_traffic_generator_t traffic_generator(&cluster, 3);
     do_writes_raft(&cluster, 100, 60000);
@@ -50,7 +50,7 @@ TPTEST(ClusteringRaft, FailoverIsolated) {
 }
 
 TPTEST(ClusteringRaft, MemberChange) {
-    std::vector<raft_member_id_t> member_ids;
+    vector_t<raft_member_id_t> member_ids;
     size_t cluster_size = 5;
     dummy_raft_cluster_t cluster(cluster_size, dummy_raft_state_t(), &member_ids);
     dummy_raft_traffic_generator_t traffic_generator(&cluster, 3);
@@ -112,7 +112,7 @@ TPTEST(ClusteringRaft, NonVoting) {
 
 TPTEST(ClusteringRaft, Regression4234) {
     cond_t non_interruptor;
-    std::vector<raft_member_id_t> member_ids;
+    vector_t<raft_member_id_t> member_ids;
     dummy_raft_cluster_t cluster(2, dummy_raft_state_t(), &member_ids);
     dummy_raft_traffic_generator_t traffic_generator(&cluster, 3);
     do_writes_raft(&cluster, 10, 60000);

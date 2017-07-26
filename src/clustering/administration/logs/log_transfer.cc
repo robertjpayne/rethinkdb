@@ -26,9 +26,9 @@ void log_server_t::handle_request(
         log_server_business_card_t::result_mailbox_t::address_t cont) {
     std::string error;
     try {
-        std::vector<log_message_t> messages =
+        vector_t<log_message_t> messages =
             writer->tail(max_lines, min_timestamp, max_timestamp, interruptor);
-        send(mailbox_manager, cont, boost::variant<std::vector<log_message_t>, std::string>(messages));
+        send(mailbox_manager, cont, boost::variant<vector_t<log_message_t>, std::string>(messages));
         return;
     } catch (const log_read_exc_t &e) {
         error = e.what();
@@ -38,19 +38,19 @@ void log_server_t::handle_request(
     }
     /* Hack around the fact that we can't call a blocking function (e.g.
     `send()` from within a `catch`-block. */
-    send(mailbox_manager, cont, boost::variant<std::vector<log_message_t>, std::string>(error));
+    send(mailbox_manager, cont, boost::variant<vector_t<log_message_t>, std::string>(error));
 }  // NOLINT(whitespace/indent)  (cpplint is confused by the 'struct timespec')
 
-std::vector<log_message_t> fetch_log_file(
+vector_t<log_message_t> fetch_log_file(
         mailbox_manager_t *mm,
         const log_server_business_card_t &bcard,
         int max_lines, timespec min_timestamp, timespec max_timestamp,
         signal_t *interruptor) THROWS_ONLY(log_transfer_exc_t, log_read_exc_t, interrupted_exc_t) {
-    promise_t<boost::variant<std::vector<log_message_t>, std::string> > promise;
+    promise_t<boost::variant<vector_t<log_message_t>, std::string> > promise;
     log_server_business_card_t::result_mailbox_t reply_mailbox(
         mm,
         [&](signal_t *,
-                const boost::variant<std::vector<log_message_t>, std::string> &r) {
+                const boost::variant<vector_t<log_message_t>, std::string> &r) {
             promise.pulse(r);
         });
     send(mm, bcard.address, max_lines, min_timestamp, max_timestamp, reply_mailbox.get_address());
@@ -60,9 +60,9 @@ std::vector<log_message_t> fetch_log_file(
         wait_interruptible(&waiter, interruptor);
     }
 
-    boost::variant<std::vector<log_message_t>, std::string> res;
+    boost::variant<vector_t<log_message_t>, std::string> res;
     if (promise.try_get_value(&res)) {
-        if (std::vector<log_message_t> *messages = boost::get<std::vector<log_message_t> >(&res)) {
+        if (vector_t<log_message_t> *messages = boost::get<vector_t<log_message_t> >(&res)) {
             return *messages;
         } else {
             throw log_read_exc_t(boost::get<std::string>(res));

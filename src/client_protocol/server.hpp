@@ -8,7 +8,7 @@
 #include <random>
 #include <string>
 #include <unordered_map>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "arch/address.hpp"
 #include "arch/io/openssl.hpp"

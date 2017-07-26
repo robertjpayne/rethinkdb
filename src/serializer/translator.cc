@@ -32,7 +32,7 @@ counted_t<standard_block_token_t> serializer_block_write(serializer_t *ser, cons
         void on_io_complete() { pulse(); }
     } cb;
 
-    std::vector<counted_t<standard_block_token_t> > tokens
+    vector_t<counted_t<standard_block_token_t> > tokens
         = ser->block_writes({ buf_write_info_t(buf.ser_buffer(), buf.block_size(),
                                                block_id) },
                             io_account, &cb);
@@ -43,7 +43,7 @@ counted_t<standard_block_token_t> serializer_block_write(serializer_t *ser, cons
 }
 
 void prep_serializer(
-        const std::vector<serializer_t *>& serializers,
+        const vector_t<serializer_t *>& serializers,
         creation_timestamp_t creation_timestamp,
         int n_proxies,
         int i) {
@@ -73,7 +73,7 @@ void prep_serializer(
                                    CONFIG_BLOCK_ID.ser_id, DEFAULT_DISK_ACCOUNT));
     op.recency = make_optional(repli_timestamp_t::invalid);
     {
-        std::vector<index_write_op_t> ops;
+        vector_t<index_write_op_t> ops;
         ops.push_back(std::move(op));
 
         new_mutex_in_line_t dummy_acq;  // We don't have ordering concerns between
@@ -83,7 +83,7 @@ void prep_serializer(
 }
 
 /* static */
-void serializer_multiplexer_t::create(const std::vector<serializer_t *>& underlying, int n_proxies) {
+void serializer_multiplexer_t::create(const vector_t<serializer_t *>& underlying, int n_proxies) {
     /* Choose a more-or-less unique ID so that we can hopefully catch the case where files are
     mixed and mismatched. */
     creation_timestamp_t creation_timestamp = time(nullptr);
@@ -93,8 +93,8 @@ void serializer_multiplexer_t::create(const std::vector<serializer_t *>& underly
         underlying, creation_timestamp, n_proxies, ph::_1));
 }
 
-void create_proxies(const std::vector<serializer_t *>& underlying,
-    creation_timestamp_t creation_timestamp, std::vector<translator_serializer_t *> *proxies, int i) {
+void create_proxies(const vector_t<serializer_t *>& underlying,
+    creation_timestamp_t creation_timestamp, vector_t<translator_serializer_t *> *proxies, int i) {
 
     serializer_t *ser = underlying[i];
 
@@ -146,7 +146,7 @@ void create_proxies(const std::vector<serializer_t *>& underlying,
     }
 }
 
-serializer_multiplexer_t::serializer_multiplexer_t(const std::vector<serializer_t *>& underlying) {
+serializer_multiplexer_t::serializer_multiplexer_t(const vector_t<serializer_t *>& underlying) {
     rassert(!underlying.empty());
     for (int i = 0; i < static_cast<int>(underlying.size()); ++i) {
         rassert(underlying[i]);
@@ -177,7 +177,7 @@ serializer_multiplexer_t::serializer_multiplexer_t(const std::vector<serializer_
     for (int i = 0; i < static_cast<int>(proxies.size()); ++i) rassert(proxies[i]);
 }
 
-void destroy_proxy(std::vector<translator_serializer_t *> *proxies, int i) {
+void destroy_proxy(vector_t<translator_serializer_t *> *proxies, int i) {
     on_thread_t thread_switcher((*proxies)[i]->home_thread());
     delete (*proxies)[i];
 }
@@ -238,18 +238,18 @@ file_account_t *translator_serializer_t::make_io_account(int priority, int outst
 void translator_serializer_t::index_write(
         new_mutex_in_line_t *mutex_acq,
         const std::function<void()> &on_writes_reflected,
-        const std::vector<index_write_op_t> &write_ops) {
-    std::vector<index_write_op_t> translated_ops(write_ops);
+        const vector_t<index_write_op_t> &write_ops) {
+    vector_t<index_write_op_t> translated_ops(write_ops);
     for (auto it = translated_ops.begin(); it < translated_ops.end(); ++it) {
         it->block_id = translate_block_id(it->block_id);
     }
     inner->index_write(mutex_acq, on_writes_reflected, translated_ops);
 }
 
-std::vector<counted_t<standard_block_token_t> >
-translator_serializer_t::block_writes(const std::vector<buf_write_info_t> &write_infos,
+vector_t<counted_t<standard_block_token_t> >
+translator_serializer_t::block_writes(const vector_t<buf_write_info_t> &write_infos,
                                       file_account_t *io_account, iocallback_t *cb) {
-    std::vector<buf_write_info_t> tmp;
+    vector_t<buf_write_info_t> tmp;
     tmp.reserve(write_infos.size());
     for (auto it = write_infos.begin(); it != write_infos.end(); ++it) {
         guarantee(it->block_id != NULL_BLOCK_ID);

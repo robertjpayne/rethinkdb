@@ -11,12 +11,12 @@ bool compare_range_by_left(const key_range_t &r1, const key_range_t &r2) {
     return r1.left < r2.left;
 }
 
-region_join_result_t region_join(const std::vector<key_range_t> &vec, key_range_t *out) THROWS_NOTHING {
+region_join_result_t region_join(const vector_t<key_range_t> &vec, key_range_t *out) THROWS_NOTHING {
     if (vec.empty()) {
         *out = key_range_t::empty();
         return REGION_JOIN_OK;
     } else {
-        std::vector<key_range_t> sorted = vec;
+        vector_t<key_range_t> sorted = vec;
         std::sort(sorted.begin(), sorted.end(), &compare_range_by_left);
         key_range_t::right_bound_t cursor = key_range_t::right_bound_t(sorted[0].left);
         for (size_t i = 0; i < sorted.size(); ++i) {
@@ -37,11 +37,11 @@ region_join_result_t region_join(const std::vector<key_range_t> &vec, key_range_
     }
 }
 
-std::vector<key_range_t> region_subtract_many(key_range_t minuend, const std::vector<key_range_t>& subtrahends) {
-    std::vector<key_range_t> buf, temp_result_buf;
+vector_t<key_range_t> region_subtract_many(key_range_t minuend, const vector_t<key_range_t>& subtrahends) {
+    vector_t<key_range_t> buf, temp_result_buf;
     buf.push_back(minuend);
-    for (std::vector<key_range_t>::const_iterator s = subtrahends.begin(); s != subtrahends.end(); ++s) {
-        for (std::vector<key_range_t>::const_iterator m = buf.begin(); m != buf.end(); ++m) {
+    for (vector_t<key_range_t>::const_iterator s = subtrahends.begin(); s != subtrahends.end(); ++s) {
+        for (vector_t<key_range_t>::const_iterator m = buf.begin(); m != buf.end(); ++m) {
             // We are computing m-s here for each m in buf and s in subtrahends:
             // m-s = m & not(s) = m & ([-inf, s.left) | [s.right, +inf))
             //                  = (m & [-inf, s.left)) | (m & [s.right, +inf))

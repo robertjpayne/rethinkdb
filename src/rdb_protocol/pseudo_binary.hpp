@@ -4,7 +4,7 @@
 
 #include <string>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
@@ -30,7 +30,7 @@ scoped_cJSON_t encode_base64_ptype(const datum_string_t &data);
 
 // Given a `r.binary` pseudotype with base64 encoding, decodes it into a raw data string
 datum_string_t decode_base64_ptype(
-    const std::vector<std::pair<datum_string_t, datum_t> > &ptype);
+    const vector_t<std::pair<datum_string_t, datum_t> > &ptype);
 
 } // namespace pseudo
 } // namespace ql

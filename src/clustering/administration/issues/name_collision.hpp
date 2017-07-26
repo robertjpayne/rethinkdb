@@ -2,7 +2,7 @@
 #ifndef CLUSTERING_ADMINISTRATION_ISSUES_NAME_COLLISION_HPP_
 #define CLUSTERING_ADMINISTRATION_ISSUES_NAME_COLLISION_HPP_
 
-#include <vector>
+#include "containers/vector.hpp"
 #include <set>
 #include <string>
 
@@ -21,7 +21,7 @@ public:
 
     ~name_collision_issue_tracker_t();
 
-    std::vector<scoped_ptr_t<issue_t> > get_issues(signal_t *interruptor) const;
+    vector_t<scoped_ptr_t<issue_t> > get_issues(signal_t *interruptor) const;
 
 private:
     server_config_client_t *server_config_client;

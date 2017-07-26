@@ -22,7 +22,7 @@ public:
     }
     bool is_exhausted() const final;
 
-    std::vector<datum_t>
+    vector_t<datum_t>
     next_raw_batch(env_t *env, const batchspec_t &batchspec);
 
     feed_type_t cfeed_type() const final {
@@ -32,7 +32,7 @@ public:
 private:
     counted_t<datum_stream_t> stream;
     scoped_ptr_t<reader_t> get_all_reader;
-    std::vector<rget_item_t> get_all_items;
+    vector_t<rget_item_t> get_all_items;
 
     counted_t<table_t> table;
     datum_string_t join_index;

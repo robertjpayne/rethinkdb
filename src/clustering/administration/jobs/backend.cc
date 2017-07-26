@@ -40,7 +40,7 @@ std::string jobs_artificial_table_backend_t::get_primary_key_name() {
 }
 
 template <typename T>
-void insert_or_merge_jobs(std::vector<T> const &jobs, std::map<uuid_u, T> *jobs_out) {
+void insert_or_merge_jobs(vector_t<T> const &jobs, std::map<uuid_u, T> *jobs_out) {
     for (auto const &job : jobs) {
         auto result = jobs_out->insert(std::make_pair(job.id, job));
         if (result.second == false) {
@@ -86,10 +86,10 @@ void jobs_artificial_table_backend_t::get_all_job_reports(
         jobs_manager_business_card_t::return_mailbox_t return_mailbox(
             mailbox_manager,
             [&](UNUSED signal_t *,
-                std::vector<query_job_report_t> const & query_jobs,
-                std::vector<disk_compaction_job_report_t> const &disk_compaction_jobs,
-                std::vector<index_construction_job_report_t> const &index_construction_jobs,
-                std::vector<backfill_job_report_t> const &backfill_jobs) {
+                vector_t<query_job_report_t> const & query_jobs,
+                vector_t<disk_compaction_job_report_t> const &disk_compaction_jobs,
+                vector_t<index_construction_job_report_t> const &index_construction_jobs,
+                vector_t<backfill_job_report_t> const &backfill_jobs) {
 
                 insert_or_merge_jobs(query_jobs, &query_jobs_map);
                 insert_or_merge_jobs(disk_compaction_jobs, &disk_compaction_jobs_map);
@@ -142,7 +142,7 @@ void jobs_artificial_table_backend_t::get_all_job_reports(
 bool jobs_artificial_table_backend_t::read_all_rows_as_vector(
         auth::user_context_t const &user_context,
         signal_t *interruptor_on_caller,
-        std::vector<ql::datum_t> *rows_out,
+        vector_t<ql::datum_t> *rows_out,
         UNUSED admin_err_t *error_out) {
     rows_out->clear();
 

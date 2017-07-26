@@ -103,7 +103,7 @@ void dummy_sharder_t::read(const read_t &_read,
                            signal_t *interruptor) {
     if (interruptor->is_pulsed()) { throw interrupted_exc_t(); }
 
-    std::vector<read_response_t> responses;
+    vector_t<read_response_t> responses;
     responses.reserve(shards.size());
 
     for (auto it = shards.begin(); it != shards.end(); ++it) {
@@ -131,7 +131,7 @@ void dummy_sharder_t::write(const write_t &_write,
                             signal_t *interruptor) {
     if (interruptor->is_pulsed()) { throw interrupted_exc_t(); }
 
-    std::vector<write_response_t> responses;
+    vector_t<write_response_t> responses;
     responses.reserve(shards.size());
 
     for (auto it = shards.begin(); it != shards.end(); ++it) {
@@ -149,7 +149,7 @@ void dummy_sharder_t::write(const write_t &_write,
 }
 
 dummy_namespace_interface_t::
-dummy_namespace_interface_t(std::vector<region_t> shards,
+dummy_namespace_interface_t(vector_t<region_t> shards,
                             store_view_t *const *stores, order_source_t
                             *order_source, rdb_context_t *_ctx,
                             bool initialize_metadata)
@@ -164,7 +164,7 @@ dummy_namespace_interface_t(std::vector<region_t> shards,
         }
     }
 
-    std::vector<dummy_sharder_t::shard_t> shards_of_this_db;
+    vector_t<dummy_sharder_t::shard_t> shards_of_this_db;
     for (size_t i = 0; i < shards.size(); ++i) {
         /* Initialize metadata everywhere */
         if (initialize_metadata) {

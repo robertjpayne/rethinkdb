@@ -11,7 +11,7 @@
 #include <map>
 #include <set>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 #include <utility>
 
 #include "arch/runtime/coroutines.hpp"
@@ -140,7 +140,7 @@ MUST_USE archive_result_t deserialize(read_stream_t *s, std::string *out) {
 // it'll take O(n) time!
 // Keep in sync with serialize.
 template <cluster_version_t W, class T>
-size_t serialized_size(const std::vector<T> &v) {
+size_t serialized_size(const vector_t<T> &v) {
     size_t ret = varint_uint64_serialized_size(v.size());
     for (auto it = v.begin(), e = v.end(); it != e; ++it) {
         ret += serialized_size<W>(*it);
@@ -151,7 +151,7 @@ size_t serialized_size(const std::vector<T> &v) {
 
 // Keep in sync with serialized_size.
 template <cluster_version_t W, class T>
-void serialize(write_message_t *wm, const std::vector<T> &v) {
+void serialize(write_message_t *wm, const vector_t<T> &v) {
     serialize_varint_uint64(wm, v.size());
     for (auto it = v.begin(), e = v.end(); it != e; ++it) {
         serialize<W>(wm, *it);
@@ -159,7 +159,7 @@ void serialize(write_message_t *wm, const std::vector<T> &v) {
 }
 
 template <cluster_version_t W, class T>
-MUST_USE archive_result_t deserialize(read_stream_t *s, std::vector<T> *v) {
+MUST_USE archive_result_t deserialize(read_stream_t *s, vector_t<T> *v) {
     v->clear();
 
     uint64_t sz;

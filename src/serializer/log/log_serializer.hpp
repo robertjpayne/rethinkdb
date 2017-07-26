@@ -4,7 +4,7 @@
 
 #include <map>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 #include <list>
 
 #include "arch/compiler.hpp"
@@ -153,9 +153,9 @@ public:
 
     void index_write(new_mutex_in_line_t *mutex_acq,
                      const std::function<void()> &on_writes_reflected,
-                     const std::vector<index_write_op_t> &write_ops);
+                     const vector_t<index_write_op_t> &write_ops);
 
-    std::vector<counted_t<ls_block_token_pointee_t> > block_writes(const std::vector<buf_write_info_t> &write_infos,
+    vector_t<counted_t<ls_block_token_pointee_t> > block_writes(const vector_t<buf_write_info_t> &write_infos,
                                                                    file_account_t *io_account, iocallback_t *cb);
 
     max_block_size_t max_block_size() const;
@@ -227,7 +227,7 @@ private:
     bool expecting_no_more_tokens;
 #endif
 
-    std::vector<serializer_read_ahead_callback_t *> read_ahead_callbacks;
+    vector_t<serializer_read_ahead_callback_t *> read_ahead_callbacks;
 
     const dynamic_config_t dynamic_config;
     static_config_t static_config;

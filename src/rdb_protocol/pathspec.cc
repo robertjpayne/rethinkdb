@@ -15,7 +15,7 @@ pathspec_t& pathspec_t::operator=(const pathspec_t &other) {
     type_t type_old = type;
     union {
         datum_string_t *str_old;
-        std::vector<pathspec_t> *vec_old;
+        vector_t<pathspec_t> *vec_old;
         std::map<datum_string_t, pathspec_t> *map_old;
     };
     switch (type) {
@@ -66,12 +66,12 @@ pathspec_t::pathspec_t(datum_t datum, const term_t *_creator)
         str = new datum_string_t(datum.as_str());
     } else if (datum.get_type() == datum_t::R_ARRAY) {
         type = VEC;
-        vec = new std::vector<pathspec_t>;
+        vec = new vector_t<pathspec_t>;
         for (size_t i = 0; i < datum.arr_size(); ++i) {
             vec->push_back(pathspec_t(datum.get(i), creator));
         }
     } else if (datum.get_type() == datum_t::R_OBJECT) {
-        scoped_ptr_t<std::vector<pathspec_t> > local_vec(new std::vector<pathspec_t>);
+        scoped_ptr_t<vector_t<pathspec_t> > local_vec(new vector_t<pathspec_t>);
         scoped_ptr_t<std::map<datum_string_t, pathspec_t> >
             local_map(new std::map<datum_string_t, pathspec_t>);
         for (size_t i = 0; i < datum.obj_size(); ++i) {
@@ -128,7 +128,7 @@ void pathspec_t::init_from(const pathspec_t &other) {
         str = new datum_string_t(*other.str);
         break;
     case VEC:
-        vec = new std::vector<pathspec_t>(*other.vec);
+        vec = new vector_t<pathspec_t>(*other.vec);
         break;
     case MAP:
         map = new std::map<datum_string_t, pathspec_t>(*other.map);
@@ -159,7 +159,7 @@ datum_t project(datum_t datum,
             if (val.has()) {
                 res.overwrite(std::move(str), val);
             }
-        } else if (const std::vector<pathspec_t> *vec = pathspec.as_vec()) {
+        } else if (const vector_t<pathspec_t> *vec = pathspec.as_vec()) {
             for (auto it = vec->begin(); it != vec->end(); ++it) {
                 datum_t sub_result = project(datum, *it, recurse, limits);
                 for (size_t i = 0; i < sub_result.obj_size(); ++i) {
@@ -193,7 +193,7 @@ void unproject_helper(datum_object_builder_t *datum,
                       const configured_limits_t &limits) {
     if (const datum_string_t *str = pathspec.as_str()) {
         UNUSED bool key_was_deleted = datum->delete_field(*str);
-    } else if (const std::vector<pathspec_t> *vec = pathspec.as_vec()) {
+    } else if (const vector_t<pathspec_t> *vec = pathspec.as_vec()) {
         for (auto it = vec->begin(); it != vec->end(); ++it) {
             unproject_helper(datum, *it, recurse, limits);
         }
@@ -243,7 +243,7 @@ bool contains(datum_t datum,
                           datum.get_field(*str).get_type() != datum_t::R_NULL))) {
                 return res;
             }
-        } else if (const std::vector<pathspec_t> *vec = pathspec.as_vec()) {
+        } else if (const vector_t<pathspec_t> *vec = pathspec.as_vec()) {
             for (auto it = vec->begin(); it != vec->end(); ++it) {
                 if (!(res &= contains(datum, *it))) {
                     return res;

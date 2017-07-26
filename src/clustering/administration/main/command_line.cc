@@ -591,12 +591,12 @@ private:
 };
 
 std::set<ip_address_t> get_local_addresses(
-    const std::vector<std::string> &specific_options,
-    const std::vector<std::string> &default_options,
+    const vector_t<std::string> &specific_options,
+    const vector_t<std::string> &default_options,
     local_ip_filter_t filter_type) {
     std::set<ip_address_t> set_filter;
 
-    const std::vector<std::string> &bind_options =
+    const vector_t<std::string> &bind_options =
         specific_options.size() > 0 ?
         specific_options :
         default_options;
@@ -649,7 +649,7 @@ std::set<ip_address_t> get_local_addresses(
 
 // Returns the options vector for a given option name.  The option must *exist*!  Typically this is
 // for OPTIONAL_REPEAT options with a default value being the empty vector.
-const std::vector<std::string> &all_options(const std::map<std::string, options::values_t> &opts,
+const vector_t<std::string> &all_options(const std::map<std::string, options::values_t> &opts,
                                             const std::string &name,
                                             std::string *source_out) {
     auto it = opts.find(name);
@@ -660,7 +660,7 @@ const std::vector<std::string> &all_options(const std::map<std::string, options:
     return it->second.values;
 }
 
-const std::vector<std::string> &all_options(const std::map<std::string, options::values_t> &opts,
+const vector_t<std::string> &all_options(const std::map<std::string, options::values_t> &opts,
                                             const std::string &name) {
     std::string source;
     return all_options(opts, name, &source);
@@ -686,7 +686,7 @@ int offseted_port(const int port, const int port_offset) {
 peer_address_t get_canonical_addresses(const std::map<std::string, options::values_t> &opts,
                                        int default_port) {
     std::string source;
-    std::vector<std::string> canonical_options = all_options(opts, "--canonical-address", &source);
+    vector_t<std::string> canonical_options = all_options(opts, "--canonical-address", &source);
     // Verify that all specified addresses are valid ip addresses
     std::set<host_and_port_t> result;
     for (size_t i = 0; i < canonical_options.size(); ++i) {
@@ -712,7 +712,7 @@ service_address_ports_t get_service_address_ports(const std::map<std::string, op
             local_ip_filter_t::MATCH_FILTER :
             local_ip_filter_t::MATCH_FILTER_OR_LOOPBACK;
 
-    const std::vector<std::string> &default_options =
+    const vector_t<std::string> &default_options =
         all_options(opts, "--bind");
     return service_address_ports_t(
         get_local_addresses(default_options, default_options, filter),
@@ -1354,7 +1354,7 @@ void run_rethinkdb_proxy(
     }
 }
 
-options::help_section_t get_server_options(std::vector<options::option_t> *options_out) {
+options::help_section_t get_server_options(vector_t<options::option_t> *options_out) {
     options::help_section_t help("Server options");
     options_out->push_back(options::option_t(options::names_t("--server-name", "-n"),
                                              options::OPTIONAL));
@@ -1371,7 +1371,7 @@ options::help_section_t get_server_options(std::vector<options::option_t> *optio
     return help;
 }
 
-options::help_section_t get_auth_options(std::vector<options::option_t> *options_out) {
+options::help_section_t get_auth_options(vector_t<options::option_t> *options_out) {
     options::help_section_t help("Authentication options");
 
     options_out->push_back(options::option_t(options::names_t("--initial-password"),
@@ -1383,7 +1383,7 @@ options::help_section_t get_auth_options(std::vector<options::option_t> *options
     return help;
 }
 
-options::help_section_t get_log_options(std::vector<options::option_t> *options_out) {
+options::help_section_t get_log_options(vector_t<options::option_t> *options_out) {
     options::help_section_t help("Log options");
     options_out->push_back(options::option_t(options::names_t("--log-file"),
                                              options::OPTIONAL));
@@ -1396,7 +1396,7 @@ options::help_section_t get_log_options(std::vector<options::option_t> *options_
 }
 
 
-options::help_section_t get_file_options(std::vector<options::option_t> *options_out) {
+options::help_section_t get_file_options(vector_t<options::option_t> *options_out) {
     options::help_section_t help("File path options");
     options_out->push_back(options::option_t(options::names_t("--directory", "-d"),
                                              options::OPTIONAL,
@@ -1420,7 +1420,7 @@ options::help_section_t get_file_options(std::vector<options::option_t> *options
     return help;
 }
 
-options::help_section_t get_config_file_options(std::vector<options::option_t> *options_out) {
+options::help_section_t get_config_file_options(vector_t<options::option_t> *options_out) {
     options::help_section_t help("Configuration file options");
     options_out->push_back(options::option_t(options::names_t("--config-file"),
                                              options::OPTIONAL));
@@ -1428,11 +1428,11 @@ options::help_section_t get_config_file_options(std::vector<options::option_t> *
     return help;
 }
 
-std::vector<host_and_port_t> parse_join_options(const std::map<std::string, options::values_t> &opts,
+vector_t<host_and_port_t> parse_join_options(const std::map<std::string, options::values_t> &opts,
                                                 int default_port) {
     std::string source;
-    const std::vector<std::string> join_strings = all_options(opts, "--join", &source);
-    std::vector<host_and_port_t> joins;
+    const vector_t<std::string> join_strings = all_options(opts, "--join", &source);
+    vector_t<host_and_port_t> joins;
     for (auto it = join_strings.begin(); it != join_strings.end(); ++it) {
         joins.push_back(parse_host_and_port(source, "--join", *it, default_port));
     }
@@ -1544,7 +1544,7 @@ std::string get_reql_http_proxy_option(const std::map<std::string, options::valu
     return proxy.get();
 }
 
-options::help_section_t get_web_options(std::vector<options::option_t> *options_out) {
+options::help_section_t get_web_options(vector_t<options::option_t> *options_out) {
     options::help_section_t help("Web options");
     options_out->push_back(options::option_t(options::names_t("--web-static-directory"),
                                              options::OPTIONAL));
@@ -1559,7 +1559,7 @@ options::help_section_t get_web_options(std::vector<options::option_t> *options_
     return help;
 }
 
-options::help_section_t get_network_options(const bool join_required, std::vector<options::option_t> *options_out) {
+options::help_section_t get_network_options(const bool join_required, vector_t<options::option_t> *options_out) {
     options::help_section_t help("Network options");
     options_out->push_back(options::option_t(options::names_t("--bind"),
                                              options::OPTIONAL_REPEAT));
@@ -1627,7 +1627,7 @@ options::help_section_t get_network_options(const bool join_required, std::vecto
     return help;
 }
 
-options::help_section_t get_cpu_options(std::vector<options::option_t> *options_out) {
+options::help_section_t get_cpu_options(vector_t<options::option_t> *options_out) {
     options::help_section_t help("CPU options");
     options_out->push_back(options::option_t(options::names_t("--cores", "-c"),
                                              options::OPTIONAL,
@@ -1647,7 +1647,7 @@ MUST_USE bool parse_cores_option(const std::map<std::string, options::values_t> 
     return true;
 }
 
-options::help_section_t get_service_options(std::vector<options::option_t> *options_out) {
+options::help_section_t get_service_options(vector_t<options::option_t> *options_out) {
     options::help_section_t help("Service options");
     options_out->push_back(options::option_t(options::names_t("--pid-file"),
                                              options::OPTIONAL));
@@ -1658,7 +1658,7 @@ options::help_section_t get_service_options(std::vector<options::option_t> *opti
     return help;
 }
 
-options::help_section_t get_setuser_options(std::vector<options::option_t> *options_out) {
+options::help_section_t get_setuser_options(vector_t<options::option_t> *options_out) {
     options::help_section_t help("Set User/Group options");
 #ifndef _WIN32
     options_out->push_back(options::option_t(options::names_t("--runuser"),
@@ -1672,7 +1672,7 @@ options::help_section_t get_setuser_options(std::vector<options::option_t> *opti
 }
 
 #ifdef ENABLE_TLS
-options::help_section_t get_tls_options(std::vector<options::option_t> *options_out) {
+options::help_section_t get_tls_options(vector_t<options::option_t> *options_out) {
     options::help_section_t help("TLS options");
 
     // Web TLS options.
@@ -1749,7 +1749,7 @@ options::help_section_t get_tls_options(std::vector<options::option_t> *options_
 }
 #endif
 
-options::help_section_t get_help_options(std::vector<options::option_t> *options_out) {
+options::help_section_t get_help_options(vector_t<options::option_t> *options_out) {
     options::help_section_t help("Help options");
     options_out->push_back(options::option_t(options::names_t("--help", "-h"),
                                              options::OPTIONAL_NO_PARAMETER));
@@ -1760,8 +1760,8 @@ options::help_section_t get_help_options(std::vector<options::option_t> *options
     return help;
 }
 
-void get_rethinkdb_create_options(std::vector<options::help_section_t> *help_out,
-                                  std::vector<options::option_t> *options_out) {
+void get_rethinkdb_create_options(vector_t<options::help_section_t> *help_out,
+                                  vector_t<options::option_t> *options_out) {
     help_out->push_back(get_file_options(options_out));
     help_out->push_back(get_server_options(options_out));
     help_out->push_back(get_auth_options(options_out));
@@ -1771,8 +1771,8 @@ void get_rethinkdb_create_options(std::vector<options::help_section_t> *help_out
     help_out->push_back(get_config_file_options(options_out));
 }
 
-void get_rethinkdb_serve_options(std::vector<options::help_section_t> *help_out,
-                                 std::vector<options::option_t> *options_out) {
+void get_rethinkdb_serve_options(vector_t<options::help_section_t> *help_out,
+                                 vector_t<options::option_t> *options_out) {
     help_out->push_back(get_file_options(options_out));
     help_out->push_back(get_network_options(false, options_out));
 #ifdef ENABLE_TLS
@@ -1788,8 +1788,8 @@ void get_rethinkdb_serve_options(std::vector<options::help_section_t> *help_out,
     help_out->push_back(get_config_file_options(options_out));
 }
 
-void get_rethinkdb_proxy_options(std::vector<options::help_section_t> *help_out,
-                                 std::vector<options::option_t> *options_out) {
+void get_rethinkdb_proxy_options(vector_t<options::help_section_t> *help_out,
+                                 vector_t<options::option_t> *options_out) {
     help_out->push_back(get_network_options(true, options_out));
 #ifdef ENABLE_TLS
     help_out->push_back(get_tls_options(options_out));
@@ -1803,8 +1803,8 @@ void get_rethinkdb_proxy_options(std::vector<options::help_section_t> *help_out,
     help_out->push_back(get_config_file_options(options_out));
 }
 
-void get_rethinkdb_porcelain_options(std::vector<options::help_section_t> *help_out,
-                                     std::vector<options::option_t> *options_out) {
+void get_rethinkdb_porcelain_options(vector_t<options::help_section_t> *help_out,
+                                     vector_t<options::option_t> *options_out) {
     help_out->push_back(get_file_options(options_out));
     help_out->push_back(get_server_options(options_out));
     help_out->push_back(get_network_options(false, options_out));
@@ -1822,14 +1822,14 @@ void get_rethinkdb_porcelain_options(std::vector<options::help_section_t> *help_
 }
 
 std::map<std::string, options::values_t> parse_config_file_flat(const std::string &config_filepath,
-                                                                const std::vector<options::option_t> &options) {
+                                                                const vector_t<options::option_t> &options) {
     std::string file;
     if (!blocking_read_file(config_filepath.c_str(), &file)) {
         throw std::runtime_error(strprintf("Trouble reading config file '%s'", config_filepath.c_str()));
     }
 
-    std::vector<options::option_t> options_superset;
-    std::vector<options::help_section_t> helps_superset;
+    vector_t<options::option_t> options_superset;
+    vector_t<options::help_section_t> helps_superset;
 
     // There will be some duplicates in here, but it shouldn't be a problem
     get_rethinkdb_create_options(&helps_superset, &options_superset);
@@ -1842,7 +1842,7 @@ std::map<std::string, options::values_t> parse_config_file_flat(const std::strin
 }
 
 std::map<std::string, options::values_t> parse_commands_deep(int argc, char **argv,
-                                                             std::vector<options::option_t> options) {
+                                                             vector_t<options::option_t> options) {
     std::map<std::string, options::values_t> opts = options::parse_command_line(argc, argv, options);
     const optional<std::string> config_file_name = get_optional_option(opts, "--config-file");
     if (config_file_name) {
@@ -1856,15 +1856,15 @@ void output_sourced_error(const options::option_error_t &ex) {
     fprintf(stderr, "Error in %s: %s\n", ex.source().c_str(), ex.what());
 }
 
-void output_named_error(const options::named_error_t &ex, const std::vector<options::help_section_t> &help) {
+void output_named_error(const options::named_error_t &ex, const vector_t<options::help_section_t> &help) {
     output_sourced_error(ex);
 
     for (auto section = help.begin(); section != help.end(); ++section) {
         for (auto line = section->help_lines.begin(); line != section->help_lines.end(); ++line) {
             if (line->syntax_description.find(ex.option_name()) != std::string::npos) {
-                std::vector<options::help_line_t> one_help_line;
+                vector_t<options::help_line_t> one_help_line;
                 one_help_line.push_back(*line);
-                std::vector<options::help_section_t> one_help_section;
+                vector_t<options::help_section_t> one_help_section;
                 one_help_section.push_back(options::help_section_t("Usage", one_help_line));
                 fprintf(stderr, "%s",
                         options::format_help(one_help_section).c_str());
@@ -1900,8 +1900,8 @@ file_direct_io_mode_t parse_direct_io_mode_option(const std::map<std::string, op
 }
 
 int main_rethinkdb_create(int argc, char *argv[]) {
-    std::vector<options::option_t> options;
-    std::vector<options::help_section_t> help;
+    vector_t<options::option_t> options;
+    vector_t<options::help_section_t> help;
     get_rethinkdb_create_options(&help, &options);
 
     try {
@@ -2020,8 +2020,8 @@ bool maybe_daemonize(const std::map<std::string, options::values_t> &opts) {
 }
 
 int main_rethinkdb_serve(int argc, char *argv[]) {
-    std::vector<options::option_t> options;
-    std::vector<options::help_section_t> help;
+    vector_t<options::option_t> options;
+    vector_t<options::help_section_t> help;
     get_rethinkdb_serve_options(&help, &options);
 
     try {
@@ -2041,7 +2041,7 @@ int main_rethinkdb_serve(int argc, char *argv[]) {
 
         std::string initial_password = parse_initial_password_option(opts);
 
-        std::vector<host_and_port_t> joins = parse_join_options(opts, port_defaults::peer_port);
+        vector_t<host_and_port_t> joins = parse_join_options(opts, port_defaults::peer_port);
 
         service_address_ports_t address_ports = get_service_address_ports(opts);
 
@@ -2104,7 +2104,7 @@ int main_rethinkdb_serve(int argc, char *argv[]) {
                                 do_update_checking,
                                 address_ports,
                                 get_optional_option(opts, "--config-file"),
-                                std::vector<std::string>(argv, argv + argc),
+                                vector_t<std::string>(argv, argv + argc),
                                 join_delay_secs.value_or(0),
                                 node_reconnect_timeout_secs.value_or(cluster_defaults::reconnect_timeout),
                                 tls_configs);
@@ -2139,8 +2139,8 @@ int main_rethinkdb_serve(int argc, char *argv[]) {
 }
 
 int main_rethinkdb_proxy(int argc, char *argv[]) {
-    std::vector<options::option_t> options;
-    std::vector<options::help_section_t> help;
+    vector_t<options::option_t> options;
+    vector_t<options::help_section_t> help;
     get_rethinkdb_proxy_options(&help, &options);
 
     try {
@@ -2152,7 +2152,7 @@ int main_rethinkdb_proxy(int argc, char *argv[]) {
 
         options::verify_option_counts(options, opts);
 
-        std::vector<host_and_port_t> joins = parse_join_options(opts, port_defaults::peer_port);
+        vector_t<host_and_port_t> joins = parse_join_options(opts, port_defaults::peer_port);
 
         service_address_ports_t address_ports = get_service_address_ports(opts);
 
@@ -2207,7 +2207,7 @@ int main_rethinkdb_proxy(int argc, char *argv[]) {
                                 update_check_t::do_not_perform,
                                 address_ports,
                                 get_optional_option(opts, "--config-file"),
-                                std::vector<std::string>(argv, argv + argc),
+                                vector_t<std::string>(argv, argv + argc),
                                 join_delay_secs.value_or(0),
                                 node_reconnect_timeout_secs.value_or(cluster_defaults::reconnect_timeout),
                                 tls_configs);
@@ -2293,8 +2293,8 @@ int main_rethinkdb_repl(int, char *argv[]) {
 }
 
 int main_rethinkdb_porcelain(int argc, char *argv[]) {
-    std::vector<options::option_t> options;
-    std::vector<options::help_section_t> help;
+    vector_t<options::option_t> options;
+    vector_t<options::help_section_t> help;
     get_rethinkdb_porcelain_options(&help, &options);
 
     try {
@@ -2312,7 +2312,7 @@ int main_rethinkdb_porcelain(int argc, char *argv[]) {
 
         std::string initial_password = parse_initial_password_option(opts);
 
-        std::vector<host_and_port_t> joins = parse_join_options(opts, port_defaults::peer_port);
+        vector_t<host_and_port_t> joins = parse_join_options(opts, port_defaults::peer_port);
 
         const service_address_ports_t address_ports = get_service_address_ports(opts);
 
@@ -2397,7 +2397,7 @@ int main_rethinkdb_porcelain(int argc, char *argv[]) {
                                 do_update_checking,
                                 address_ports,
                                 get_optional_option(opts, "--config-file"),
-                                std::vector<std::string>(argv, argv + argc),
+                                vector_t<std::string>(argv, argv + argc),
                                 join_delay_secs.value_or(0),
                                 node_reconnect_timeout_secs.value_or(cluster_defaults::reconnect_timeout),
                                 tls_configs);
@@ -2434,9 +2434,9 @@ int main_rethinkdb_porcelain(int argc, char *argv[]) {
 }
 
 void help_rethinkdb_porcelain() {
-    std::vector<options::help_section_t> help_sections;
+    vector_t<options::help_section_t> help_sections;
     {
-        std::vector<options::option_t> options;
+        vector_t<options::option_t> options;
         get_rethinkdb_porcelain_options(&help_sections, &options);
     }
 
@@ -2463,9 +2463,9 @@ void help_rethinkdb_porcelain() {
 }
 
 void help_rethinkdb_create() {
-    std::vector<options::help_section_t> help_sections;
+    vector_t<options::help_section_t> help_sections;
     {
-        std::vector<options::option_t> options;
+        vector_t<options::option_t> options;
         get_rethinkdb_create_options(&help_sections, &options);
     }
 
@@ -2475,9 +2475,9 @@ void help_rethinkdb_create() {
 }
 
 void help_rethinkdb_serve() {
-    std::vector<options::help_section_t> help_sections;
+    vector_t<options::help_section_t> help_sections;
     {
-        std::vector<options::option_t> options;
+        vector_t<options::option_t> options;
         get_rethinkdb_serve_options(&help_sections, &options);
     }
 
@@ -2486,9 +2486,9 @@ void help_rethinkdb_serve() {
 }
 
 void help_rethinkdb_proxy() {
-    std::vector<options::help_section_t> help_sections;
+    vector_t<options::help_section_t> help_sections;
     {
-        std::vector<options::option_t> options;
+        vector_t<options::option_t> options;
         get_rethinkdb_proxy_options(&help_sections, &options);
     }
 
@@ -2589,8 +2589,8 @@ int main_rethinkdb_run_service(int argc, char *argv[]) {
 }
 
 void get_rethinkdb_install_service_options(
-    std::vector<options::help_section_t> *help_out,
-    std::vector<options::option_t> *options_out) {
+    vector_t<options::help_section_t> *help_out,
+    vector_t<options::option_t> *options_out) {
     options::help_section_t help("Service options");
     options_out->push_back(options::option_t(options::names_t("--instance-name"),
         options::OPTIONAL));
@@ -2612,9 +2612,9 @@ void get_rethinkdb_install_service_options(
 }
 
 void help_rethinkdb_install_service() {
-    std::vector<options::help_section_t> help_sections;
+    vector_t<options::help_section_t> help_sections;
     {
-        std::vector<options::option_t> options;
+        vector_t<options::option_t> options;
         get_rethinkdb_install_service_options(&help_sections, &options);
     }
 
@@ -2623,8 +2623,8 @@ void help_rethinkdb_install_service() {
 }
 
 void get_rethinkdb_remove_service_options(
-    std::vector<options::help_section_t> *help_out,
-    std::vector<options::option_t> *options_out) {
+    vector_t<options::help_section_t> *help_out,
+    vector_t<options::option_t> *options_out) {
     options::help_section_t help("Service options");
     options_out->push_back(options::option_t(options::names_t("--instance-name"),
         options::OPTIONAL));
@@ -2636,9 +2636,9 @@ void get_rethinkdb_remove_service_options(
 }
 
 void help_rethinkdb_remove_service() {
-    std::vector<options::help_section_t> help_sections;
+    vector_t<options::help_section_t> help_sections;
     {
-        std::vector<options::option_t> options;
+        vector_t<options::option_t> options;
         get_rethinkdb_remove_service_options(&help_sections, &options);
     }
 
@@ -2724,8 +2724,8 @@ int main_rethinkdb_install_service(int argc, char *argv[]) {
         --argc;
     }
 
-    std::vector<options::option_t> options;
-    std::vector<options::help_section_t> help;
+    vector_t<options::option_t> options;
+    vector_t<options::help_section_t> help;
     get_rethinkdb_install_service_options(&help, &options);
     try {
         std::map<std::string, options::values_t> opts = parse_command_line(argc - 2, argv + 2, options);
@@ -2770,8 +2770,8 @@ int main_rethinkdb_install_service(int argc, char *argv[]) {
 
         // Validate the configuration file (we ignore the resulting options)
         {
-            std::vector<options::help_section_t> help;
-            std::vector<options::option_t> valid_options;
+            vector_t<options::help_section_t> help;
+            vector_t<options::option_t> valid_options;
             get_rethinkdb_porcelain_options(&help, &valid_options);
             parse_config_file_flat(config_file_name, valid_options);
         }
@@ -2806,7 +2806,7 @@ int main_rethinkdb_install_service(int argc, char *argv[]) {
         std::string service_name = "rethinkdb_" + instance_name;
         std::string display_name = "RethinkDB (" + instance_name + ")";
 
-        std::vector<std::string> service_args;
+        vector_t<std::string> service_args;
         service_args.push_back("run-service");
         service_args.push_back("--config-file");
         service_args.push_back(config_file_name);
@@ -2843,8 +2843,8 @@ int main_rethinkdb_remove_service(int argc, char *argv[]) {
         --argc;
     }
 
-    std::vector<options::option_t> options;
-    std::vector<options::help_section_t> help;
+    vector_t<options::option_t> options;
+    vector_t<options::help_section_t> help;
     get_rethinkdb_remove_service_options(&help, &options);
     try {
         std::map<std::string, options::values_t> opts = parse_command_line(argc - 2, argv + 2, options);

@@ -3,7 +3,7 @@
 #define PPRINT_PPRINT_HPP_
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 #include <utility>
 
 #include "containers/counted.hpp"
@@ -36,13 +36,13 @@ counted_t<const document_t> make_cond(const std::string small, const std::string
                        const std::string tail);
 
 // A concatenation of documents.
-counted_t<const document_t> make_concat(std::vector<counted_t<const document_t> > args);
+counted_t<const document_t> make_concat(vector_t<counted_t<const document_t> > args);
 counted_t<const document_t>
 make_concat(std::initializer_list<counted_t<const document_t> > args);
 
 template <typename It>
 counted_t<const document_t> make_concat(It &&begin, It &&end) {
-    std::vector<counted_t<const document_t> > v(std::forward<It>(begin),
+    vector_t<counted_t<const document_t> > v(std::forward<It>(begin),
                                                 std::forward<It>(end));
     return make_concat(std::move(v));
 }

@@ -99,7 +99,7 @@ private:
         stream.reserve(wm.size());
         int res = send_write_message(&stream, &wm);
         guarantee(res == 0);
-        std::vector<char> data;
+        vector_t<char> data;
         stream.swap(&data);
         vector_read_stream_t rstream(std::move(data));
         T value;

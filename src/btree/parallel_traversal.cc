@@ -113,7 +113,7 @@ public:
     cond_t finished_cond;
 
     // The number of pending + acquired blocks, by level.
-    std::vector<int64_t> level_counts;
+    vector_t<int64_t> level_counts;
 
     class interruptor_watcher_t : public signal_t::subscription_t {
     public:
@@ -209,9 +209,9 @@ public:
         return sum;
     }
 
-    std::vector< std::vector<acquisition_waiter_callback_t *> > acquisition_waiter_stacks;
+    vector_t< vector_t<acquisition_waiter_callback_t *> > acquisition_waiter_stacks;
 
-    std::vector<acquisition_waiter_callback_t *>& acquisition_waiter_stack(int level) {
+    vector_t<acquisition_waiter_callback_t *>& acquisition_waiter_stack(int level) {
         rassert(level >= 0);
         if (level >= static_cast<int>(acquisition_waiter_stacks.size())) {
             rassert(level == static_cast<int>(acquisition_waiter_stacks.size()),
@@ -666,12 +666,12 @@ progress_completion_fraction_t parallel_traversal_progress_t::guess_completion()
      * learned nodes. This gives us a rough estimate of the branch factor at
      * each level. */
 
-    std::vector<double> released_to_acquired_ratios;
+    vector_t<double> released_to_acquired_ratios;
     for (unsigned i = 0; i + 1 < learned.size(); ++i) {
         released_to_acquired_ratios.push_back(static_cast<double>(acquired[i + 1]) / std::max<double>(1.0, released[i]));
     }
 
-    std::vector<int> population_by_level_guesses;
+    vector_t<int> population_by_level_guesses;
     population_by_level_guesses.push_back(learned[0]);
 
     rassert(!learned.empty());

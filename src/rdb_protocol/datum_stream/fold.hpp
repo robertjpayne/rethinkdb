@@ -14,7 +14,7 @@ public:
                         counted_t<const func_t> &&_final_emit_func,
                         backtrace_id_t bt);
 
-    std::vector<datum_t>
+    vector_t<datum_t>
     next_raw_batch(env_t *env, const batchspec_t &batchspec);
 
     bool is_array() const final {

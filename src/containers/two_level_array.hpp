@@ -2,7 +2,7 @@
 #ifndef CONTAINERS_TWO_LEVEL_ARRAY_HPP_
 #define CONTAINERS_TWO_LEVEL_ARRAY_HPP_
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "errors.hpp"
 
@@ -35,7 +35,7 @@ private:
         size_t count;
         value_t values[CHUNK_SIZE];
     };
-    std::vector<chunk_t *> chunks;
+    vector_t<chunk_t *> chunks;
 
     static size_t chunk_for_key(size_t key) {
         size_t chunk_id = key / CHUNK_SIZE;

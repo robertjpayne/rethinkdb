@@ -10,7 +10,7 @@
 
 class get_distribution_traversal_helper_t : public btree_traversal_helper_t, public home_thread_mixin_debug_only_t {
 public:
-    get_distribution_traversal_helper_t(int _depth_limit, std::vector<store_key_t> *_keys)
+    get_distribution_traversal_helper_t(int _depth_limit, vector_t<store_key_t> *_keys)
         : depth_limit(_depth_limit), key_count(0), keys(_keys)
     { }
 
@@ -85,12 +85,12 @@ public:
     int64_t key_count;
 
     //TODO this is inefficient since each one is maximum size
-    std::vector<store_key_t> *keys;
+    vector_t<store_key_t> *keys;
 };
 
 void get_btree_key_distribution(superblock_t *superblock, int depth_limit,
                                 int64_t *key_count_out,
-                                std::vector<store_key_t> *keys_out) {
+                                vector_t<store_key_t> *keys_out) {
     get_distribution_traversal_helper_t helper(depth_limit, keys_out);
     rassert(keys_out->empty(), "Why is this output parameter not an empty vector\n");
 

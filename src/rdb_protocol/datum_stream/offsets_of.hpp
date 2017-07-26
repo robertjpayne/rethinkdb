@@ -10,7 +10,7 @@ public:
     offsets_of_datum_stream_t(counted_t<const func_t> _f, counted_t<datum_stream_t> _source);
 
 private:
-    std::vector<datum_t>
+    vector_t<datum_t>
     next_raw_batch(env_t *env, const batchspec_t &batchspec);
 
     counted_t<const func_t> f;

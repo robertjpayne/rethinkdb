@@ -481,7 +481,7 @@ get_ls_block_token(const counted_t<scs_block_token_t<log_serializer_t> > &tok) {
 
 void log_serializer_t::index_write(new_mutex_in_line_t *mutex_acq,
                                    const std::function<void()> &on_writes_reflected,
-                                   const std::vector<index_write_op_t> &write_ops) {
+                                   const vector_t<index_write_op_t> &write_ops) {
     assert_thread();
     ticks_t pm_time;
     stats->pm_serializer_index_writes.begin(&pm_time);
@@ -496,7 +496,7 @@ void log_serializer_t::index_write(new_mutex_in_line_t *mutex_acq,
         // atomic.
         ASSERT_NO_CORO_WAITING;
 
-        for (std::vector<index_write_op_t>::const_iterator write_op_it = write_ops.begin();
+        for (vector_t<index_write_op_t>::const_iterator write_op_it = write_ops.begin();
              write_op_it != write_ops.end();
              ++write_op_it) {
             const index_write_op_t &op = *write_op_it;
@@ -664,13 +664,13 @@ log_serializer_t::generate_block_token(int64_t offset, block_size_t block_size) 
     return ret;
 }
 
-std::vector<counted_t<ls_block_token_pointee_t> >
-log_serializer_t::block_writes(const std::vector<buf_write_info_t> &write_infos,
+vector_t<counted_t<ls_block_token_pointee_t> >
+log_serializer_t::block_writes(const vector_t<buf_write_info_t> &write_infos,
                                file_account_t *io_account, iocallback_t *cb) {
     assert_thread();
     stats->pm_serializer_block_writes += write_infos.size();
 
-    std::vector<counted_t<ls_block_token_pointee_t> > result
+    vector_t<counted_t<ls_block_token_pointee_t> > result
         = data_block_manager->many_writes(write_infos, io_account, cb);
     guarantee(result.size() == write_infos.size());
     return result;

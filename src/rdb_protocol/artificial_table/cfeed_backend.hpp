@@ -58,7 +58,7 @@ protected:
         returns `false` if something goes wrong. */
         virtual bool get_initial_values(
             const new_mutex_acq_t *proof,
-            std::vector<ql::datum_t> *initial_values_out,
+            vector_t<ql::datum_t> *initial_values_out,
             signal_t *interruptor) = 0;
 
         new_mutex_t mutex;

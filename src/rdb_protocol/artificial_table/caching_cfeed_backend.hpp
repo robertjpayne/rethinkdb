@@ -58,7 +58,7 @@ private:
 
         bool get_initial_values(
             const new_mutex_acq_t *proof,
-            std::vector<ql::datum_t> *out,
+            vector_t<ql::datum_t> *out,
             signal_t *interruptor);
 
         /* Pulsed when all of the initial values have been fetched. */

@@ -14,7 +14,7 @@ public:
                            const datum_t &,
                            const datum_t &)> lt_cmp);
 private:
-    virtual std::vector<datum_t>
+    virtual vector_t<datum_t>
     next_raw_batch(env_t *env, const batchspec_t &batchspec);
 
     std::function<bool(env_t *,  // NOLINT(readability/casting)
@@ -22,7 +22,7 @@ private:
                        const datum_t &,
                        const datum_t &)> lt_cmp;
     size_t index;
-    std::vector<datum_t> data;
+    vector_t<datum_t> data;
 };
 
 }  // namespace ql

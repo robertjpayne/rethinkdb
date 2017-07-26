@@ -98,7 +98,7 @@ bool cfeed_artificial_table_backend_t::read_changes(
     }
 
     new_mutex_acq_t machinery_lock(&machinery->mutex, &interruptor2);
-    std::vector<ql::datum_t> initial_values;
+    vector_t<ql::datum_t> initial_values;
     if (!machinery->get_initial_values(
             &machinery_lock, &initial_values, &interruptor2)) {
         *error_out = admin_err_t{

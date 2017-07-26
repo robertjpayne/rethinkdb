@@ -41,7 +41,7 @@ minidriver_t::reql_t::reql_t(minidriver_t *_r, const datum_t &d) :
     term->datum = d;
 }
 
-minidriver_t::reql_t::reql_t(minidriver_t *_r, std::vector<reql_t> &&val) :
+minidriver_t::reql_t::reql_t(minidriver_t *_r, vector_t<reql_t> &&val) :
         r(_r), term(make_counted<generated_term_t>(Term::MAKE_ARRAY, r->bt)) {
     for (const auto &item : val) {
         term->args.push_back(item.term);

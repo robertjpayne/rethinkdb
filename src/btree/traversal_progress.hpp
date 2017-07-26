@@ -2,7 +2,7 @@
 #ifndef BTREE_TRAVERSAL_PROGRESS_HPP_
 #define BTREE_TRAVERSAL_PROGRESS_HPP_
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "errors.hpp"
 #include "threading.hpp"
@@ -61,10 +61,10 @@ private:
 
     // Used by guess_completion in a pmap call to go to the
     // constituent's home thread.
-    void get_constituent_fraction(int i, std::vector<progress_completion_fraction_t> *outputs) const;
+    void get_constituent_fraction(int i, vector_t<progress_completion_fraction_t> *outputs) const;
 
     // constituents _owns_ these pointers.
-    std::vector<traversal_progress_t *> constituents;
+    vector_t<traversal_progress_t *> constituents;
 
     bool is_destructing;
 

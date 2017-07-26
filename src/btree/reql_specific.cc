@@ -140,7 +140,7 @@ block_id_t sindex_superblock_t::get_sindex_block_id() {
 #define BACKFILL_CACHE_PRIORITY 10
 
 void btree_slice_t::init_real_superblock(real_superblock_t *superblock,
-                                         const std::vector<char> &metainfo_key,
+                                         const vector_t<char> &metainfo_key,
                                          const binary_blob_t &metainfo_value) {
     buf_write_t sb_write(superblock->get());
     auto sb = static_cast<reql_btree_superblock_t *>(
@@ -238,9 +238,9 @@ void superblock_metainfo_iterator_t::operator++() {
 
 void get_superblock_metainfo(
         real_superblock_t *superblock,
-        std::vector<std::pair<std::vector<char>, std::vector<char> > > *kv_pairs_out,
+        vector_t<std::pair<vector_t<char>, vector_t<char> > > *kv_pairs_out,
         cluster_version_t *version_out) {
-    std::vector<char> metainfo;
+    vector_t<char> metainfo;
     {
         buf_read_t read(superblock->get());
         uint32_t sb_size;
@@ -278,22 +278,22 @@ void get_superblock_metainfo(
     for (superblock_metainfo_iterator_t kv_iter(metainfo.data(), metainfo.data() + metainfo.size()); !kv_iter.is_end(); ++kv_iter) {
         superblock_metainfo_iterator_t::key_t key = kv_iter.key();
         superblock_metainfo_iterator_t::value_t value = kv_iter.value();
-        kv_pairs_out->push_back(std::make_pair(std::vector<char>(key.second, key.second + key.first), std::vector<char>(value.second, value.second + value.first)));
+        kv_pairs_out->push_back(std::make_pair(vector_t<char>(key.second, key.second + key.first), vector_t<char>(value.second, value.second + value.first)));
     }
 }
 
 void set_superblock_metainfo(real_superblock_t *superblock,
-                             const std::vector<char> &key,
+                             const vector_t<char> &key,
                              const binary_blob_t &value,
                              cluster_version_t version) {
-    std::vector<std::vector<char> > keys = {key};
-    std::vector<binary_blob_t> values = {value};
+    vector_t<vector_t<char> > keys = {key};
+    vector_t<binary_blob_t> values = {value};
     set_superblock_metainfo(superblock, keys, values, version);
 }
 
 void set_superblock_metainfo(real_superblock_t *superblock,
-                             const std::vector<std::vector<char> > &keys,
-                             const std::vector<binary_blob_t> &values,
+                             const vector_t<vector_t<char> > &keys,
+                             const vector_t<binary_blob_t> &values,
                              cluster_version_t version) {
     buf_write_t write(superblock->get());
     reql_btree_superblock_t *data
@@ -312,7 +312,7 @@ void set_superblock_metainfo(real_superblock_t *superblock,
                 data->metainfo_blob, reql_btree_superblock_t::METAINFO_BLOB_MAXREFLEN);
     blob.clear(buf_parent_t(superblock->get()));
 
-    std::vector<char> metainfo;
+    vector_t<char> metainfo;
 
     rassert(keys.size() == values.size());
     auto value_it = values.begin();

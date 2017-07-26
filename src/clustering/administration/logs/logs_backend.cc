@@ -89,7 +89,7 @@ std::string logs_artificial_table_backend_t::get_primary_key_name() {
 bool logs_artificial_table_backend_t::read_all_rows_as_vector(
         UNUSED auth::user_context_t const &user_context,
         signal_t *interruptor,
-        std::vector<ql::datum_t> *rows_out,
+        vector_t<ql::datum_t> *rows_out,
         admin_err_t *error_out) {
     return read_all_rows_raw(
         [&](const log_message_t &message,
@@ -150,7 +150,7 @@ bool logs_artificial_table_backend_t::read_row(
         return true;
     }
 
-    std::vector<log_message_t> messages;
+    vector_t<log_message_t> messages;
     try {
         /* The timestamp filter is set so that we'll only get messages with the exact
         timestamp we're looking for, and there should be at most one such message. */
@@ -281,7 +281,7 @@ void logs_artificial_table_backend_t::cfeed_machinery_t::run(
             }
 
             /* Fetch the last message in the server's log file */
-            std::vector<log_message_t> messages;
+            vector_t<log_message_t> messages;
             try {
                 timespec min_time = { 0, 0 };
                 timespec max_time = { std::numeric_limits<time_t>::max(), 0 };
@@ -333,7 +333,7 @@ void logs_artificial_table_backend_t::cfeed_machinery_t::run(
             }
 
             /* Fetch messages since our last request */
-            std::vector<log_message_t> messages;
+            vector_t<log_message_t> messages;
             try {
                 /* We choose `min_time` so as to exclude the last message from before */
                 timespec min_time = *last_timestamp.get_value();
@@ -423,7 +423,7 @@ bool logs_artificial_table_backend_t::cfeed_machinery_t::check_disconnected(
 
 bool logs_artificial_table_backend_t::cfeed_machinery_t::get_initial_values(
         const new_mutex_acq_t *proof,
-        std::vector<ql::datum_t> *initial_values_out,
+        vector_t<ql::datum_t> *initial_values_out,
         signal_t *interruptor) {
     admin_err_t dummy_error;
     return parent->read_all_rows_raw(
@@ -474,7 +474,7 @@ bool logs_artificial_table_backend_t::read_all_rows_raw(
             auto server_name = server_names.find(pair.first);
             guarantee(server_name != server_names.end());
 
-            std::vector<log_message_t> messages;
+            vector_t<log_message_t> messages;
             try {
                 struct timespec min_time = { 0, 0 };
                 struct timespec max_time = { std::numeric_limits<time_t>::max(), 0 };

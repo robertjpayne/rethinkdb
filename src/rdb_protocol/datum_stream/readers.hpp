@@ -17,9 +17,9 @@ public:
     virtual void accumulate(env_t *env, eager_acc_t *acc,
                             const terminal_variant_t &tv) = 0;
     virtual void accumulate_all(env_t *env, eager_acc_t *acc) = 0;
-    virtual std::vector<datum_t> next_batch(
+    virtual vector_t<datum_t> next_batch(
         env_t *env, const batchspec_t &batchspec) = 0;
-    virtual std::vector<rget_item_t> raw_next_batch(
+    virtual vector_t<rget_item_t> raw_next_batch(
         env_t *, const batchspec_t &) { unreachable(); }
     virtual bool is_finished() const = 0;
 
@@ -41,12 +41,12 @@ public:
     }
     virtual void accumulate(env_t *, eager_acc_t *, const terminal_variant_t &) {}
     virtual void accumulate_all(env_t *, eager_acc_t *) {}
-    virtual std::vector<datum_t> next_batch(env_t *, const batchspec_t &) {
-        return std::vector<datum_t>();
+    virtual vector_t<datum_t> next_batch(env_t *, const batchspec_t &) {
+        return vector_t<datum_t>();
     }
-    std::vector<rget_item_t> raw_next_batch(
+    vector_t<rget_item_t> raw_next_batch(
         env_t *, const batchspec_t &) final {
-        return std::vector<rget_item_t>{};
+        return vector_t<rget_item_t>{};
     }
     virtual bool is_finished() const {
         return true;
@@ -60,7 +60,7 @@ private:
 
 class vector_reader_t : public reader_t {
 public:
-    explicit vector_reader_t(std::vector<datum_t> &&_items) :
+    explicit vector_reader_t(vector_t<datum_t> &&_items) :
         finished(false),
         items(std::move(_items)) {
     }
@@ -80,15 +80,15 @@ public:
     virtual void accumulate_all(env_t *, eager_acc_t *) {
         r_sanity_fail();
     }
-    virtual std::vector<datum_t> next_batch(env_t *, const batchspec_t &) {
+    virtual vector_t<datum_t> next_batch(env_t *, const batchspec_t &) {
         r_sanity_check(!finished);
         finished = true;
         return std::move(items);
     }
-    std::vector<rget_item_t> raw_next_batch(
+    vector_t<rget_item_t> raw_next_batch(
         env_t *, const batchspec_t &) final {
         r_sanity_check(!finished);
-        std::vector<rget_item_t> rget_items;
+        vector_t<rget_item_t> rget_items;
         for (auto it = items.begin(); it != items.end(); ++it) {
             rget_item_t item;
             item.data = std::move(*it);
@@ -107,7 +107,7 @@ public:
 
 private:
     bool finished;
-    std::vector<datum_t> items;
+    vector_t<datum_t> items;
 };
 
 // For reads that generate read_response_t results.
@@ -121,8 +121,8 @@ public:
     virtual optional<active_state_t> get_active_state();
     virtual void accumulate(env_t *env, eager_acc_t *acc, const terminal_variant_t &tv);
     virtual void accumulate_all(env_t *env, eager_acc_t *acc) = 0;
-    virtual std::vector<datum_t> next_batch(env_t *env, const batchspec_t &batchspec);
-    virtual std::vector<rget_item_t> raw_next_batch(env_t *env,
+    virtual vector_t<datum_t> next_batch(env_t *env, const batchspec_t &batchspec);
+    virtual vector_t<rget_item_t> raw_next_batch(env_t *env,
                                                     const batchspec_t &batchspec);
     virtual bool is_finished() const;
 
@@ -149,7 +149,7 @@ protected:
     rget_read_response_t do_read(env_t *env, const read_t &read);
 
     counted_t<real_table_t> table;
-    std::vector<transform_variant_t> transforms;
+    vector_t<transform_variant_t> transforms;
     optional<changefeed_stamp_t> stamp;
 
     bool started;
@@ -159,7 +159,7 @@ protected:
     std::map<uuid_u, shard_stamp_info_t> shard_stamp_infos;
 
     // We need this to handle the SINDEX_CONSTANT case.
-    std::vector<rget_item_t> items;
+    vector_t<rget_item_t> items;
     size_t items_index;
 };
 
@@ -176,7 +176,7 @@ protected:
     virtual bool load_items(env_t *env, const batchspec_t &batchspec);
 
 private:
-    std::vector<rget_item_t> do_range_read(env_t *env, const read_t &read);
+    vector_t<rget_item_t> do_range_read(env_t *env, const read_t &read);
 };
 
 // intersecting_reader_t performs filtering for duplicate documents in the stream,
@@ -195,7 +195,7 @@ protected:
     virtual bool load_items(env_t *env, const batchspec_t &batchspec);
 
 private:
-    std::vector<rget_item_t> do_intersecting_read(env_t *env, const read_t &read);
+    vector_t<rget_item_t> do_intersecting_read(env_t *env, const read_t &read);
 
     // Each secondary index value might be inserted into a geospatial index multiple
     // times, and we need to remove those duplicates across batches.

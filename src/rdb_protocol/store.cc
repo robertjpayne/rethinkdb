@@ -162,7 +162,7 @@ scoped_ptr_t<sindex_superblock_t> acquire_sindex_for_read(
     rassert(sindex_uuid_out != NULL);
 
     scoped_ptr_t<sindex_superblock_t> sindex_sb;
-    std::vector<char> sindex_mapping_data;
+    vector_t<char> sindex_mapping_data;
 
     uuid_u sindex_uuid;
     try {
@@ -310,7 +310,7 @@ struct rdb_read_visitor_t : public boost::static_visitor<void> {
         ql::raw_stream_t stream;
         optional<uuid_u> sindex_id;
         {
-            std::vector<scoped_ptr_t<ql::op_t> > ops;
+            vector_t<scoped_ptr_t<ql::op_t> > ops;
             for (const auto &transform : s.spec.range.transforms) {
                 ops.push_back(make_op(transform));
             }
@@ -389,7 +389,7 @@ struct rdb_read_visitor_t : public boost::static_visitor<void> {
             std::move(lvec),
             cserver.second);
         auto addr = cserver.first->get_limit_stop_addr();
-        std::vector<decltype(addr)> vec{addr};
+        vector_t<decltype(addr)> vec{addr};
         response->response = changefeed_limit_subscribe_response_t(1, std::move(vec));
     }
 
@@ -786,7 +786,7 @@ private:
 
     counted_t<const ql::func_t> write_hook;
 
-    const std::vector<ql::datum_t> *const datums;
+    const vector_t<ql::datum_t> *const datums;
     const conflict_behavior_t conflict_behavior;
     const std::string pkey;
     const return_changes_t return_changes;
@@ -840,7 +840,7 @@ struct rdb_write_visitor_t : public boost::static_visitor<void> {
             trace);
         datum_replacer_t replacer(&ql_env,
                                   bi);
-        std::vector<store_key_t> keys;
+        vector_t<store_key_t> keys;
         keys.reserve(bi.inserts.size());
         for (auto it = bi.inserts.begin(); it != bi.inserts.end(); ++it) {
             keys.emplace_back(it->get_field(datum_string_t(bi.pkey)).print_primary());
@@ -931,7 +931,7 @@ struct rdb_write_visitor_t : public boost::static_visitor<void> {
 
 private:
     void update_sindexes(const rdb_modification_report_t &mod_report) {
-        std::vector<rdb_modification_report_t> mod_reports;
+        vector_t<rdb_modification_report_t> mod_reports;
         // This copying of the mod_report is inefficient, but it seems this
         // function is only used for unit tests at the moment anyway.
         mod_reports.push_back(mod_report);

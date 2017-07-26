@@ -20,7 +20,7 @@ private:
             ? (ops_to_do() ? eager_datum_stream_t::as_array(env) : arr)
             : datum_t();
     }
-    virtual std::vector<datum_t>
+    virtual vector_t<datum_t>
     next_raw_batch(env_t *env, UNUSED const batchspec_t &batchspec);
     datum_t next(env_t *env, const batchspec_t &batchspec);
     datum_t next_arr_el();

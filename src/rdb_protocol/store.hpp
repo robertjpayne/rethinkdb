@@ -5,7 +5,7 @@
 #include <map>
 #include <set>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "btree/node.hpp"
 #include "btree/parallel_traversal.hpp"
@@ -219,21 +219,21 @@ public:
     void update_sindexes(
             txn_t *txn,
             buf_lock_t *sindex_block,
-            const std::vector<rdb_modification_report_t> &mod_reports,
+            const vector_t<rdb_modification_report_t> &mod_reports,
             bool release_sindex_block);
 
     void sindex_queue_push(
             const rdb_modification_report_t &mod_report,
             const new_mutex_in_line_t *acq);
     void sindex_queue_push(
-            const std::vector<rdb_modification_report_t> &mod_reports,
+            const vector_t<rdb_modification_report_t> &mod_reports,
             const new_mutex_in_line_t *acq);
 
     // Returns the UUID of the created index, or r_nullopt if an index by `name`
     // already existed.
     MUST_USE optional<uuid_u> add_sindex_internal(
         const sindex_name_t &name,
-        const std::vector<char> &opaque_definition,
+        const vector_t<char> &opaque_definition,
         buf_lock_t *sindex_block);
 
     std::map<sindex_name_t, secondary_index_t> get_sindexes() const;
@@ -249,7 +249,7 @@ public:
             const std::string &table_name,
             real_superblock_t *superblock,  // releases this.
             scoped_ptr_t<sindex_superblock_t> *sindex_sb_out,
-            std::vector<char> *opaque_definition_out,
+            vector_t<char> *opaque_definition_out,
             uuid_u *sindex_uuid_out)
         THROWS_ONLY(sindex_not_ready_exc_t);
 
@@ -274,7 +274,7 @@ public:
         scoped_ptr_t<sindex_superblock_t> superblock;
     };
 
-    typedef std::vector<scoped_ptr_t<sindex_access_t> > sindex_access_vector_t;
+    typedef vector_t<scoped_ptr_t<sindex_access_t> > sindex_access_vector_t;
 
     void acquire_all_sindex_superblocks_for_write(
             block_id_t sindex_block_id,
@@ -391,7 +391,7 @@ public:
         key_range_t construction_range;
         disk_backed_queue_wrapper_t<rdb_modification_report_t> *queue;
     };
-    std::vector<ranged_sindex_queue_t> sindex_queues;
+    vector_t<ranged_sindex_queue_t> sindex_queues;
     new_mutex_t sindex_queue_mutex;
     // Used to control access to stamps.  We need this so that `do_stamp` in
     // `store.cc` can synchronize with the `rdb_modification_report_cb_t` in

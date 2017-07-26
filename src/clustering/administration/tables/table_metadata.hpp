@@ -6,7 +6,7 @@
 #include <set>
 #include <string>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "buffer_cache/types.hpp"   // for `write_durability_t`
 #include "clustering/administration/servers/server_metadata.hpp"
@@ -69,7 +69,7 @@ public:
         server_id_t primary_replica;
     };
     table_basic_config_t basic;
-    std::vector<shard_t> shards;
+    vector_t<shard_t> shards;
     std::map<std::string, sindex_config_t> sindexes;
     optional<write_hook_config_t> write_hook;
     write_ack_config_t write_ack_config;
@@ -83,7 +83,7 @@ RDB_DECLARE_EQUALITY_COMPARABLE(table_config_t::shard_t);
 
 class table_shard_scheme_t {
 public:
-    std::vector<store_key_t> split_points;
+    vector_t<store_key_t> split_points;
 
     static table_shard_scheme_t one_shard() {
         return table_shard_scheme_t();

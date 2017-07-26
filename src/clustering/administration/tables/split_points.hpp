@@ -4,7 +4,7 @@
 
 #include <map>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "btree/keys.hpp"
 #include "clustering/table_manager/table_meta_client.hpp"

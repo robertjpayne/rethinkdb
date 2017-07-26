@@ -23,7 +23,7 @@ void serialize(write_message_t *wm, const table_config_t &tc) {
     table_basic_config_t basic = tc.basic;
     serialize<W>(wm, basic);
 
-    std::vector<table_config_t::shard_t> shards = tc.shards;
+    vector_t<table_config_t::shard_t> shards = tc.shards;
     serialize<W>(wm, shards);
 
     std::map<std::string, sindex_config_t> sindexes = tc.sindexes;
@@ -50,7 +50,7 @@ archive_result_t deserialize_table_config_pre_v2_4(
     res = deserialize<W>(s, &basic);
     if (bad(res)) { return res; }
 
-    std::vector<table_config_t::shard_t> shards;
+    vector_t<table_config_t::shard_t> shards;
     res = deserialize<W>(s, &shards);
     if (bad(res)) { return res; }
 
@@ -84,7 +84,7 @@ archive_result_t deserialize(
     res = deserialize<W>(s, &basic);
     if (bad(res)) { return res; }
 
-    std::vector<table_config_t::shard_t> shards;
+    vector_t<table_config_t::shard_t> shards;
     res = deserialize<W>(s, &shards);
     if (bad(res)) { return res; }
 

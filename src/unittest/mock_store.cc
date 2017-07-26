@@ -293,18 +293,18 @@ continue_bool_t mock_store_t::send_backfill_pre(
     return continue_bool_t::CONTINUE;
 }
 
-std::vector<char> datum_to_vector(const ql::datum_t &datum) {
+vector_t<char> datum_to_vector(const ql::datum_t &datum) {
     write_message_t wm;
     serialize<cluster_version_t::CLUSTER>(&wm, datum);
     vector_stream_t vs;
     int res = send_write_message(&vs, &wm);
     guarantee(res == 0);
-    std::vector<char> vector;
+    vector_t<char> vector;
     vs.swap(&vector);
     return vector;
 }
 
-ql::datum_t vector_to_datum(std::vector<char> &&vector) {
+ql::datum_t vector_to_datum(vector_t<char> &&vector) {
     vector_read_stream_t vs(std::move(vector));
     ql::datum_t datum;
     archive_result_t res = deserialize<cluster_version_t::CLUSTER>(&vs, &datum);
@@ -496,7 +496,7 @@ continue_bool_t mock_store_t::receive_backfill(
             for (const auto &pair : item.pairs) {
                 guarantee(static_cast<bool>(pair.value));
                 table_[pair.key] = std::make_pair(
-                    pair.recency, vector_to_datum(std::vector<char>(*pair.value)));
+                    pair.recency, vector_to_datum(vector_t<char>(*pair.value)));
             }
         } else {
             cursor = empty_range;

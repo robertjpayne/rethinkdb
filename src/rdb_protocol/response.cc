@@ -32,7 +32,7 @@ void response_t::set_data(const ql::datum_t &_data) {
     data_.push_back(_data);
 }
 
-void response_t::set_data(std::vector<ql::datum_t> &&_data) {
+void response_t::set_data(vector_t<ql::datum_t> &&_data) {
     guarantee(data_.empty());
     data_ = std::move(_data);
 }
@@ -65,12 +65,12 @@ const optional<Response::ErrorType> &response_t::error_type() const {
     return error_type_;
 }
 
-const std::vector<ql::datum_t> &response_t::data() const {
+const vector_t<ql::datum_t> &response_t::data() const {
     guarantee(type_is_initialized_);
     return data_;
 }
 
-const std::vector<Response::ResponseNote> &response_t::notes() const {
+const vector_t<Response::ResponseNote> &response_t::notes() const {
     guarantee(type_is_initialized_);
     return notes_;
 }

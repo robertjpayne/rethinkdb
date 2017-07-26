@@ -70,23 +70,23 @@ private:
 class arg_terms_t : public bt_rcheckable_t {
 public:
     arg_terms_t(const raw_term_t &_src, argspec_t _argspec,
-                std::vector<counted_t<const term_t> > _original_args);
+                vector_t<counted_t<const term_t> > _original_args);
     // Evals the r.args arguments, and returns the expanded argument list.
     argvec_t start_eval(scope_env_t *env, eval_flags_t flags) const;
 
-    const std::vector<counted_t<const term_t> > &get_original_args() const {
+    const vector_t<counted_t<const term_t> > &get_original_args() const {
         return original_args;
     }
 private:
     const raw_term_t src;
     const argspec_t argspec;
-    const std::vector<counted_t<const term_t> > original_args;
+    const vector_t<counted_t<const term_t> > original_args;
 
     DISABLE_COPYING(arg_terms_t);
 };
 
 arg_terms_t::arg_terms_t(const raw_term_t &_src, argspec_t _argspec,
-                         std::vector<counted_t<const term_t> > _original_args)
+                         vector_t<counted_t<const term_t> > _original_args)
     : bt_rcheckable_t(_src.bt()),
       src(_src),
       argspec(std::move(_argspec)),
@@ -107,7 +107,7 @@ arg_terms_t::arg_terms_t(const raw_term_t &_src, argspec_t _argspec,
 argvec_t arg_terms_t::start_eval(scope_env_t *env, eval_flags_t flags) const {
     eval_flags_t new_flags = static_cast<eval_flags_t>(
         flags | argspec.get_eval_flags());
-    std::vector<counted_t<const runtime_term_t> > args;
+    vector_t<counted_t<const runtime_term_t> > args;
     for (const auto &arg : original_args) {
         if (arg->get_src().type() == Term::ARGS) {
             deterministic_t det = arg->is_deterministic();
@@ -130,7 +130,7 @@ argvec_t arg_terms_t::start_eval(scope_env_t *env, eval_flags_t flags) const {
     return argvec_t(std::move(args));
 }
 
-argvec_t::argvec_t(std::vector<counted_t<const runtime_term_t> > &&v)
+argvec_t::argvec_t(vector_t<counted_t<const runtime_term_t> > &&v)
     : vec(std::move(v)) { }
 
 counted_t<const runtime_term_t> argvec_t::remove(size_t i) {
@@ -178,7 +178,7 @@ args_t::args_t(const op_term_t *_op_term,
 op_term_t::op_term_t(compile_env_t *env, const raw_term_t &term,
                      argspec_t argspec, optargspec_t optargspec)
         : term_t(term) {
-    std::vector<counted_t<const term_t> > original_args;
+    vector_t<counted_t<const term_t> > original_args;
     original_args.reserve(term.num_args());
     for (size_t i = 0; i < term.num_args(); ++i) {
         counted_t<const term_t> t = compile_term(env, term.arg(i));
@@ -271,7 +271,7 @@ void accumulate_all_captures(
 }
 
 void op_term_t::accumulate_captures(var_captures_t *captures) const {
-    const std::vector<counted_t<const term_t> > &original_args
+    const vector_t<counted_t<const term_t> > &original_args
         = arg_terms->get_original_args();
     for (const auto &arg : original_args) {
         arg->accumulate_captures(captures);
@@ -279,7 +279,7 @@ void op_term_t::accumulate_captures(var_captures_t *captures) const {
     accumulate_all_captures(optargs, captures);
 }
 
-const std::vector<counted_t<const term_t> > &op_term_t::get_original_args() const {
+const vector_t<counted_t<const term_t> > &op_term_t::get_original_args() const {
     return arg_terms->get_original_args();
 }
 
@@ -288,7 +288,7 @@ deterministic_t worst_determinism(const deterministic_t a, const deterministic_t
 }
 
 deterministic_t op_term_t::is_deterministic() const {
-    const std::vector<counted_t<const term_t> > &original_args
+    const vector_t<counted_t<const term_t> > &original_args
         = arg_terms->get_original_args();
     deterministic_t worst_so_far = deterministic_t::always;
     for (const auto &arg : original_args) {

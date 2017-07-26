@@ -113,7 +113,7 @@ void file_http_app_t::handle_blocking(std::string filename, http_res_t *res_out)
         return;
     }
 
-    std::vector<char> body;
+    vector_t<char> body;
 
     for (;;) {
         const int bufsize = 4096;

@@ -4,7 +4,7 @@
 
 #include <map>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/datum_string.hpp"
 #include "rdb_protocol/datum.hpp"
@@ -25,7 +25,7 @@ public:
         return (type == STR ? str : NULL);
     }
 
-    const std::vector<pathspec_t> *as_vec() const {
+    const vector_t<pathspec_t> *as_vec() const {
         return (type == VEC ? vec: NULL);
     }
 
@@ -72,7 +72,7 @@ private:
 
     union {
         datum_string_t *str;
-        std::vector<pathspec_t> *vec;
+        vector_t<pathspec_t> *vec;
         std::map<datum_string_t, pathspec_t> *map;
     };
 

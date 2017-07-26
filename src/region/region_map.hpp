@@ -3,7 +3,7 @@
 
 #include <algorithm>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "utils.hpp"
 #include "containers/archive/stl_types.hpp"
@@ -35,8 +35,8 @@ public:
         { }
 
     static region_map_t from_unordered_fragments(
-            std::vector<region_t> &&regions,
-            std::vector<value_t> &&values) {
+            vector_t<region_t> &&regions,
+            vector_t<value_t> &&values) {
         region_t domain;
         region_join_result_t res = region_join(regions, &domain);
         guarantee(res == REGION_JOIN_OK);
@@ -294,11 +294,11 @@ MUST_USE archive_result_t deserialize(read_stream_t *s, region_map_t<V> *map) {
         case cluster_version_t::v1_16:
         case cluster_version_t::v1_15:
         case cluster_version_t::v1_14: {
-            std::vector<std::pair<region_t, V> > pairs;
+            vector_t<std::pair<region_t, V> > pairs;
             archive_result_t res = deserialize<W>(s, &pairs);
             if (bad(res)) { return res; }
-            std::vector<region_t> regions;
-            std::vector<V> values;
+            vector_t<region_t> regions;
+            vector_t<V> values;
             for (auto &&pair : pairs) {
                 regions.push_back(pair.first);
                 values.push_back(std::move(pair.second));

@@ -13,13 +13,12 @@
 #include <stdarg.h>
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/geo/s2/base/stl_decl.h"
 #include "rdb_protocol/geo/s2/base/port.h"
 
 namespace geo {
-using std::vector;
 
 // Return a C++ string
 extern std::string StringPrintf(const char* format, ...)

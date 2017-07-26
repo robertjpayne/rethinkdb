@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 #include <functional>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "errors.hpp"
 
@@ -103,7 +103,7 @@ public:
     ~thread_allocator_t();
 private:
     std::function<bool(threadnum_t, threadnum_t)> secondary_lt;
-    std::vector<size_t> num_allocated;
+    vector_t<size_t> num_allocated;
     friend class thread_allocation_t;
     DISABLE_COPYING(thread_allocator_t);
 };

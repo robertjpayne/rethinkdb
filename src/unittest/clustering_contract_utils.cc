@@ -6,8 +6,8 @@ namespace unittest {
 region_map_t<version_t> quick_cpu_version_map(
         size_t which_cpu_subspace,
         std::initializer_list<quick_cpu_version_map_args_t> qvms) {
-    std::vector<region_t> region_vector;
-    std::vector<version_t> version_vector;
+    vector_t<region_t> region_vector;
+    vector_t<version_t> version_vector;
     for (const quick_cpu_version_map_args_t &qvm : qvms) {
         key_range_t range = quick_range(qvm.quick_range_spec);
         region_t region = region_intersection(

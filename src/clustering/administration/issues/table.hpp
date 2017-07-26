@@ -2,7 +2,7 @@
 #ifndef CLUSTERING_ADMINISTRATION_ISSUES_TABLE_HPP_
 #define CLUSTERING_ADMINISTRATION_ISSUES_TABLE_HPP_
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "clustering/administration/issues/issue.hpp"
 #include "containers/scoped.hpp"
@@ -20,11 +20,11 @@ public:
         namespace_repo_t *_namespace_repo);
     ~table_issue_tracker_t();
 
-    std::vector<scoped_ptr_t<issue_t> > get_issues(signal_t *interruptor) const;
+    vector_t<scoped_ptr_t<issue_t> > get_issues(signal_t *interruptor) const;
 
 private:
     void check_table(const namespace_id_t &table_id,
-                     std::vector<scoped_ptr_t<issue_t> > *issues_out,
+                     vector_t<scoped_ptr_t<issue_t> > *issues_out,
                      signal_t *interruptor) const;
 
     server_config_client_t *server_config_client;

@@ -2,7 +2,7 @@
 #ifndef RDB_PROTOCOL_ERASE_RANGE_HPP_
 #define RDB_PROTOCOL_ERASE_RANGE_HPP_
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "errors.hpp"
 #include "btree/keys.hpp"
@@ -52,7 +52,7 @@ continue_bool_t rdb_erase_small_range(
     const deletion_context_t *deletion_context,
     signal_t *interruptor,
     uint64_t max_keys_to_erase /* 0 = unlimited */,
-    std::vector<rdb_modification_report_t> *mod_reports_out,
+    vector_t<rdb_modification_report_t> *mod_reports_out,
     key_range_t *deleted_out);
 
 #endif  // RDB_PROTOCOL_ERASE_RANGE_HPP_

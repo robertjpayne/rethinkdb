@@ -4,7 +4,7 @@
 #define UTIL_GEOMETRY_S2POLYGON_H_
 
 #include <map>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/geo/s2/base/basictypes.h"
 #include "rdb_protocol/geo/s2/base/macros.h"
@@ -16,7 +16,6 @@
 namespace geo {
 using std::map;
 using std::multimap;
-using std::vector;
 
 class S2CellUnion;
 
@@ -49,7 +48,7 @@ class S2Polygon : public S2Region {
 
   // Convenience constructor that calls Init() with the given loops.  Takes
   // ownership of the loops and clears the given vector.
-  explicit S2Polygon(vector<S2Loop*>* loops);
+  explicit S2Polygon(vector_t<S2Loop*>* loops);
 
   // Convenience constructor that creates a polygon with a single loop
   // corresponding to the given cell.
@@ -60,11 +59,11 @@ class S2Polygon : public S2Region {
   // then reorders the loops by following a preorder traversal.  This implies
   // that each loop is immediately followed by its descendants in the nesting
   // hierarchy.  (See also GetParent and GetLastDescendant.)
-  void Init(vector<S2Loop*>* loops);
+  void Init(vector_t<S2Loop*>* loops);
 
   // Release ownership of the loops of this polygon, and appends them to
   // "loops" if non-NULL.  Resets the polygon to be empty.
-  void Release(vector<S2Loop*>* loops);
+  void Release(vector_t<S2Loop*>* loops);
 
   // Makes a deep copy of the given source polygon.  Requires that the
   // destination polygon is empty.
@@ -75,7 +74,7 @@ class S2Polygon : public S2Region {
 
   // Return true if the given loops form a valid polygon.  Assumes that
   // all of the given loops have already been validated.
-  static bool IsValid(const vector<S2Loop*>& loops);
+  static bool IsValid(const vector_t<S2Loop*>& loops);
 
   // Return true if this is a valid polygon.  Note that in debug mode,
   // validity is checked at polygon creation time, so IsValid() should always
@@ -183,7 +182,7 @@ class S2Polygon : public S2Region {
   // This is equivalent to calling IntersectWithPolylineSloppy() with the
   // "vertex_merge_radius" set to S2EdgeUtil::kIntersectionTolerance.
   void IntersectWithPolyline(S2Polyline const* in,
-                             vector<S2Polyline*> *out) const;
+                             vector_t<S2Polyline*> *out) const;
 
   // Similar to IntersectWithPolyline(), except that vertices will be
   // dropped as necessary to ensure that all adjacent vertices in the
@@ -191,24 +190,24 @@ class S2Polygon : public S2Region {
   // farther than "vertex_merge_radius" apart.  Note that this can change
   // the number of output polylines and/or yield single-vertex polylines.
   void IntersectWithPolylineSloppy(S2Polyline const* in,
-                                   vector<S2Polyline*> *out,
+                                   vector_t<S2Polyline*> *out,
                                    S1Angle vertex_merge_radius) const;
 
   // Same as IntersectWithPolyline, but subtracts this polygon from
   // the given polyline.
   void SubtractFromPolyline(S2Polyline const* in,
-                            vector<S2Polyline*> *out) const;
+                            vector_t<S2Polyline*> *out) const;
 
   // Same as IntersectWithPolylineSloppy, but subtracts this polygon
   // from the given polyline.
   void SubtractFromPolylineSloppy(S2Polyline const* in,
-                                  vector<S2Polyline*> *out,
+                                  vector_t<S2Polyline*> *out,
                                   S1Angle vertex_merge_radius) const;
 
   // Return a polygon which is the union of the given polygons.
   // Clears the vector and deletes the polygons!
-  static S2Polygon* DestructiveUnion(vector<S2Polygon*>* polygons);
-  static S2Polygon* DestructiveUnionSloppy(vector<S2Polygon*>* polygons,
+  static S2Polygon* DestructiveUnion(vector_t<S2Polygon*>* polygons);
+  static S2Polygon* DestructiveUnionSloppy(vector_t<S2Polygon*>* polygons,
                                            S1Angle vertex_merge_radius);
 
   // Initialize this polygon to the outline of the given cell union.
@@ -273,7 +272,7 @@ class S2Polygon : public S2Region {
   // A map from each loop to its immediate children with respect to nesting.
   // This map is built during initialization of multi-loop polygons to
   // determine which are shells and which are holes, and then discarded.
-  typedef map<S2Loop*, vector<S2Loop*> > LoopMap;
+  typedef map<S2Loop*, vector_t<S2Loop*> > LoopMap;
 
   // Internal implementation of the Decode and DecodeWithinScope methods above.
   // The within_scope parameter specifies whether to call DecodeWithinScope
@@ -283,7 +282,7 @@ class S2Polygon : public S2Region {
   // Internal implementation of intersect/subtract polyline functions above.
   void InternalClipPolyline(bool invert,
                             S2Polyline const* a,
-                            vector<S2Polyline*> *out,
+                            vector_t<S2Polyline*> *out,
                             S1Angle vertex_merge_radius) const;
 
   static void InsertLoop(S2Loop* new_loop, S2Loop* parent, LoopMap* loop_map);
@@ -297,7 +296,7 @@ class S2Polygon : public S2Region {
   bool IntersectsAnyShell(S2Polygon const* b) const;
   bool IntersectsShell(S2Loop const* b) const;
 
-  vector<S2Loop*> loops_;
+  vector_t<S2Loop*> loops_;
   S2LatLngRect bound_;
   char owns_loops_;
   char has_holes_;

@@ -202,7 +202,7 @@ bool artificial_reql_cluster_interface_t::table_estimate_doc_counts(
         counted_t<const ql::db_t> db,
         const name_string_t &name,
         ql::env_t *env,
-        std::vector<int64_t> *doc_counts_out,
+        vector_t<int64_t> *doc_counts_out,
         admin_err_t *error_out) {
     if (db->name == artificial_reql_cluster_interface_t::database_name) {
         auto it = m_table_backends.find(name);
@@ -224,7 +224,7 @@ bool artificial_reql_cluster_interface_t::table_estimate_doc_counts(
             try {
                 scoped_ptr_t<ql::val_t> count =
                     docs->run_terminal(env, ql::count_wire_func_t());
-                *doc_counts_out = std::vector<int64_t>({ count->as_int<int64_t>() });
+                *doc_counts_out = vector_t<int64_t>({ count->as_int<int64_t>() });
             } catch (const ql::base_exc_t &msg) {
                 *error_out = admin_err_t{
                     "When estimating doc count: " + std::string(msg.what()),

@@ -4,7 +4,7 @@
 
 #include <map>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "errors.hpp"
 #include <boost/variant.hpp>
@@ -32,7 +32,7 @@ struct generated_term_t : public slow_atomic_countable_t<generated_term_t> {
     const Term::TermType type;
 
     // args and optargs are only valid if type != DATUM
-    std::vector<term_variant_t> args;
+    vector_t<term_variant_t> args;
     std::map<std::string, term_variant_t> optargs;
 
     // datum is only valid if type != DATUM

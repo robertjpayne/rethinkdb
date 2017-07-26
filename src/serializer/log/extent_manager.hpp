@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "arch/types.hpp"
 #include "config/args.hpp"
@@ -77,7 +77,7 @@ public:
         guarantee(state_ == begun);
         state_ = ended;
     }
-    MUST_USE std::vector<extent_reference_t> reset() {
+    MUST_USE vector_t<extent_reference_t> reset() {
         guarantee(state_ == ended);
         state_ = committed;
         return std::move(extent_ref_set_);
@@ -85,7 +85,7 @@ public:
 
 private:
     enum { uninitialized, begun, ended, committed } state_;
-    std::vector<extent_reference_t> extent_ref_set_;
+    vector_t<extent_reference_t> extent_ref_set_;
 
     DISABLE_COPYING(extent_transaction_t);
 };

@@ -3,7 +3,7 @@
 #define RDB_PROTOCOL_ARTIFICIAL_TABLE_BACKEND_HPP_
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/datum.hpp"
 #include "rdb_protocol/datum_stream.hpp"
@@ -57,7 +57,7 @@ public:
     virtual bool read_all_rows_as_vector(
         auth::user_context_t const &user_context,
         signal_t *interruptor,
-        std::vector<ql::datum_t> *rows_out,
+        vector_t<ql::datum_t> *rows_out,
         admin_err_t *error_out);
 
     /* Sets `*row_out` to the current value of the row, or an empty `datum_t` if no such

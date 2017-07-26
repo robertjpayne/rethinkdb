@@ -99,12 +99,12 @@ void S2EdgeIndex::ComputeIndex() {
 
   for (int i = 0; i < num_edges(); ++i) {
     S2Point from, to;
-    vector<S2CellId> cover;
+    vector_t<S2CellId> cover;
     int level = GetCovering(*edge_from(i), *edge_to(i),
                             true, &cover);
     minimum_s2_level_used_ = min(minimum_s2_level_used_, level);
 
-    for (vector<S2CellId>::const_iterator it = cover.begin(); it != cover.end();
+    for (vector_t<S2CellId>::const_iterator it = cover.begin(); it != cover.end();
          ++it) {
       mapping_.insert(make_pair(*it, i));
     }
@@ -154,13 +154,13 @@ void S2EdgeIndex::PredictAdditionalCalls(int n) {
 }
 
 void S2EdgeIndex::GetEdgesInParentCells(
-    const vector<S2CellId>& cover,
+    const vector_t<S2CellId>& cover,
     const CellEdgeMultimap& mapping,
     int minimum_s2_level_used,
-    vector<int>* candidate_crossings) {
+    vector_t<int>* candidate_crossings) {
   // Find all parent cells of covering cells.
   set<S2CellId> parent_cells;
-  for (vector<S2CellId>::const_iterator it = cover.begin(); it != cover.end();
+  for (vector_t<S2CellId>::const_iterator it = cover.begin(); it != cover.end();
        ++it) {
     for (int parent_level = it->level() - 1;
          parent_level >= minimum_s2_level_used;
@@ -228,9 +228,9 @@ bool S2EdgeIndex::EdgeIntersectsCellBoundary(
 
 void S2EdgeIndex::GetEdgesInChildrenCells(
     S2Point const& a, S2Point const& b,
-    vector<S2CellId>* cover,
+    vector_t<S2CellId>* cover,
     const CellEdgeMultimap& mapping,
-    vector<int>* candidate_crossings) {
+    vector_t<int>* candidate_crossings) {
   CellEdgeMultimap::const_iterator it, start, end;
 
   int num_cells = 0;
@@ -300,9 +300,9 @@ void S2EdgeIndex::GetEdgesInChildrenCells(
 // advantage of the natural ordering of S2CellIds.
 void S2EdgeIndex::FindCandidateCrossings(
     S2Point const& a, S2Point const& b,
-    vector<int>* candidate_crossings) const {
+    vector_t<int>* candidate_crossings) const {
   DCHECK(index_computed_);
-  vector<S2CellId> cover;
+  vector_t<S2CellId> cover;
   GetCovering(a, b, false, &cover);
   GetEdgesInParentCells(cover, mapping_, minimum_s2_level_used_,
                         candidate_crossings);
@@ -315,9 +315,9 @@ void S2EdgeIndex::FindCandidateCrossings(
   // Remove duplicates: This is necessary because edge references are
   // inserted into the map once for each covering cell. (Testing shows
   // this to be at least as fast as using a set.)
-  sort(candidate_crossings->begin(), candidate_crossings->end());
+  std::sort(candidate_crossings->begin(), candidate_crossings->end());
   candidate_crossings->erase(
-      unique(candidate_crossings->begin(), candidate_crossings->end()),
+      std::unique(candidate_crossings->begin(), candidate_crossings->end()),
       candidate_crossings->end());
 }
 
@@ -364,7 +364,7 @@ static S2CellId ContainingCell(S2Point const& pa, S2Point const& pb) {
 int S2EdgeIndex::GetCovering(
     S2Point const& a, S2Point const& b,
     bool thicken_edge,
-    vector<S2CellId>* edge_covering) const {
+    vector_t<S2CellId>* edge_covering) const {
   edge_covering->clear();
 
   // Thicken the edge in all directions by roughly 1% of the edge length when

@@ -13,14 +13,13 @@
 #include <stdarg.h>
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/geo/s2/base/stl_decl.h"
 #include "rdb_protocol/geo/s2/base/port.h"
 #include "rdb_protocol/geo/s2/base/stringprintf.h"
 
 namespace geo {
-using std::vector;
 
 // This file formerly contained
 //   StringPrintf, SStringPrintf, StringAppendF, and StringAppendV.
@@ -36,7 +35,7 @@ extern const size_t kStringPrintfVectorMaxArgs;
 // You can use this version when all your arguments are strings, but
 // you don't know how many arguments you'll have at compile time.
 // StringPrintfVector will LOG(FATAL) if v.size() > kStringPrintfVectorMaxArgs
-extern std::string StringPrintfVector(const char* format, const vector<std::string>& v);
+extern std::string StringPrintfVector(const char* format, const vector_t<std::string>& v);
 
 }  // namespace geo
 

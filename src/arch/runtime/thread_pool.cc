@@ -301,7 +301,7 @@ void linux_thread_pool_t::run_thread_pool(linux_thread_message_t *initial_messag
 
 #ifndef NDEBUG
     // Save each thread's coroutine counters before shutting down
-    std::vector<std::map<std::string, size_t> > coroutine_counts(n_threads);
+    vector_t<std::map<std::string, size_t> > coroutine_counts(n_threads);
 #endif
 
     // Shut down child threads

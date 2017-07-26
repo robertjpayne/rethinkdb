@@ -9,7 +9,7 @@
 #include <iostream>
 #include <map>
 #include <set>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/geo/s2/base/logging.h"
 #include "rdb_protocol/geo/s2/base/macros.h"
@@ -34,7 +34,6 @@ using std::map;
 using std::multimap;
 using std::set;
 using std::multiset;
-using std::vector;
 
 
 void S2PolygonBuilderOptions::set_undirected_edges(bool _undirected_edges) {
@@ -173,7 +172,7 @@ S2Loop* S2PolygonBuilder::AssembleLoop(S2Point const& _v0, S2Point const& _v1,
   // vertex that we have seen before *except* for the first vertex (v0).
   // This ensures that only CCW loops are constructed when possible.
 
-  vector<S2Point> path;          // The path so far.
+  vector_t<S2Point> path;          // The path so far.
   unordered_map<S2Point, int, std::hash<S2Point> > index;  // Maps a vertex to its index in "path".
   path.push_back(_v0);
   path.push_back(_v1);
@@ -252,7 +251,7 @@ class S2PolygonBuilder::PointIndex {
   double vertex_radius_;
   double edge_fraction_;
   int level_;
-  vector<S2CellId> ids_;  // Allocated here for efficiency.
+  vector_t<S2CellId> ids_;  // Allocated here for efficiency.
 
  public:
   PointIndex(double vertex_radius, double edge_fraction)
@@ -288,7 +287,7 @@ class S2PolygonBuilder::PointIndex {
     ids_.clear();
   }
 
-  void QueryCap(S2Point const& axis, vector<S2Point>* output) {
+  void QueryCap(S2Point const& axis, vector_t<S2Point>* output) {
     // Return the set the points whose distance to "axis" is less than
     // vertex_radius_.
 
@@ -320,7 +319,7 @@ class S2PolygonBuilder::PointIndex {
     S2CellId::FromPoint(v1).AppendVertexNeighbors(level, &ids_);
 
     // Sort the cell ids so that we can skip duplicates in the loop below.
-    sort(ids_.begin(), ids_.end());
+    std::sort(ids_.begin(), ids_.end());
 
     double best_dist = 2 * vertex_radius_;
     for (int i = ids_.size(); --i >= 0; ) {
@@ -376,7 +375,7 @@ void S2PolygonBuilder::BuildMergeMap(PointIndex* index, MergeMap* merge_map) {
 
   // Next, we loop through all the vertices and attempt to grow a maximial
   // mergeable group starting from each vertex.
-  vector<S2Point> frontier, mergeable;
+  vector_t<S2Point> frontier, mergeable;
   for (unordered_set<S2Point, std::hash<S2Point> >::const_iterator vstart = vertices.begin();
        vstart != vertices.end(); ++vstart) {
     // Skip any vertices that have already been merged with another vertex.
@@ -407,7 +406,7 @@ void S2PolygonBuilder::MoveVertices(MergeMap const& merge_map) {
 
   // We need to copy the set of edges affected by the move, since
   // edges_ could be reallocated when we start modifying it.
-  vector<pair<S2Point, S2Point> > edges;
+  vector_t<pair<S2Point, S2Point> > edges;
   for (EdgeSet::const_iterator i = edges_->begin(); i != edges_->end(); ++i) {
     S2Point const& v0 = i->first;
     VertexSet const& vset = i->second;
@@ -441,7 +440,7 @@ void S2PolygonBuilder::MoveVertices(MergeMap const& merge_map) {
 void S2PolygonBuilder::SpliceEdges(PointIndex* index) {
   // We keep a stack of unprocessed edges.  Initially all edges are
   // pushed onto the stack.
-  vector<pair<S2Point, S2Point> > edges;
+  vector_t<pair<S2Point, S2Point> > edges;
   for (EdgeSet::const_iterator i = edges_->begin(); i != edges_->end(); ++i) {
     S2Point const& v0 = i->first;
     VertexSet const& vset = i->second;
@@ -474,7 +473,7 @@ void S2PolygonBuilder::SpliceEdges(PointIndex* index) {
   }
 }
 
-bool S2PolygonBuilder::AssembleLoops(vector<S2Loop*>* loops,
+bool S2PolygonBuilder::AssembleLoops(vector_t<S2Loop*>* loops,
                                      EdgeList* unused_edges) {
   if (options_.vertex_merge_radius().radians() > 0) {
     PointIndex index(options_.vertex_merge_radius().radians(),
@@ -528,7 +527,7 @@ bool S2PolygonBuilder::AssembleLoops(vector<S2Loop*>* loops,
 
 bool S2PolygonBuilder::AssemblePolygon(S2Polygon* polygon,
                                        EdgeList* unused_edges) {
-  vector<S2Loop*> loops;
+  vector_t<S2Loop*> loops;
   bool success = AssembleLoops(&loops, unused_edges);
 
   // If edges are undirected, then all loops are already CCW.  Otherwise we

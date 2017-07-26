@@ -18,7 +18,7 @@ void global_optargs_t::add_optarg(const raw_term_t &optarg, const std::string &n
         strprintf("Unrecognized global optional argument `%s`.", name.c_str()));
 
     auto res = optargs.insert(std::make_pair(std::string(name),
-                                             wire_func_t(optarg, std::vector<sym_t>())));
+                                             wire_func_t(optarg, vector_t<sym_t>())));
 
     rcheck_toplevel(res.second, base_exc_t::LOGIC,
         strprintf("Duplicate global optional argument: `%s`.", name.c_str()));

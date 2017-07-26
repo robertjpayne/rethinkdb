@@ -47,7 +47,7 @@ public:
         }
     }
 
-    const std::vector<store_key_t> &get_collected_keys() const {
+    const vector_t<store_key_t> &get_collected_keys() const {
         return collected_keys_;
     }
 
@@ -56,7 +56,7 @@ public:
     }
 
 private:
-    std::vector<store_key_t> collected_keys_;
+    vector_t<store_key_t> collected_keys_;
     bool aborted_;
 
     key_tester_t *tester_;
@@ -75,7 +75,7 @@ continue_bool_t rdb_erase_small_range(
         const deletion_context_t *deletion_context,
         signal_t *interruptor,
         uint64_t max_keys_to_erase,
-        std::vector<rdb_modification_report_t> *mod_reports_out,
+        vector_t<rdb_modification_report_t> *mod_reports_out,
         key_range_t *deleted_out) {
     rassert(mod_reports_out != nullptr);
     rassert(deleted_out != nullptr);

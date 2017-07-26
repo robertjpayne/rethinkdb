@@ -107,13 +107,13 @@ datum_t::data_wrapper_t::data_wrapper_t(datum_string_t str) :
 datum_t::data_wrapper_t::data_wrapper_t(const char *cstr) :
     r_str(cstr), internal_type(internal_type_t::R_STR) { }
 
-datum_t::data_wrapper_t::data_wrapper_t(std::vector<datum_t> &&array) :
-    r_array(new countable_wrapper_t<std::vector<datum_t> >(std::move(array))),
+datum_t::data_wrapper_t::data_wrapper_t(vector_t<datum_t> &&array) :
+    r_array(new countable_wrapper_t<vector_t<datum_t> >(std::move(array))),
     internal_type(internal_type_t::R_ARRAY) { }
 
 datum_t::data_wrapper_t::data_wrapper_t(
-        std::vector<std::pair<datum_string_t, datum_t> > &&object) :
-    r_object(new countable_wrapper_t<std::vector<std::pair<datum_string_t, datum_t> > >(
+        vector_t<std::pair<datum_string_t, datum_t> > &&object) :
+    r_object(new countable_wrapper_t<vector_t<std::pair<datum_string_t, datum_t> > >(
         std::move(object))),
     internal_type(internal_type_t::R_OBJECT) {
 
@@ -213,10 +213,10 @@ void datum_t::data_wrapper_t::destruct() {
         r_str.~datum_string_t();
     } break;
     case internal_type_t::R_ARRAY: {
-        r_array.~counted_t<countable_wrapper_t<std::vector<datum_t> > >();
+        r_array.~counted_t<countable_wrapper_t<vector_t<datum_t> > >();
     } break;
     case internal_type_t::R_OBJECT: {
-        r_object.~counted_t<countable_wrapper_t<std::vector<std::pair<datum_string_t, datum_t> > > >();
+        r_object.~counted_t<countable_wrapper_t<vector_t<std::pair<datum_string_t, datum_t> > > >();
     } break;
     case internal_type_t::BUF_R_ARRAY: // fallthru
     case internal_type_t::BUF_R_OBJECT: {
@@ -245,10 +245,10 @@ void datum_t::data_wrapper_t::assign_copy(const datum_t::data_wrapper_t &copyee)
         new(&r_str) datum_string_t(copyee.r_str);
     } break;
     case internal_type_t::R_ARRAY: {
-        new(&r_array) counted_t<countable_wrapper_t<std::vector<datum_t> > >(copyee.r_array);
+        new(&r_array) counted_t<countable_wrapper_t<vector_t<datum_t> > >(copyee.r_array);
     } break;
     case internal_type_t::R_OBJECT: {
-        new(&r_object) counted_t<countable_wrapper_t<std::vector<std::pair<datum_string_t, datum_t> > > >(
+        new(&r_object) counted_t<countable_wrapper_t<vector_t<std::pair<datum_string_t, datum_t> > > >(
             copyee.r_object);
     } break;
     case internal_type_t::BUF_R_ARRAY: // fallthru
@@ -277,11 +277,11 @@ void datum_t::data_wrapper_t::assign_move(datum_t::data_wrapper_t &&movee) noexc
         new(&r_str) datum_string_t(std::move(movee.r_str));
     } break;
     case internal_type_t::R_ARRAY: {
-        new(&r_array) counted_t<countable_wrapper_t<std::vector<datum_t> > >(
+        new(&r_array) counted_t<countable_wrapper_t<vector_t<datum_t> > >(
             std::move(movee.r_array));
     } break;
     case internal_type_t::R_OBJECT: {
-        new(&r_object) counted_t<countable_wrapper_t<std::vector<std::pair<datum_string_t, datum_t> > > >(
+        new(&r_object) counted_t<countable_wrapper_t<vector_t<std::pair<datum_string_t, datum_t> > > >(
             std::move(movee.r_object));
     } break;
     case internal_type_t::BUF_R_ARRAY: // fallthru
@@ -326,13 +326,13 @@ datum_t::datum_t(const std::string &string)
 
 datum_t::datum_t(const char *cstr) : data(cstr) { }
 
-datum_t::datum_t(std::vector<datum_t> &&_array,
+datum_t::datum_t(vector_t<datum_t> &&_array,
                  const configured_limits_t &limits)
     : data(std::move(_array)) {
     rcheck_array_size(*data.r_array, limits);
 }
 
-datum_t::datum_t(std::vector<datum_t> &&_array,
+datum_t::datum_t(vector_t<datum_t> &&_array,
                  no_array_size_limit_check_t) : data(std::move(_array)) { }
 
 datum_t::datum_t(std::map<datum_string_t, datum_t> &&_object,
@@ -341,7 +341,7 @@ datum_t::datum_t(std::map<datum_string_t, datum_t> &&_object,
     maybe_sanitize_ptype(allowed_pts);
 }
 
-datum_t::datum_t(std::vector<std::pair<datum_string_t, datum_t> > &&_object,
+datum_t::datum_t(vector_t<std::pair<datum_string_t, datum_t> > &&_object,
                  const std::set<std::string> &allowed_pts)
     : data(std::move(_object)) {
     maybe_sanitize_ptype(allowed_pts);
@@ -351,9 +351,9 @@ datum_t::datum_t(std::map<datum_string_t, datum_t> &&_object,
                  no_sanitize_ptype_t)
     : data(to_sorted_vec(std::move(_object))) { }
 
-std::vector<std::pair<datum_string_t, datum_t> > datum_t::to_sorted_vec(
+vector_t<std::pair<datum_string_t, datum_t> > datum_t::to_sorted_vec(
         std::map<datum_string_t, datum_t> &&map) {
-    std::vector<std::pair<datum_string_t, datum_t> > sorted_vec;
+    vector_t<std::pair<datum_string_t, datum_t> > sorted_vec;
     sorted_vec.reserve(map.size());
     for (auto it = map.begin(); it != map.end(); ++it) {
         sorted_vec.push_back(std::make_pair(std::move(it->first), std::move(it->second)));
@@ -369,7 +369,7 @@ datum_t to_datum_for_client_serialization(grouped_data_t &&gd,
         datum_array_builder_t arr(limits);
         arr.reserve(gd.size());
         for (auto &&pair : *gd.get_underlying_map()) {
-            arr.add(datum_t(std::vector<datum_t>{
+            arr.add(datum_t(vector_t<datum_t>{
                                 std::move(pair.first), std::move(pair.second)},
                             limits));
         }
@@ -391,7 +391,7 @@ void datum_t::reset() {
 }
 
 datum_t datum_t::empty_array() {
-    return datum_t(std::vector<datum_t>(),
+    return datum_t(vector_t<datum_t>(),
                    no_array_size_limit_check_t());
 }
 
@@ -1929,7 +1929,7 @@ datum_t to_datum(cJSON *json, const configured_limits_t &limits,
         return datum_t(json->valuestring);
     } break;
     case cJSON_Array: {
-        std::vector<datum_t> array;
+        vector_t<datum_t> array;
         json_array_iterator_t it(json);
         while (cJSON *item = it.next()) {
             array.push_back(to_datum(item, limits, reql_version));
@@ -2211,7 +2211,7 @@ void datum_array_builder_t::splice(size_t index, datum_t values) {
 
     // First copy the values into a vector so vector.insert() can know the number
     // of elements being inserted.
-    std::vector<datum_t> arr;
+    vector_t<datum_t> arr;
     const size_t values_sz = values.arr_size();
     arr.reserve(values_sz);
     for (size_t i = 0; i < values_sz; ++i) {

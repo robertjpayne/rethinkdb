@@ -1,5 +1,5 @@
 #include <map>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "clustering/administration/main/options.hpp"
 #include "errors.hpp"
@@ -8,7 +8,7 @@
 
 namespace unittest {
 
-std::vector<options::option_t> make_options() {
+vector_t<options::option_t> make_options() {
     return make_vector(options::option_t(options::names_t("--no-parameter"),
                                                             options::OPTIONAL_NO_PARAMETER),
                                           options::option_t(options::names_t("--optional"),
@@ -24,8 +24,8 @@ std::vector<options::option_t> make_options() {
                                                             "default-not-overridden"));
 }
 
-std::map<std::string, std::vector<std::string> > without_source(const std::map<std::string, options::values_t> &opts) {
-    std::map<std::string, std::vector<std::string> > ret;
+std::map<std::string, vector_t<std::string> > without_source(const std::map<std::string, options::values_t> &opts) {
+    std::map<std::string, vector_t<std::string> > ret;
     for (auto pair = opts.begin(); pair != opts.end(); ++pair) {
         ret.insert(std::make_pair(pair->first, pair->second.values));
     }
@@ -33,7 +33,7 @@ std::map<std::string, std::vector<std::string> > without_source(const std::map<s
 }
 
 TEST(OptionsTest, CommandLineParsing) {
-    const std::vector<const char *> command_line = make_vector<const char *>(
+    const vector_t<const char *> command_line = make_vector<const char *>(
          "--no-parameter",
         "--optional", "optional1",
         "--optional-repeat", "optional-repeat1",
@@ -46,12 +46,12 @@ TEST(OptionsTest, CommandLineParsing) {
         "--override-default", "override-default1"
     );
 
-    const std::vector<options::option_t> options = make_options();
+    const vector_t<options::option_t> options = make_options();
 
-    const std::map<std::string, std::vector<std::string> > opts
+    const std::map<std::string, vector_t<std::string> > opts
         = without_source(options::parse_command_line(command_line.size(), command_line.data(), options));
 
-    const std::map<std::string, std::vector<std::string> > expected_parse = make_map<std::string, std::vector<std::string> >(
+    const std::map<std::string, vector_t<std::string> > expected_parse = make_map<std::string, vector_t<std::string> >(
         std::make_pair("--no-parameter", make_vector<std::string>("")),
         std::make_pair("--optional", make_vector<std::string>("optional1")),
         std::make_pair("--optional-repeat", make_vector<std::string>("optional-repeat1", "optional-repeat2", "optional-repeat3")),
@@ -64,9 +64,9 @@ TEST(OptionsTest, CommandLineParsing) {
 }
 
 TEST(OptionsTest, CommandLineMissingParameter) {
-    const std::vector<options::option_t> options = make_options();
+    const vector_t<options::option_t> options = make_options();
 
-    std::vector<const char *> command_line = make_vector<const char *>("--optional", "");
+    vector_t<const char *> command_line = make_vector<const char *>("--optional", "");
     ASSERT_THROW(options::parse_command_line(command_line.size(),
                                              command_line.data(),
                                              options),
@@ -96,15 +96,15 @@ TEST(OptionsTest, ConfigFileParsing) {
         "override-default = override-default1\n"
         "ignored-option=fake";
 
-    const std::vector<options::option_t> options = make_options();
-    std::vector<options::option_t> options_superset = options;
+    const vector_t<options::option_t> options = make_options();
+    vector_t<options::option_t> options_superset = options;
     options_superset.push_back(options::option_t(options::names_t("--ignored-option", "-i"), options::OPTIONAL));
     options_superset.push_back(options::option_t(options::names_t("--fake-option", "-f"), options::OPTIONAL));
 
-    const std::map<std::string, std::vector<std::string> > opts
+    const std::map<std::string, vector_t<std::string> > opts
         = without_source(options::parse_config_file(config_file, "ConfigFileParsing file", options, options_superset));
 
-    const std::map<std::string, std::vector<std::string> > expected_parse = make_map<std::string, std::vector<std::string> >(
+    const std::map<std::string, vector_t<std::string> > expected_parse = make_map<std::string, vector_t<std::string> >(
         std::make_pair("--no-parameter", make_vector<std::string>("")),
         std::make_pair("--optional", make_vector<std::string>("optional1")),
         std::make_pair("--optional-repeat", make_vector<std::string>("optional-repeat1", "optional-repeat2", "optional-repeat3")),
@@ -117,8 +117,8 @@ TEST(OptionsTest, ConfigFileParsing) {
 }
 
 TEST(OptionsTest, ConfigFileMissingParameter) {
-    const std::vector<options::option_t> options = make_options();
-    std::vector<options::option_t> options_superset = options;
+    const vector_t<options::option_t> options = make_options();
+    vector_t<options::option_t> options_superset = options;
 
     std::string config_file = std::string("optional");
     ASSERT_THROW(options::parse_config_file(config_file,

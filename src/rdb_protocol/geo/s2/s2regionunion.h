@@ -3,7 +3,7 @@
 #ifndef UTIL_GEOMETRY_S2REGIONUNION_H__
 #define UTIL_GEOMETRY_S2REGIONUNION_H__
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/geo/s2/base/basictypes.h"
 #include "rdb_protocol/geo/s2/base/logging.h"
@@ -12,7 +12,6 @@
 #include "utils.hpp"
 
 namespace geo {
-using std::vector;
 
 class S2Cap;
 class S2Cell;
@@ -27,16 +26,16 @@ class S2RegionUnion : public S2Region {
 
   // Create a region representing the union of the given regions.
   // Takes ownership of all regions and clears the given vector.
-  S2RegionUnion(vector<S2Region*>* regions);
+  S2RegionUnion(vector_t<S2Region*>* regions);
 
   virtual ~S2RegionUnion();
 
   // Initialize region by taking ownership of the given regions.
-  void Init(vector<S2Region*>* regions);
+  void Init(vector_t<S2Region*>* regions);
 
   // Release ownership of the regions of this union, and appends them to
   // "regions" if non-NULL.  Resets the region to be empty.
-  void Release(vector<S2Region*>* regions);
+  void Release(vector_t<S2Region*>* regions);
 
   // Add the given region to the union.  This method can be called repeatedly
   // as an alternative to Init().
@@ -67,7 +66,7 @@ class S2RegionUnion : public S2Region {
   // its argument.
   S2RegionUnion(S2RegionUnion const* src);
 
-  vector<S2Region*> regions_;
+  vector_t<S2Region*> regions_;
 
   DISALLOW_EVIL_CONSTRUCTORS(S2RegionUnion);
 };

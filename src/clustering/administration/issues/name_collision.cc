@@ -11,12 +11,12 @@ class name_collision_issue_t : public issue_t {
 public:
     name_collision_issue_t(const issue_id_t &_issue_id,
                            const name_string_t &_name,
-                           const std::vector<std::string> &_collided_ids);
+                           const vector_t<std::string> &_collided_ids);
     bool is_critical() const { return true; }
 
 protected:
     const name_string_t name;
-    const std::vector<std::string> collided_ids;
+    const vector_t<std::string> collided_ids;
 };
 
 // Issue for server name collisions
@@ -24,7 +24,7 @@ class server_name_collision_issue_t : public name_collision_issue_t {
 public:
     explicit server_name_collision_issue_t(
         const name_string_t &_name,
-        const std::vector<server_id_t> &_collided_ids);
+        const vector_t<server_id_t> &_collided_ids);
     const datum_string_t &get_name() const { return server_name_collision_issue_type; }
 
 private:
@@ -44,7 +44,7 @@ class db_name_collision_issue_t : public name_collision_issue_t {
 public:
     explicit db_name_collision_issue_t(
         const name_string_t &_name,
-        const std::vector<database_id_t> &_collided_ids);
+        const vector_t<database_id_t> &_collided_ids);
     const datum_string_t &get_name() const { return db_name_collision_issue_type; }
 
 private:
@@ -65,7 +65,7 @@ public:
     table_name_collision_issue_t(
         const name_string_t &_name,
         const database_id_t &_db_id,
-        const std::vector<namespace_id_t> &_collided_ids);
+        const vector_t<namespace_id_t> &_collided_ids);
     const datum_string_t &get_name() const { return table_name_collision_issue_type; }
 
 private:
@@ -99,7 +99,7 @@ const uuid_u table_name_collision_issue_t::base_issue_id =
 name_collision_issue_t::name_collision_issue_t(
         const issue_id_t &_issue_id,
         const name_string_t &_name,
-        const std::vector<std::string> &_collided_ids) :
+        const vector_t<std::string> &_collided_ids) :
     issue_t(_issue_id),
     name(_name),
     collided_ids(_collided_ids) { }
@@ -109,7 +109,7 @@ void generic_build_info_and_description(
         const char *short_type_singular,
         const char *system_table_name,
         const name_string_t &name,
-        const std::vector<std::string> &ids,
+        const vector_t<std::string> &ids,
         ql::datum_t *info_out,
         datum_string_t *description_out) {
     ql::datum_object_builder_t builder;
@@ -135,16 +135,16 @@ void generic_build_info_and_description(
 }
 
 // Helper functions for converting IDs to strings
-std::vector<std::string> server_ids_to_str_ids(const std::vector<server_id_t> &ids) {
-    std::vector<std::string> res;
+vector_t<std::string> server_ids_to_str_ids(const vector_t<server_id_t> &ids) {
+    vector_t<std::string> res;
     res.reserve(ids.size());
     for (const auto &id : ids) {
         res.push_back(id.print());
     }
     return res;
 }
-std::vector<std::string> uuids_to_str_ids(const std::vector<uuid_u> &ids) {
-    std::vector<std::string> res;
+vector_t<std::string> uuids_to_str_ids(const vector_t<uuid_u> &ids) {
+    vector_t<std::string> res;
     res.reserve(ids.size());
     for (const auto &id : ids) {
         res.push_back(uuid_to_str(id));
@@ -154,7 +154,7 @@ std::vector<std::string> uuids_to_str_ids(const std::vector<uuid_u> &ids) {
 
 server_name_collision_issue_t::server_name_collision_issue_t(
         const name_string_t &_name,
-        const std::vector<server_id_t> &_collided_ids) :
+        const vector_t<server_id_t> &_collided_ids) :
     name_collision_issue_t(from_hash(base_issue_id, _name),
                            _name,
                            server_ids_to_str_ids(_collided_ids)) { }
@@ -174,7 +174,7 @@ bool server_name_collision_issue_t::build_info_and_description(
 
 db_name_collision_issue_t::db_name_collision_issue_t(
         const name_string_t &_name,
-        const std::vector<database_id_t> &_collided_ids) :
+        const vector_t<database_id_t> &_collided_ids) :
     name_collision_issue_t(from_hash(base_issue_id, _name),
                            _name,
                            uuids_to_str_ids(_collided_ids)) { }
@@ -195,7 +195,7 @@ bool db_name_collision_issue_t::build_info_and_description(
 table_name_collision_issue_t::table_name_collision_issue_t(
         const name_string_t &_name,
         const database_id_t &_db_id,
-        const std::vector<namespace_id_t> &_collided_ids) :
+        const vector_t<namespace_id_t> &_collided_ids) :
     name_collision_issue_t(from_hash(base_issue_id, _db_id, _name),
                            _name,
                            uuids_to_str_ids(_collided_ids)),
@@ -239,8 +239,8 @@ name_collision_issue_tracker_t::~name_collision_issue_tracker_t() { }
 
 void find_server_duplicates(
         watchable_map_t<server_id_t, server_config_versioned_t> *servers,
-        std::vector<scoped_ptr_t<issue_t> > *issues_out) {
-    std::map<name_string_t, std::vector<server_id_t> > name_counts;
+        vector_t<scoped_ptr_t<issue_t> > *issues_out) {
+    std::map<name_string_t, vector_t<server_id_t> > name_counts;
     servers->read_all(
     [&](const server_id_t &sid, const server_config_versioned_t *config) {
         name_counts[config->config.name].push_back(sid);
@@ -255,8 +255,8 @@ void find_server_duplicates(
 
 void find_db_duplicates(
         const databases_semilattice_metadata_t &dbs,
-        std::vector<scoped_ptr_t<issue_t> > *issues_out) {
-    std::map<name_string_t, std::vector<database_id_t> > name_counts;
+        vector_t<scoped_ptr_t<issue_t> > *issues_out) {
+    std::map<name_string_t, vector_t<database_id_t> > name_counts;
     for (auto const &it : dbs.databases) {
         if (!it.second.is_deleted()) {
             name_string_t name = it.second.get_ref().name.get_ref();
@@ -274,11 +274,11 @@ void find_db_duplicates(
 
 void find_table_duplicates(
         table_meta_client_t *table_meta_client,
-        std::vector<scoped_ptr_t<issue_t> > *issues_out) {
+        vector_t<scoped_ptr_t<issue_t> > *issues_out) {
     std::map<namespace_id_t, table_basic_config_t> table_names;
     table_meta_client->list_names(&table_names);
 
-    std::map<std::pair<database_id_t, name_string_t>, std::vector<namespace_id_t> >
+    std::map<std::pair<database_id_t, name_string_t>, vector_t<namespace_id_t> >
         name_counts;
     for (auto const &table_name : table_names) {
         auto pair = std::make_pair(table_name.second.database, table_name.second.name);
@@ -295,10 +295,10 @@ void find_table_duplicates(
     }
 }
 
-std::vector<scoped_ptr_t<issue_t> > name_collision_issue_tracker_t::get_issues(
+vector_t<scoped_ptr_t<issue_t> > name_collision_issue_tracker_t::get_issues(
         UNUSED signal_t *interruptor) const {
     cluster_semilattice_metadata_t metadata = cluster_sl_view->get();
-    std::vector<scoped_ptr_t<issue_t> > issues;
+    vector_t<scoped_ptr_t<issue_t> > issues;
 
     find_server_duplicates(server_config_client->get_server_config_map(), &issues);
     find_db_duplicates(metadata.databases, &issues);

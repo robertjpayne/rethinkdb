@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "errors.hpp"
 
@@ -41,7 +41,7 @@ public:
     }
 
 private:
-    std::vector<buffer_t> buffers_;
+    vector_t<buffer_t> buffers_;
     DISABLE_COPYING(const_buffer_group_t);
 };
 

@@ -3,14 +3,13 @@
 #include <stdarg.h> // For va_list and related operations
 #include <stdio.h> // MSVC requires this for _vsnprintf
 
-#include <vector>
+#include "containers/vector.hpp"
 #include <string>
 
 #include "rdb_protocol/geo/s2/strings/stringprintf.h"
 #include "rdb_protocol/geo/s2/base/logging.h"
 
 namespace geo {
-using std::vector;
 
 
 // Max arguments supported by StringPrintVector
@@ -21,7 +20,7 @@ const size_t kStringPrintfVectorMaxArgs = 32;
 // and we can fix the problem or protect against an attack.
 static const char string_printf_empty_block [256] = { '\0' };
 
-std::string StringPrintfVector(const char* format, const vector<std::string>& v) {
+std::string StringPrintfVector(const char* format, const vector_t<std::string>& v) {
   CHECK_LE(v.size(), kStringPrintfVectorMaxArgs)
       << "StringPrintfVector currently only supports up to "
       << kStringPrintfVectorMaxArgs << " arguments. "

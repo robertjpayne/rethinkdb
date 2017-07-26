@@ -160,7 +160,7 @@ void conflict_resolving_diskmgr_t::done(accounting_diskmgr_action_t *payload) {
         /* Resume all operations that were waiting for us. */
         std::deque<action_t *> &waiter_queue = resize_waiter_queues[action->get_fd()];
 
-        std::vector<action_t *> waiters_to_unblock;
+        vector_t<action_t *> waiters_to_unblock;
         waiters_to_unblock.reserve(waiter_queue.size());
 
         while (!waiter_queue.empty()) {

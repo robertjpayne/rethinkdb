@@ -45,7 +45,7 @@ SPAWNER_TEST(JSProc, CallTimeout) {
 
     config.timeout_ms = 10;
 
-    result = js_runner.call(loop_source, std::vector<ql::datum_t>(), config);
+    result = js_runner.call(loop_source, vector_t<ql::datum_t>(), config);
     std::string value = boost::get<std::string>(result);
     ASSERT_EQ(strprintf("JavaScript query `%s` timed out after 0.010 seconds.", loop_source.c_str()), value);
     ASSERT_FALSE(js_runner.connected());
@@ -105,7 +105,7 @@ SPAWNER_TEST(JSProc, EvalAndCall) {
 
     // Call the function
     result = js_runner.call(source_code,
-                            std::vector<ql::datum_t>(),
+                            vector_t<ql::datum_t>(),
                             config);
     ASSERT_TRUE(js_runner.connected());
 
@@ -137,7 +137,7 @@ SPAWNER_TEST(JSProc, BrokenFunction) {
 
     // Call the function
     result = js_runner.call(source_code,
-                            std::vector<ql::datum_t>(),
+                            vector_t<ql::datum_t>(),
                             config);
     ASSERT_TRUE(js_runner.connected());
 
@@ -184,7 +184,7 @@ SPAWNER_TEST(JSProc, InfiniteRecursionFunction) {
     ASSERT_TRUE(js_id != nullptr);
 
     // Call the function
-    std::vector<ql::datum_t> args;
+    vector_t<ql::datum_t> args;
     args.push_back(ql::datum_t(1.0));
     result = js_runner.call(source_code, args, config);
 
@@ -219,7 +219,7 @@ void run_overalloc_function_test() {
 
     // Call the function
     ASSERT_THROW(js_runner.call(source_code,
-                                std::vector<ql::datum_t>(),
+                                vector_t<ql::datum_t>(),
                                 config), extproc_worker_exc_t);
 }
 
@@ -252,7 +252,7 @@ void passthrough_test_internal(extproc_pool_t *pool, const ql::datum_t &arg) {
 
     // Call the function
     js_result_t res = js_runner.call(source_code,
-                                     std::vector<ql::datum_t>(1, arg),
+                                     vector_t<ql::datum_t>(1, arg),
                                      config);
 
     ql::datum_t *res_datum = boost::get<ql::datum_t>(&res);
@@ -284,14 +284,14 @@ SPAWNER_TEST(JSProc, Passthrough) {
     // Array
     ql::datum_t array_datum;
     {
-        std::vector<ql::datum_t> array_data;
+        vector_t<ql::datum_t> array_data;
         array_datum = ql::datum_t(std::move(array_data), limits);
         passthrough_test_internal(&pool, array_datum);
 
         for (size_t i = 0; i < 100; ++i) {
             array_data.push_back(
                 ql::datum_t(datum_string_t(std::string(i, 'a'))));
-            std::vector<ql::datum_t> copied_data(array_data);
+            vector_t<ql::datum_t> copied_data(array_data);
             array_datum = ql::datum_t(std::move(copied_data), limits);
             passthrough_test_internal(&pool, array_datum);
         }
@@ -317,12 +317,12 @@ SPAWNER_TEST(JSProc, Passthrough) {
     // Nested structure
     ql::datum_t nested_datum;
     {
-        std::vector<ql::datum_t> nested_data;
+        vector_t<ql::datum_t> nested_data;
         nested_datum = ql::datum_t(std::move(nested_data), limits);
         passthrough_test_internal(&pool, nested_datum);
 
         nested_data.push_back(array_datum);
-        std::vector<ql::datum_t> copied_data(nested_data);
+        vector_t<ql::datum_t> copied_data(nested_data);
         nested_datum = ql::datum_t(std::move(copied_data), limits);
         passthrough_test_internal(&pool, nested_datum);
 

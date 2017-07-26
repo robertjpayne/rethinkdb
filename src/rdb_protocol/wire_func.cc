@@ -20,7 +20,7 @@ wire_func_t::wire_func_t(const counted_t<const func_t> &f) : func(f) {
 }
 
 wire_func_t::wire_func_t(const raw_term_t &body,
-                         std::vector<sym_t> arg_names) {
+                         vector_t<sym_t> arg_names) {
     compile_env_t env(var_visibility_t().with_func_arg_name_list(arg_names));
     func = make_counted<reql_func_t>(var_scope_t(),
                                      arg_names, compile_term(&env, body));
@@ -64,7 +64,7 @@ public:
         serialize<W>(wm, wire_func_type_t::REQL);
         const var_scope_t &scope = reql_func->captured_scope;
         serialize<W>(wm, scope);
-        const std::vector<sym_t> &arg_names = reql_func->arg_names;
+        const vector_t<sym_t> &arg_names = reql_func->arg_names;
         serialize<W>(wm, arg_names);
         const raw_term_t &body = reql_func->body->get_src();
         serialize_term_tree<W>(wm, body);
@@ -113,7 +113,7 @@ archive_result_t deserialize(read_stream_t *s, wire_func_t *wf) {
         res = deserialize<W>(s, &scope);
         if (bad(res)) { return res; }
 
-        std::vector<sym_t> arg_names;
+        vector_t<sym_t> arg_names;
         res = deserialize<W>(s, &arg_names);
         if (bad(res)) { return res; }
 
@@ -177,7 +177,7 @@ archive_result_t deserialize_wire_func(
         res = deserialize<W>(s, &scope);
         if (bad(res)) { return res; }
 
-        std::vector<sym_t> arg_names;
+        vector_t<sym_t> arg_names;
         res = deserialize<W>(s, &arg_names);
         if (bad(res)) { return res; }
 
@@ -274,7 +274,7 @@ counted_t<const func_t> maybe_wire_func_t::compile_wire_func_or_null() const {
     }
 }
 
-group_wire_func_t::group_wire_func_t(std::vector<counted_t<const func_t> > &&_funcs,
+group_wire_func_t::group_wire_func_t(vector_t<counted_t<const func_t> > &&_funcs,
                                      bool _append_index, bool _multi)
     : append_index(_append_index), multi(_multi) {
     funcs.reserve(_funcs.size());
@@ -283,8 +283,8 @@ group_wire_func_t::group_wire_func_t(std::vector<counted_t<const func_t> > &&_fu
     }
 }
 
-std::vector<counted_t<const func_t> > group_wire_func_t::compile_funcs() const {
-    std::vector<counted_t<const func_t> > ret;
+vector_t<counted_t<const func_t> > group_wire_func_t::compile_funcs() const {
+    vector_t<counted_t<const func_t> > ret;
     ret.reserve(funcs.size());
     for (size_t i = 0; i < funcs.size(); ++i) {
         ret.push_back(funcs[i].compile_wire_func());

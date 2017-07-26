@@ -15,7 +15,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "errors.hpp"
 #include <boost/crc.hpp>
@@ -37,7 +37,7 @@
 /* TODO support multiple concurrent writes */
 static const char MB_MARKER_MAGIC[8] = {'m', 'e', 't', 'a', 'b', 'l', 'c', 'k'};
 
-std::vector<int64_t> initial_metablock_offsets(int64_t extent_size);
+vector_t<int64_t> initial_metablock_offsets(int64_t extent_size);
 
 
 
@@ -144,7 +144,7 @@ private:
 
     extent_manager_t *const extent_manager;
 
-    const std::vector<int64_t> metablock_offsets;
+    const vector_t<int64_t> metablock_offsets;
 
     enum state_t {
         state_unstarted,

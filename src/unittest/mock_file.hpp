@@ -3,7 +3,7 @@
 #define UNITTEST_MOCK_FILE_HPP_
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "arch/types.hpp"
 #include "errors.hpp"
@@ -17,7 +17,7 @@ public:
     // That mode_rw == (mode_read | mode_write) is no accident.
     enum mode_t { mode_read = 1, mode_write = 2, mode_rw = 3 };
 
-    mock_file_t(mode_t mode, std::vector<char> *data);
+    mock_file_t(mode_t mode, vector_t<char> *data);
     ~mock_file_t();
 
     int64_t get_file_size();
@@ -45,7 +45,7 @@ public:
 
 private:
     mode_t mode_;
-    std::vector<char> *data_;
+    vector_t<char> *data_;
 
     DISABLE_COPYING(mock_file_t);
 };
@@ -63,7 +63,7 @@ public:
 private:
     enum existence_state_t { no_file, temporary_file, permanent_file, unlinked_file };
     existence_state_t file_existence_state_;
-    std::vector<char> file_;
+    vector_t<char> file_;
 };
 
 }  // namespace unittest

@@ -697,7 +697,7 @@ void clean_entry(void *p, int sz) {
 void move_elements(value_sizer_t *sizer, leaf_node_t *fro, int beg, int end,
                    int wpoint, leaf_node_t *tow, int fro_copysize,
                    int fro_mand_offset,
-                   std::vector<const void *> *moved_values_out) {
+                   vector_t<const void *> *moved_values_out) {
     rassert(is_underfull(sizer, tow));
     rassert(end >= beg);
 
@@ -1064,7 +1064,7 @@ void merge(value_sizer_t *sizer, leaf_node_t *left, leaf_node_t *right) {
 bool level(value_sizer_t *sizer, int nodecmp_node_with_sib,
            leaf_node_t *node, leaf_node_t *sibling,
            btree_key_t *replacement_key_out,
-           std::vector<const void *> *moved_values_out) {
+           vector_t<const void *> *moved_values_out) {
     rassert(node != sibling);
 
     // If sibling were underfull, we'd just merge the nodes.

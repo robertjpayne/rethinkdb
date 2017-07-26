@@ -62,7 +62,7 @@ static store_key_t interpolate_key(store_key_t in1, store_key_t in2, double frac
 /* `ensure_distinct()` ensures that all of the `store_key_t`s in the given vector are
 distinct from eachother. Initially, they should be non-strictly monotonically increasing;
 upon return, they will be strictly monotonically increasing. */
-static void ensure_distinct(std::vector<store_key_t> *split_points) {
+static void ensure_distinct(vector_t<store_key_t> *split_points) {
     for (size_t i = 1; i < split_points->size(); ++i) {
         /* Make sure the initial condition is met */
         guarantee(split_points->at(i) >= split_points->at(i-1));
@@ -121,7 +121,7 @@ bool calculate_split_points_with_distribution(
         const std::map<store_key_t, int64_t> &counts,
         size_t num_shards,
         table_shard_scheme_t *split_points_out) {
-    std::vector<std::pair<int64_t, store_key_t> > pairs;
+    vector_t<std::pair<int64_t, store_key_t> > pairs;
     int64_t total_count = 0;
     for (auto const &pair : counts) {
         if (pair.second != 0) {

@@ -12,7 +12,7 @@ class coro_stream_t;
 class union_datum_stream_t : public datum_stream_t, public home_thread_mixin_t {
 public:
     union_datum_stream_t(env_t *env,
-                         std::vector<counted_t<datum_stream_t> > &&_streams,
+                         vector_t<counted_t<datum_stream_t> > &&_streams,
                          backtrace_id_t bt,
                          size_t expected_states = 0);
 
@@ -30,13 +30,13 @@ public:
 private:
     friend class coro_stream_t;
 
-    virtual std::vector<changespec_t> get_changespecs();
-    std::vector<datum_t >
+    virtual vector_t<changespec_t> get_changespecs();
+    vector_t<datum_t >
     next_batch_impl(env_t *env, const batchspec_t &batchspec);
 
     // We need to keep these around to apply transformations to even though we
     // spawn coroutines to read from them.
-    std::vector<scoped_ptr_t<coro_stream_t> > coro_streams;
+    vector_t<scoped_ptr_t<coro_stream_t> > coro_streams;
     feed_type_t union_type;
     bool is_infinite_union;
 
@@ -70,7 +70,7 @@ private:
     promise_t<std::exception_ptr> abort_exc;
     scoped_ptr_t<cond_t> data_available;
 
-    std::queue<std::vector<datum_t> > queue; // FIFO
+    std::queue<vector_t<datum_t> > queue; // FIFO
 
     auto_drainer_t drainer;
 };

@@ -56,12 +56,12 @@ class extent_zone_t {
     queue.  The free queue can contain entries that point past the end of
     extents, if the file size ever gets shrunk. */
 
-    std::vector<extent_info_t> extents;
+    vector_t<extent_info_t> extents;
 
     // We want to remove the minimum element from the free_queue first, leaving
     // free extents at the end of the file.
     std::priority_queue<size_t,
-                        std::vector<size_t>,
+                        vector_t<size_t>,
                         std::greater<size_t> > free_queue;
 
     file_t *const dbfile;
@@ -121,7 +121,7 @@ public:
         } else if (free_queue.top() >= extents.size()) {
             rassert(held_extents_ == 0);
             std::priority_queue<size_t,
-                                std::vector<size_t>,
+                                vector_t<size_t>,
                                 std::greater<size_t> > tmp;
             free_queue = tmp;
             extent = extents.size() * extent_size;
@@ -183,7 +183,7 @@ public:
             // size shrinks.
             if (held_extents_ < free_queue.size() / 2) {
                 std::priority_queue<size_t,
-                                    std::vector<size_t>,
+                                    vector_t<size_t>,
                                     std::greater<size_t> > tmp;
                 for (size_t i = 0; i < held_extents_; ++i) {
                     tmp.push(free_queue.top());
@@ -312,7 +312,7 @@ void extent_manager_t::end_transaction(extent_transaction_t *t) {
 
 void extent_manager_t::commit_transaction(extent_transaction_t *t) {
     assert_thread();
-    std::vector<extent_reference_t> extents = t->reset();
+    vector_t<extent_reference_t> extents = t->reset();
     for (auto it = extents.begin(); it != extents.end(); ++it) {
         zone->release_extent(std::move(*it));
     }

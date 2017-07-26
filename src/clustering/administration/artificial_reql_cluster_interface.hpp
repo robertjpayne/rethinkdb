@@ -107,7 +107,7 @@ public:
             counted_t<const ql::db_t> db,
             const name_string_t &name,
             ql::env_t *env,
-            std::vector<int64_t> *doc_counts_out,
+            vector_t<int64_t> *doc_counts_out,
             admin_err_t *error_out);
     bool table_config(
             auth::user_context_t const &user_context,

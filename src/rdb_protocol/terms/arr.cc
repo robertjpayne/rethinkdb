@@ -594,8 +594,8 @@ public:
 private:
     virtual scoped_ptr_t<val_t> eval_impl(scope_env_t *env, args_t *args, eval_flags_t) const {
         counted_t<datum_stream_t> seq = args->arg(env, 0)->as_seq(env->env);
-        std::vector<datum_t> required_els;
-        std::vector<counted_t<const func_t> > required_funcs;
+        vector_t<datum_t> required_els;
+        vector_t<counted_t<const func_t> > required_funcs;
         for (size_t i = 1; i < args->num_args(); ++i) {
             scoped_ptr_t<val_t> v = args->arg(env, i);
             if (v->get_type().is_convertible(val_t::type_t::FUNC)) {

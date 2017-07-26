@@ -3,7 +3,7 @@
 #define EXTPROC_JS_JOB_HPP_
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "utils.hpp"
 #include "containers/archive/archive.hpp"
@@ -20,7 +20,7 @@ public:
              const ql::configured_limits_t &limits);
 
     js_result_t eval(const std::string &source);
-    js_result_t call(js_id_t id, const std::vector<ql::datum_t> &args);
+    js_result_t call(js_id_t id, const vector_t<ql::datum_t> &args);
     void release(js_id_t id);
     void exit();
 

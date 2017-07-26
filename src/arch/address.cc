@@ -43,7 +43,7 @@ std::string str_gethostname() {
     const int namelen = _POSIX_HOST_NAME_MAX;
 #endif
 
-    std::vector<char> bytes(namelen + 1);
+    vector_t<char> bytes(namelen + 1);
     bytes[namelen] = '0';
 
     int res = gethostname(bytes.data(), namelen);

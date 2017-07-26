@@ -27,7 +27,7 @@ public:
             rdb_context_t *rdb_context,
             perfmon_collection_t *perfmon_collection_serializers,
             scoped_ptr_t<thread_allocation_t> &&serializer_thread,
-            std::vector<scoped_ptr_t<thread_allocation_t> > &&store_threads,
+            vector_t<scoped_ptr_t<thread_allocation_t> > &&store_threads,
             std::map<
                 namespace_id_t, std::pair<real_multistore_ptr_t *, auto_drainer_t::lock_t>
             > *real_multistores) :
@@ -70,7 +70,7 @@ public:
             std::move(inner_serializer),
             MERGER_SERIALIZER_MAX_ACTIVE_WRITES));
 
-        std::vector<serializer_t *> ptrs;
+        vector_t<serializer_t *> ptrs;
         ptrs.push_back(serializer.get());
         if (create) {
             serializer_multiplexer_t::create(ptrs, CPU_SHARDING_FACTOR);
@@ -170,7 +170,7 @@ private:
     scoped_ptr_t<store_t> stores[CPU_SHARDING_FACTOR];
 
     scoped_ptr_t<thread_allocation_t> serializer_thread_allocation;
-    std::vector<scoped_ptr_t<thread_allocation_t> > store_thread_allocations;
+    vector_t<scoped_ptr_t<thread_allocation_t> > store_thread_allocations;
 
     auto_drainer_t drainer;
     map_insertion_sentry_t<
@@ -284,7 +284,7 @@ void real_table_persistence_interface_t::load_multistore(
 
     scoped_ptr_t<thread_allocation_t> serializer_thread(
         new thread_allocation_t(&thread_allocator));
-    std::vector<scoped_ptr_t<thread_allocation_t> > store_threads;
+    vector_t<scoped_ptr_t<thread_allocation_t> > store_threads;
     for (size_t i = 0; i < CPU_SHARDING_FACTOR; ++i) {
         store_threads.emplace_back(new thread_allocation_t(&thread_allocator));
     }

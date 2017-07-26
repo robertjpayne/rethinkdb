@@ -211,7 +211,7 @@ private:
         }
     }
 
-    std::vector<std::string> keys_used;
+    vector_t<std::string> keys_used;
     order_source_t *osource;
     std::string tag;
     int next_value;

@@ -3,7 +3,7 @@
 #include "rdb_protocol/geo/s2/s2cellunion.h"
 
 #include <algorithm>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/geo/s2/base/integral_types.h"
 #include "rdb_protocol/geo/s2/base/logging.h"
@@ -18,12 +18,11 @@ using std::min;
 using std::max;
 using std::swap;
 using std::reverse;
-using std::vector;
 
 
 // Returns true if the vector of cell_ids is sorted.  Used only in
 // DCHECKs.
-extern bool IsSorted(vector<S2CellId> const& cell_ids) {
+extern bool IsSorted(vector_t<S2CellId> const& cell_ids) {
   for (size_t i = 0; i + 1 < cell_ids.size(); ++i) {
     if (cell_ids[i + 1] < cell_ids[i]) {
       return false;
@@ -32,45 +31,45 @@ extern bool IsSorted(vector<S2CellId> const& cell_ids) {
   return true;
 }
 
-void S2CellUnion::Init(vector<S2CellId> const& _cell_ids) {
+void S2CellUnion::Init(vector_t<S2CellId> const& _cell_ids) {
   InitRaw(_cell_ids);
   Normalize();
 }
 
-void S2CellUnion::Init(vector<uint64> const& _cell_ids) {
+void S2CellUnion::Init(vector_t<uint64> const& _cell_ids) {
   InitRaw(_cell_ids);
   Normalize();
 }
 
-void S2CellUnion::InitSwap(vector<S2CellId>* _cell_ids) {
+void S2CellUnion::InitSwap(vector_t<S2CellId>* _cell_ids) {
   InitRawSwap(_cell_ids);
   Normalize();
 }
 
-void S2CellUnion::InitRaw(vector<S2CellId> const& _cell_ids) {
+void S2CellUnion::InitRaw(vector_t<S2CellId> const& _cell_ids) {
   cell_ids_ = _cell_ids;
 }
 
-void S2CellUnion::InitRaw(vector<uint64> const& _cell_ids) {
+void S2CellUnion::InitRaw(vector_t<uint64> const& _cell_ids) {
   cell_ids_.resize(_cell_ids.size());
   for (int i = 0; i < num_cells(); ++i) {
     cell_ids_[i] = S2CellId(_cell_ids[i]);
   }
 }
 
-void S2CellUnion::InitRawSwap(vector<S2CellId>* _cell_ids) {
+void S2CellUnion::InitRawSwap(vector_t<S2CellId>* _cell_ids) {
   cell_ids_.swap(*_cell_ids);
   _cell_ids->clear();
 }
 
-void S2CellUnion::Detach(vector<S2CellId>* _cell_ids) {
+void S2CellUnion::Detach(vector_t<S2CellId>* _cell_ids) {
   cell_ids_.swap(*_cell_ids);
   cell_ids_.clear();
 }
 
 void S2CellUnion::Pack(int excess) {
   if (excess >= 0 && cell_ids_.capacity() - cell_ids_.size() > static_cast<size_t>(excess)) {
-    vector<S2CellId> packed = cell_ids_;
+    vector_t<S2CellId> packed = cell_ids_;
     cell_ids_.swap(packed);
   }
 }
@@ -85,9 +84,9 @@ bool S2CellUnion::Normalize() {
   // Optimize the representation by looking for cases where all subcells
   // of a parent cell are present.
 
-  vector<S2CellId> output;
+  vector_t<S2CellId> output;
   output.reserve(cell_ids_.size());
-  sort(cell_ids_.begin(), cell_ids_.end());
+  std::sort(cell_ids_.begin(), cell_ids_.end());
 
   for (int i = 0; i < num_cells(); ++i) {
     S2CellId id = cell_id(i);
@@ -136,7 +135,7 @@ bool S2CellUnion::Normalize() {
 }
 
 void S2CellUnion::Denormalize(int min_level, int level_mod,
-                              vector<S2CellId>* output) const {
+                              vector_t<S2CellId>* output) const {
   DCHECK_GE(min_level, 0);
   DCHECK_LE(min_level, S2CellId::kMaxLevel);
   DCHECK_GE(level_mod, 1);
@@ -209,8 +208,8 @@ bool S2CellUnion::Contains(S2CellId const& id) const {
   // surround the given cell id (using binary search).  There is containment
   // if and only if one of these two cell ids contains this cell.
 
-  vector<S2CellId>::const_iterator i =
-    lower_bound(cell_ids_.begin(), cell_ids_.end(), id);
+  vector_t<S2CellId>::const_iterator i =
+    std::lower_bound(cell_ids_.begin(), cell_ids_.end(), id);
   if (i != cell_ids_.end() && i->range_min() <= id) return true;
   return i != cell_ids_.begin() && (--i)->range_max() >= id;
 }
@@ -219,8 +218,8 @@ bool S2CellUnion::Intersects(S2CellId const& id) const {
   // This function requires that Normalize has been called first.
   // This is an exact test; see the comments for Contains() above.
 
-  vector<S2CellId>::const_iterator i =
-    lower_bound(cell_ids_.begin(), cell_ids_.end(), id);
+  vector_t<S2CellId>::const_iterator i =
+    std::lower_bound(cell_ids_.begin(), cell_ids_.end(), id);
   if (i != cell_ids_.end() && i->range_min() <= id.range_max()) return true;
   return i != cell_ids_.begin() && (--i)->range_max() >= id.range_min();
 }
@@ -260,8 +259,8 @@ void S2CellUnion::GetIntersection(S2CellUnion const* x, S2CellId const& id) {
   if (x->Contains(id)) {
     cell_ids_.push_back(id);
   } else {
-    vector<S2CellId>::const_iterator i =
-      lower_bound(x->cell_ids_.begin(), x->cell_ids_.end(), id.range_min());
+    vector_t<S2CellId>::const_iterator i =
+      std::lower_bound(x->cell_ids_.begin(), x->cell_ids_.end(), id.range_min());
     S2CellId idmax = id.range_max();
     while (i != x->cell_ids_.end() && *i <= idmax)
       cell_ids_.push_back(*i++);
@@ -277,8 +276,8 @@ void S2CellUnion::GetIntersection(S2CellUnion const* x, S2CellUnion const* y) {
   // cells of "x" come before or after all the cells of "y" in S2CellId order.
 
   cell_ids_.clear();
-  vector<S2CellId>::const_iterator i = x->cell_ids_.begin();
-  vector<S2CellId>::const_iterator j = y->cell_ids_.begin();
+  vector_t<S2CellId>::const_iterator i = x->cell_ids_.begin();
+  vector_t<S2CellId>::const_iterator j = y->cell_ids_.begin();
   while (i != x->cell_ids_.end() && j != y->cell_ids_.end()) {
     S2CellId imin = i->range_min();
     S2CellId jmin = j->range_min();
@@ -288,7 +287,7 @@ void S2CellUnion::GetIntersection(S2CellUnion const* x, S2CellUnion const* y) {
         cell_ids_.push_back(*i++);
       } else {
         // Advance "j" to the first cell possibly contained by *i.
-        j = lower_bound(j + 1, y->cell_ids_.end(), imin);
+        j = std::lower_bound(j + 1, y->cell_ids_.end(), imin);
         // The previous cell *(j-1) may now contain *i.
         if (*i <= (j - 1)->range_max()) --j;
       }
@@ -297,7 +296,7 @@ void S2CellUnion::GetIntersection(S2CellUnion const* x, S2CellUnion const* y) {
       if (*j <= i->range_max()) {
         cell_ids_.push_back(*j++);
       } else {
-        i = lower_bound(i + 1, x->cell_ids_.end(), jmin);
+        i = std::lower_bound(i + 1, x->cell_ids_.end(), jmin);
         if (*j <= (i - 1)->range_max()) --i;
       }
     } else {
@@ -316,7 +315,7 @@ void S2CellUnion::GetIntersection(S2CellUnion const* x, S2CellUnion const* y) {
 
 static void GetDifferenceInternal(S2CellId cell,
                                   S2CellUnion const* y,
-                                  vector<S2CellId>* cell_ids) {
+                                  vector_t<S2CellId>* cell_ids) {
   // Add the difference between cell and y to cell_ids.
   // If they intersect but the difference is non-empty, divides and conquers.
 
@@ -349,7 +348,7 @@ void S2CellUnion::GetDifference(S2CellUnion const* x, S2CellUnion const* y) {
 }
 
 void S2CellUnion::Expand(int level) {
-  vector<S2CellId> output;
+  vector_t<S2CellId> output;
   uint64 level_lsb = S2CellId::lsb_for_level(level);
   for (int i = num_cells() - 1; i >= 0; --i) {
     S2CellId id = cell_id(i);

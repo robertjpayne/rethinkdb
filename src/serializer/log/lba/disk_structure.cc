@@ -254,7 +254,7 @@ struct reader_t
             delete this;
         }
     };
-    std::vector< extent_reader_t* > readers;
+    vector_t< extent_reader_t* > readers;
 
     int next_reader;   // The index of the next reader that we should call start_reading() on
 

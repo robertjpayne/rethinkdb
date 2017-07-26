@@ -9,7 +9,7 @@
 #include <openssl/opensslv.h>
 #include <openssl/ssl.h>
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "arch/io/concurrency.hpp"
 #include "arch/runtime/runtime.hpp"
@@ -31,7 +31,7 @@ initialization_guard_t::initialization_guard_t() {
     });
     CRYPTO_set_locking_callback(
         [](int mode, int n, UNUSED const char *file, UNUSED int line) {
-            static std::vector<system_rwlock_t> openssl_locks(CRYPTO_num_locks());
+            static vector_t<system_rwlock_t> openssl_locks(CRYPTO_num_locks());
             rassert(n >= 0);
             rassert(static_cast<size_t>(n) < openssl_locks.size());
             if (mode & CRYPTO_LOCK) {

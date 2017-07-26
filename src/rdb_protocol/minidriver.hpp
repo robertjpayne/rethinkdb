@@ -3,7 +3,7 @@
 #define RDB_PROTOCOL_MINIDRIVER_HPP_
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 #include <utility>
 #include <algorithm>
 
@@ -126,7 +126,7 @@ public:
         reql_t(minidriver_t *_r, const double val);
         reql_t(minidriver_t *_r, const std::string &val);
         reql_t(minidriver_t *_r, const datum_t &d);
-        reql_t(minidriver_t *_r, std::vector<reql_t> &&val);
+        reql_t(minidriver_t *_r, vector_t<reql_t> &&val);
         reql_t(minidriver_t *_r, dummy_var_t var);
 
         template <class... T>

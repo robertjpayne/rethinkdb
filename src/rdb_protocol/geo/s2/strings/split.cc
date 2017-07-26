@@ -107,8 +107,8 @@ void SplitStringToIteratorAllowEmpty(const StringType& full,
 void SplitStringIntoNPiecesAllowEmpty(const std::string& full,
                                       const char* delim,
                                       int pieces,
-                                      vector<std::string>* result) {
-  std::back_insert_iterator<std::vector<std::string> > it(*result);
+                                      vector_t<std::string>* result) {
+  std::back_insert_iterator<vector_t<std::string> > it(*result);
   SplitStringToIteratorAllowEmpty(full, delim, pieces, it);
 }
 
@@ -122,8 +122,8 @@ void SplitStringIntoNPiecesAllowEmpty(const std::string& full,
 //    will return corresponding empty strings.
 // ----------------------------------------------------------------------
 void SplitStringAllowEmpty(const std::string& full, const char* delim,
-                           vector<std::string>* result) {
-  std::back_insert_iterator<std::vector<std::string> > it((*result));
+                           vector_t<std::string>* result) {
+  std::back_insert_iterator<vector_t<std::string> > it((*result));
   SplitStringToIteratorAllowEmpty(full, delim, 0, it);
 }
 
@@ -146,7 +146,7 @@ void SplitStringToHashmapAllowEmpty(const std::string& full, const char* delim,
 }
 
 // If we know how much to allocate for a vector of strings, we can
-// allocate the vector<string> only once and directly to the right size.
+// allocate the vector_t<string> only once and directly to the right size.
 // This saves in between 33-66 % of memory space needed for the result,
 // and runs faster in the microbenchmarks.
 //
@@ -227,9 +227,9 @@ void SplitStringToIteratorUsing(const StringType& full,
 
 void SplitStringUsing(const std::string& full,
                       const char* delim,
-                      vector<std::string>* result) {
+                      vector_t<std::string>* result) {
   result->reserve(result->size() + CalculateReserveForVector(full, delim));
-  std::back_insert_iterator<std::vector<std::string> > it((*result));
+  std::back_insert_iterator<vector_t<std::string> > it((*result));
   SplitStringToIteratorUsing(full, delim, it);
 }
 

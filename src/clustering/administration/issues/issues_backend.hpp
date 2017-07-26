@@ -4,7 +4,7 @@
 
 #include <memory>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/artificial_table/caching_cfeed_backend.hpp"
 #include "clustering/administration/metadata.hpp"
@@ -39,7 +39,7 @@ public:
     bool read_all_rows_as_vector(
             auth::user_context_t const &user_context,
             signal_t *interruptor,
-            std::vector<ql::datum_t> *rows_out,
+            vector_t<ql::datum_t> *rows_out,
             admin_err_t *error_out);
 
     bool read_row(
@@ -58,7 +58,7 @@ public:
             admin_err_t *error_out);
 
 private:
-    std::vector<scoped_ptr_t<issue_t> > all_issues(signal_t *interruptor) const;
+    vector_t<scoped_ptr_t<issue_t> > all_issues(signal_t *interruptor) const;
 
     admin_identifier_format_t identifier_format;
 

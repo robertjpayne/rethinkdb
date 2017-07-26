@@ -2,7 +2,7 @@
 #include "unittest/rdb_protocol.hpp"
 
 #include <functional>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "arch/io/disk.hpp"
 #include "buffer_cache/cache_balancer.hpp"
@@ -34,14 +34,14 @@ void run_with_namespace_interface(
         std::function<void(
             namespace_interface_t *,
             order_source_t *,
-            const std::vector<scoped_ptr_t<store_t> > *
+            const vector_t<scoped_ptr_t<store_t> > *
             )> fun,
         bool oversharding,
         int num_restarts) {
     recreate_temporary_directory(base_path_t("."));
 
     /* Pick shards */
-    std::vector<region_t> store_shards;
+    vector_t<region_t> store_shards;
     if (oversharding) {
         store_shards.push_back(region_t(key_range_t(key_range_t::none, store_key_t(), key_range_t::none, store_key_t())));
     } else {
@@ -49,12 +49,12 @@ void run_with_namespace_interface(
         store_shards.push_back(region_t(key_range_t(key_range_t::closed, store_key_t("n"), key_range_t::none, store_key_t() )));
     }
 
-    std::vector<region_t> nsi_shards;
+    vector_t<region_t> nsi_shards;
 
     nsi_shards.push_back(region_t(key_range_t(key_range_t::none,   store_key_t(),  key_range_t::open, store_key_t("n"))));
     nsi_shards.push_back(region_t(key_range_t(key_range_t::closed, store_key_t("n"), key_range_t::none, store_key_t() )));
 
-    std::vector<scoped_ptr_t<temp_file_t> > temp_files;
+    vector_t<scoped_ptr_t<temp_file_t> > temp_files;
     for (size_t i = 0; i < store_shards.size(); ++i) {
         temp_files.push_back(make_scoped<temp_file_t>());
     }
@@ -80,7 +80,7 @@ void run_with_namespace_interface(
 
     for (int rep = 0; rep < num_restarts; ++rep) {
         const bool do_create = rep == 0;
-        std::vector<scoped_ptr_t<store_t> > underlying_stores;
+        vector_t<scoped_ptr_t<store_t> > underlying_stores;
         for (size_t i = 0; i < store_shards.size(); ++i) {
             underlying_stores.push_back(
                     make_scoped<store_t>(region_t::universe(), serializers[i].get(),
@@ -89,8 +89,8 @@ void run_with_namespace_interface(
                         base_path_t("."), generate_uuid(), update_sindexes_t::UPDATE));
         }
 
-        std::vector<scoped_ptr_t<store_view_t> > stores;
-        std::vector<store_view_t *> store_ptrs;
+        vector_t<scoped_ptr_t<store_view_t> > stores;
+        vector_t<store_view_t *> store_ptrs;
         for (size_t i = 0; i < nsi_shards.size(); ++i) {
             if (oversharding) {
                 stores.push_back(make_scoped<store_subview_t>(underlying_stores[0].get(),
@@ -118,7 +118,7 @@ void run_in_thread_pool_with_namespace_interface(
         std::function<void(
             namespace_interface_t *,
             order_source_t *,
-            const std::vector<scoped_ptr_t<store_t> > *)> fun,
+            const vector_t<scoped_ptr_t<store_t> > *)> fun,
         bool oversharded,
         int num_restarts = 1) {
     extproc_spawner_t extproc_spawner;
@@ -133,7 +133,7 @@ horribly wrong */
 void run_setup_teardown_test(
         namespace_interface_t *,
         order_source_t *,
-        const std::vector<scoped_ptr_t<store_t> > *) {
+        const vector_t<scoped_ptr_t<store_t> > *) {
     /* Do nothing */
 }
 TEST(RDBProtocol, SetupTeardown) {
@@ -148,7 +148,7 @@ TEST(RDBProtocol, OvershardedSetupTeardown) {
 void run_get_set_test(
         namespace_interface_t *nsi,
         order_source_t *osource,
-        const std::vector<scoped_ptr_t<store_t> > *) {
+        const vector_t<scoped_ptr_t<store_t> > *) {
     {
         write_t write(
                 point_write_t(store_key_t("a"), ql::datum_t::null()),
@@ -203,7 +203,7 @@ TEST(RDBProtocol, OvershardedGetSet) {
     run_in_thread_pool_with_namespace_interface(&run_get_set_test, true);
 }
 
-std::string create_sindex(const std::vector<scoped_ptr_t<store_t> > *stores) {
+std::string create_sindex(const vector_t<scoped_ptr_t<store_t> > *stores) {
     std::string id = uuid_to_str(generate_uuid());
 
     const ql::sym_t arg(1);
@@ -226,7 +226,7 @@ std::string create_sindex(const std::vector<scoped_ptr_t<store_t> > *stores) {
 }
 
 void wait_for_sindex(
-        const std::vector<scoped_ptr_t<store_t> > *stores,
+        const vector_t<scoped_ptr_t<store_t> > *stores,
         const std::string &id) {
     cond_t non_interruptor;
     for (int attempts = 0; attempts < 50; ++attempts) {
@@ -248,7 +248,7 @@ void wait_for_sindex(
     ADD_FAILURE() << "Waiting for sindex " << id << " timed out.";
 }
 
-void drop_sindex(const std::vector<scoped_ptr_t<store_t> > *stores,
+void drop_sindex(const vector_t<scoped_ptr_t<store_t> > *stores,
                  const std::string &id) {
     cond_t non_interruptor;
     for (const auto &store : *stores) {
@@ -259,7 +259,7 @@ void drop_sindex(const std::vector<scoped_ptr_t<store_t> > *stores,
 void run_create_drop_sindex_test(
         namespace_interface_t *nsi,
         order_source_t *osource,
-        const std::vector<scoped_ptr_t<store_t> > *stores) {
+        const vector_t<scoped_ptr_t<store_t> > *stores) {
     /* Create a secondary index. */
     std::string id = create_sindex(stores);
     wait_for_sindex(stores, id);
@@ -421,7 +421,7 @@ void fuzz_sindex(namespace_interface_t *nsi,
                  auto_drainer_t::lock_t drainer_lock) {
     // We assume that about half of the ids up to goal_size * 2 will be deleted at any
     // time.
-    std::vector<bool> doc_exists(goal_size * 2, false);
+    vector_t<bool> doc_exists(goal_size * 2, false);
     while (!drainer_lock.get_drain_signal()->is_pulsed()) {
         int id = randint(goal_size * 2);
         write_t write;
@@ -481,7 +481,7 @@ void fuzz_sindex(namespace_interface_t *nsi,
 void run_fuzz_create_drop_sindex(
         namespace_interface_t *nsi,
         order_source_t *osource,
-        const std::vector<scoped_ptr_t<store_t> > *stores) {
+        const vector_t<scoped_ptr_t<store_t> > *stores) {
     const int num_docs = 500;
 
     /* Start fuzzing the table. */
@@ -514,7 +514,7 @@ TEST(RDBProtocol, SindexFuzzCreateDrop) {
 void run_create_drop_sindex_with_data_test(
         namespace_interface_t *nsi,
         order_source_t *osource,
-        const std::vector<scoped_ptr_t<store_t> > *stores,
+        const vector_t<scoped_ptr_t<store_t> > *stores,
         int num_docs) {
     /* Create a secondary index. */
     std::string id = create_sindex(stores);
@@ -526,11 +526,11 @@ void run_create_drop_sindex_with_data_test(
 void run_repeated_sindex_test(
         namespace_interface_t *nsi,
         order_source_t *osource,
-        const std::vector<scoped_ptr_t<store_t> > *stores,
+        const vector_t<scoped_ptr_t<store_t> > *stores,
         void (*fn)(
             namespace_interface_t *,
             order_source_t *,
-            const std::vector<scoped_ptr_t<store_t> > *,
+            const vector_t<scoped_ptr_t<store_t> > *,
             int)
         ) {
     // Run the test with just a few documents in it
@@ -567,7 +567,7 @@ TEST(RDBProtocol, OvershardedSindexCreateDrop) {
     run_in_thread_pool_with_namespace_interface(&run_create_drop_sindex_test, true);
 }
 
-void rename_sindex(const std::vector<scoped_ptr_t<store_t> > *stores,
+void rename_sindex(const vector_t<scoped_ptr_t<store_t> > *stores,
                    std::string old_name,
                    std::string new_name) {
     std::map<std::string, std::string> renames{ {old_name, new_name} };
@@ -612,7 +612,7 @@ void read_sindex(namespace_interface_t *nsi,
 
 void run_rename_sindex_test(namespace_interface_t *nsi,
                             order_source_t *osource,
-                            const std::vector<scoped_ptr_t<store_t> > *stores,
+                            const vector_t<scoped_ptr_t<store_t> > *stores,
                             int num_rows) {
     bool sindex_before_data = randint(2) == 0;
     std::string id1;
@@ -677,7 +677,7 @@ TEST(RDBProtocol, SindexRepeatedRename) {
 }
 
 void check_sindexes(
-        const std::vector<scoped_ptr_t<store_t> > *stores,
+        const vector_t<scoped_ptr_t<store_t> > *stores,
         const std::set<std::string> &expect) {
     cond_t non_interruptor;
     for (const auto &store : *stores) {
@@ -695,7 +695,7 @@ void check_sindexes(
 void run_sindex_list_test(
         UNUSED namespace_interface_t *nsi,
         UNUSED order_source_t *osource,
-        const std::vector<scoped_ptr_t<store_t> > *stores) {
+        const vector_t<scoped_ptr_t<store_t> > *stores) {
     std::set<std::string> sindexes;
 
     // Do the whole test a couple times on the same namespace for kicks
@@ -730,7 +730,7 @@ TEST(RDBProtocol, OvershardedSindexList) {
 void run_sindex_oversized_keys_test(
         namespace_interface_t *nsi,
         order_source_t *osource,
-        const std::vector<scoped_ptr_t<store_t> > *stores) {
+        const vector_t<scoped_ptr_t<store_t> > *stores) {
     std::string sindex_id = create_sindex(stores);
     wait_for_sindex(stores, sindex_id);
     ql::configured_limits_t limits;
@@ -833,7 +833,7 @@ TEST(RDBProtocol, OvershardedOverSizedKeys) {
 void run_sindex_missing_attr_test(
         namespace_interface_t *nsi,
         order_source_t *osource,
-        const std::vector<scoped_ptr_t<store_t> > *stores) {
+        const vector_t<scoped_ptr_t<store_t> > *stores) {
     create_sindex(stores);
 
     ql::configured_limits_t limits;
@@ -914,7 +914,7 @@ TPTEST(RDBProtocol, ArtificialChangefeeds) {
                           env,
                           ql::changefeed::streamspec_t(
                               make_counted<ql::vector_datum_stream_t>(
-                                  bt, std::vector<ql::datum_t>(), r_nullopt),
+                                  bt, vector_t<ql::datum_t>(), r_nullopt),
                               "test",
                               false,
                               false,
@@ -923,13 +923,13 @@ TPTEST(RDBProtocol, ArtificialChangefeeds) {
                               ql::datum_t::boolean(false),
                               keyspec_t::point_t{ql::datum_t(0.0)}),
                           "id",
-                          std::vector<ql::datum_t>(),
+                          vector_t<ql::datum_t>(),
                           bt)),
               point_10(a->subscribe(
                            env,
                            ql::changefeed::streamspec_t(
                                make_counted<ql::vector_datum_stream_t>(
-                                   bt, std::vector<ql::datum_t>(), r_nullopt),
+                                   bt, vector_t<ql::datum_t>(), r_nullopt),
                                "test",
                                false,
                                false,
@@ -938,13 +938,13 @@ TPTEST(RDBProtocol, ArtificialChangefeeds) {
                                ql::datum_t::boolean(false),
                                keyspec_t::point_t{ql::datum_t(10.0)}),
                            "id",
-                           std::vector<ql::datum_t>(),
+                           vector_t<ql::datum_t>(),
                            bt)),
               range(a->subscribe(
                         env,
                         ql::changefeed::streamspec_t(
                             make_counted<ql::vector_datum_stream_t>(
-                                bt, std::vector<ql::datum_t>(), r_nullopt),
+                                bt, vector_t<ql::datum_t>(), r_nullopt),
                             "test",
                             false,
                             false,
@@ -952,7 +952,7 @@ TPTEST(RDBProtocol, ArtificialChangefeeds) {
                             ql::configured_limits_t(),
                             ql::datum_t::boolean(false),
                             keyspec_t::range_t{
-                                std::vector<ql::transform_variant_t>(),
+                                vector_t<ql::transform_variant_t>(),
                                     optional<std::string>(),
                                     sorting_t::UNORDERED,
                                     ql::datumspec_t(
@@ -963,7 +963,7 @@ TPTEST(RDBProtocol, ArtificialChangefeeds) {
                                             key_range_t::open)),
                                     r_nullopt}),
                         "id",
-                        std::vector<ql::datum_t>(),
+                        vector_t<ql::datum_t>(),
                         bt)) { }
         ql::backtrace_id_t bt;
         counted_t<ql::datum_stream_t> point_0, point_10, range;
@@ -987,7 +987,7 @@ TPTEST(RDBProtocol, ArtificialChangefeeds) {
                            .with_new_batch_type(ql::batch_type_t::NORMAL)
                            .with_max_dur(1000));
         size_t i = pair.first;
-        std::vector<ql::datum_t> p0, p10, rng;
+        vector_t<ql::datum_t> p0, p10, rng;
         p0 = pair.second.point_0->next_batch(&env, bs);
         p10 = pair.second.point_10->next_batch(&env, bs);
         rng = pair.second.range->next_batch(&env, bs);

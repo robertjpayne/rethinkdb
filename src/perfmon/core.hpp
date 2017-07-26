@@ -6,7 +6,7 @@
 #include <string>
 #include <type_traits>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "concurrency/cross_thread_mutex.hpp"
 #include "containers/intrusive_list.hpp"
@@ -141,7 +141,7 @@ public:
 private:
     void init(perfmon_collection_t *collection, size_t count, ...);
 
-    std::vector<perfmon_membership_t *> memberships;
+    vector_t<perfmon_membership_t *> memberships;
 
     DISABLE_COPYING(perfmon_multi_membership_t);
 };

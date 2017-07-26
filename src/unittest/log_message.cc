@@ -20,7 +20,7 @@ TEST(LogMessageTest, ParseFormat) {
     EXPECT_EQ(message.message, parsed.message);
 }
 
-void test_chunks(const std::vector<size_t> &sizes) {
+void test_chunks(const vector_t<size_t> &sizes) {
 #ifdef _WIN32
     std::string filename = strprintf("c:\\windows\\temp\\rethinkdb-unittest-file-reverse-reader-%09d", randint(1000000000));
     HANDLE handle = CreateFile(filename.c_str(), GENERIC_WRITE | GENERIC_READ, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_DELETE_ON_CLOSE, NULL);

@@ -33,9 +33,9 @@ local_issue_client_t::local_issue_client_t(
     mailbox_manager(_mailbox_manager), directory(_directory)
     { }
 
-std::vector<scoped_ptr_t<issue_t> > local_issue_client_t::get_issues(
+vector_t<scoped_ptr_t<issue_t> > local_issue_client_t::get_issues(
         signal_t *interruptor) const {
-    std::vector<std::pair<server_id_t, local_issue_bcard_t> > bcards;
+    vector_t<std::pair<server_id_t, local_issue_bcard_t> > bcards;
     directory->read_all(
     [&](const peer_id_t &, const cluster_directory_metadata_t *md) {
         if (md->peer_type == SERVER_PEER) {
@@ -75,7 +75,7 @@ std::vector<scoped_ptr_t<issue_t> > local_issue_client_t::get_issues(
     if (interruptor->is_pulsed()) {
         throw interrupted_exc_t();
     }
-    std::vector<scoped_ptr_t<issue_t> > res;
+    vector_t<scoped_ptr_t<issue_t> > res;
     log_write_issue_tracker_t::combine(
         std::move(aggregator.log_write_issues), &res);
     memory_issue_tracker_t::combine(

@@ -140,7 +140,7 @@ void perfmon_multi_membership_t::init(perfmon_collection_t *collection,
 }
 
 perfmon_multi_membership_t::~perfmon_multi_membership_t() {
-    for (std::vector<perfmon_membership_t*>::const_iterator it = memberships.begin(); it != memberships.end(); ++it) {
+    for (vector_t<perfmon_membership_t*>::const_iterator it = memberships.begin(); it != memberships.end(); ++it) {
         delete *it;
     }
 }

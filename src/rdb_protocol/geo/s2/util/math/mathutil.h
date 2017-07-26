@@ -9,7 +9,7 @@
 
 #include <math.h>
 #include <algorithm>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/geo/s2/base/basictypes.h"
 #include "rdb_protocol/geo/s2/base/logging.h"
@@ -20,7 +20,6 @@ using std::min;
 using std::max;
 using std::swap;
 using std::reverse;
-using std::vector;
 
 // Returns the sign of x:
 //   -1 if x < 0,
@@ -267,8 +266,8 @@ class MathUtil {
   // Outputs:
   //   shards_to_read gives the subset of the N input shards to read.
   // --------------------------------------------------------------------
-  static void ShardsToRead(const vector<bool>& shards_to_write,
-                           vector<bool>* shards_to_read);
+  static void ShardsToRead(const vector_t<bool>& shards_to_write,
+                           vector_t<bool>* shards_to_read);
 
   // --------------------------------------------------------------------
   // Round, IntRound

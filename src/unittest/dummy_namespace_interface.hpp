@@ -3,7 +3,7 @@
 #define UNITTEST_DUMMY_NAMESPACE_INTERFACE_HPP_
 
 #include <set>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "containers/scoped.hpp"
 #include "protocol_api.hpp"
@@ -63,7 +63,7 @@ public:
         region_t region;
     };
 
-    explicit dummy_sharder_t(std::vector<shard_t> _shards,
+    explicit dummy_sharder_t(vector_t<shard_t> _shards,
                              rdb_context_t *_ctx)
         : shards(_shards), ctx(_ctx) { }
 
@@ -72,13 +72,13 @@ public:
     void write(const write_t &write, write_response_t *response, order_token_t tok, signal_t *interruptor);
 
 private:
-    std::vector<shard_t> shards;
+    vector_t<shard_t> shards;
     rdb_context_t *ctx;
 };
 
 class dummy_namespace_interface_t : public namespace_interface_t {
 public:
-    dummy_namespace_interface_t(std::vector<region_t> shards,
+    dummy_namespace_interface_t(vector_t<region_t> shards,
                                 store_view_t *const *stores, order_source_t
                                 *order_source, rdb_context_t *_ctx,
                                 bool initialize_metadata);
@@ -112,8 +112,8 @@ public:
     }
 
 private:
-    std::vector<scoped_ptr_t<dummy_performer_t> > performers;
-    std::vector<scoped_ptr_t<dummy_timestamper_t> > timestampers;
+    vector_t<scoped_ptr_t<dummy_performer_t> > performers;
+    vector_t<scoped_ptr_t<dummy_timestamper_t> > timestampers;
     scoped_ptr_t<dummy_sharder_t> sharder;
     rdb_context_t *ctx;
 };

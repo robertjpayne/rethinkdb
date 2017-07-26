@@ -223,7 +223,7 @@ void pick_best_pairings(
         long_calculation_yielder_t *yielder,
         signal_t *interruptor,
         const std::function<void(size_t, server_id_t)> &callback) {
-    std::vector<size_t> shard_replicas(num_shards, 0);
+    vector_t<size_t> shard_replicas(num_shards, 0);
     size_t total_replicas = 0;
     while (total_replicas < num_shards * num_replicas) {
         counted_t<countable_wrapper_t<server_pairings_t> > sp = *pairings.begin();
@@ -250,7 +250,7 @@ void table_generate_config(
         const table_generate_config_params_t &params,
         const table_shard_scheme_t &shard_scheme,
         signal_t *interruptor,
-        std::vector<table_config_t::shard_t> *config_shards_out,
+        vector_t<table_config_t::shard_t> *config_shards_out,
         server_name_map_t *server_names_out)
         THROWS_ONLY(interrupted_exc_t, no_such_table_exc_t, failed_table_op_exc_t,
             admin_op_exc_t) {

@@ -214,11 +214,11 @@ private:
 
                 // OBJECT -> ARRAY
                 if (start_type == R_OBJECT_TYPE && end_type == R_ARRAY_TYPE) {
-                    std::vector<datum_t> arr;
+                    vector_t<datum_t> arr;
                     arr.reserve(d.obj_size());
                     for (size_t i = 0; i < d.obj_size(); ++i) {
                         std::pair<datum_string_t, datum_t> pair_in = d.get_pair(i);
-                        std::vector<datum_t> pair_out;
+                        vector_t<datum_t> pair_out;
                         pair_out.reserve(2);
                         pair_out.push_back(datum_t(pair_in.first));
                         pair_out.push_back(pair_in.second);
@@ -304,7 +304,7 @@ private:
         scope_env_t *env, args_t *args, eval_flags_t) const {
         counted_t<grouped_data_t> groups
             = args->arg(env, 0)->as_promiscuous_grouped_data(env->env);
-        std::vector<datum_t> v;
+        vector_t<datum_t> v;
         v.reserve(groups->size());
 
         for (auto &&pair : *groups) {
@@ -390,7 +390,7 @@ private:
             name_string_t table_name =
                 name_string_t::guarantee_valid(table->name.c_str());
             {
-                std::vector<int64_t> doc_counts;
+                vector_t<int64_t> doc_counts;
                 try {
                     admin_err_t error;
                     if (!env->env->reql_cluster_interface()->table_estimate_doc_counts(

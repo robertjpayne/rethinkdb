@@ -70,7 +70,7 @@ private:
                   args_t *args,
                   std::string *data_out,
                   std::map<std::string, std::string> *form_data_out,
-                  std::vector<std::string> *header_out,
+                  vector_t<std::string> *header_out,
                   http_method_t method) const;
 
     static void get_timeout_ms(scope_env_t *env,
@@ -79,7 +79,7 @@ private:
 
     static void get_header(scope_env_t *env,
                            args_t *args,
-                           std::vector<std::string> *header_out);
+                           vector_t<std::string> *header_out);
 
     static void get_method(scope_env_t *env,
                            args_t *args,
@@ -153,11 +153,11 @@ public:
     bool is_infinite() const { return false; }
 
 private:
-    virtual std::vector<changefeed::keyspec_t> get_change_specs() {
+    virtual vector_t<changefeed::keyspec_t> get_change_specs() {
         rfail(base_exc_t::LOGIC, "%s", "Cannot call `changes` on an HTTP stream.");
     }
-    std::vector<datum_t> next_page(env_t *env);
-    std::vector<datum_t> next_raw_batch(env_t *env, const batchspec_t &batchspec);
+    vector_t<datum_t> next_page(env_t *env);
+    vector_t<datum_t> next_raw_batch(env_t *env, const batchspec_t &batchspec);
 
     // Helper functions used during `next_raw_batch`
     bool apply_depaginate(env_t *env, const http_result_t &res);
@@ -259,7 +259,7 @@ scoped_ptr_t<val_t> http_term_t::eval_impl(scope_env_t *env, args_t *args,
     return new_val(res.body);
 }
 
-std::vector<datum_t>
+vector_t<datum_t>
 http_datum_stream_t::next_page(env_t *env) {
     profile::sampler_t sampler(strprintf("Performing HTTP %s of `%s`",
                                          http_method_to_str(opts.method).c_str(),
@@ -275,7 +275,7 @@ http_datum_stream_t::next_page(env_t *env) {
     more = apply_depaginate(env, res);
 
     if (res.body.get_type() == datum_t::R_ARRAY) {
-        std::vector<datum_t> res_arr;
+        vector_t<datum_t> res_arr;
         res_arr.reserve(res.body.arr_size());
         for (size_t i = 0; i < res.body.arr_size(); ++i) {
             res_arr.push_back(res.body.get(i));
@@ -283,23 +283,23 @@ http_datum_stream_t::next_page(env_t *env) {
         return res_arr;
     }
 
-    return std::vector<datum_t>({ res.body });
+    return vector_t<datum_t>({ res.body });
 }
 
-std::vector<datum_t>
+vector_t<datum_t>
 http_datum_stream_t::next_raw_batch(env_t *env, const batchspec_t &batchspec) {
     if (!more) {
-        return std::vector<datum_t>();
+        return vector_t<datum_t>();
     }
 
     if (!runner.has()) {
         runner.create(env->get_extproc_pool());
     }
 
-    std::vector<datum_t> res;
+    vector_t<datum_t> res;
     if (batchspec.get_batch_type() == batch_type_t::TERMINAL) {
         while (more) {
-            std::vector<datum_t> delta = next_page(env);
+            vector_t<datum_t> delta = next_page(env);
             std::move(delta.begin(), delta.end(), std::back_inserter(res));
         }
     } else {
@@ -331,7 +331,7 @@ bool http_datum_stream_t::apply_depaginate(env_t *env, const http_result_t &res)
         = { { datum_string_t("params"), opts.url_params },
             { datum_string_t("header"), res.header },
             { datum_string_t("body"), res.body } };
-    std::vector<datum_t> args
+    vector_t<datum_t> args
         = { datum_t(std::move(arg_obj)) };
 
     try {
@@ -489,7 +489,7 @@ void http_term_t::verify_header_string(const std::string &str,
 // Header lines are not allowed to contain newlines.
 void http_term_t::get_header(scope_env_t *env,
                              args_t *args,
-                             std::vector<std::string> *header_out) {
+                             vector_t<std::string> *header_out) {
     scoped_ptr_t<val_t> header = args->optarg(env, "header");
     if (header.has()) {
         datum_t datum_header = header->as_datum();
@@ -653,7 +653,7 @@ void http_term_t::get_data(
         args_t *args,
         std::string *data_out,
         std::map<std::string, std::string> *form_data_out,
-        std::vector<std::string> *header_out,
+        vector_t<std::string> *header_out,
         http_method_t method) const {
     scoped_ptr_t<val_t> data = args->optarg(env, "data");
     if (data.has()) {

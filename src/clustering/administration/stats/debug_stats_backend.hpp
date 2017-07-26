@@ -3,7 +3,7 @@
 #define CLUSTERING_ADMINISTRATION_STATS_DEBUG_STATS_BACKEND_HPP_
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "clustering/administration/metadata.hpp"
 #include "clustering/administration/servers/server_common.hpp"

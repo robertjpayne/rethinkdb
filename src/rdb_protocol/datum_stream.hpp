@@ -10,7 +10,7 @@
 #include <set>
 #include <string>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "containers/counted.hpp"
 #include "containers/optional.hpp"
@@ -66,7 +66,7 @@ public:
     virtual ~datum_stream_t() { }
     virtual void set_notes(response_t *) const { }
 
-    virtual std::vector<changespec_t> get_changespecs() = 0;
+    virtual vector_t<changespec_t> get_changespecs() = 0;
     virtual void add_transformation(transform_variant_t &&tv, backtrace_id_t bt) = 0;
     virtual bool add_stamp(changefeed_stamp_t stamp);
     virtual optional<active_state_t> get_active_state();
@@ -90,7 +90,7 @@ public:
     // Gets the next elements from the stream.  (Returns zero elements only when
     // the end of the stream has been reached.  Otherwise, returns at least one
     // element.)  (Wrapper around `next_batch_impl`.)
-    std::vector<datum_t>
+    vector_t<datum_t>
     next_batch(env_t *env, const batchspec_t &batchspec);
     // Prefer `next_batch`.  Cannot be used in conjunction with `next_batch`.
     virtual datum_t next(env_t *env, const batchspec_t &batchspec);
@@ -108,10 +108,10 @@ protected:
     explicit datum_stream_t(backtrace_id_t bt);
 
 private:
-    virtual std::vector<datum_t>
+    virtual vector_t<datum_t>
     next_batch_impl(env_t *env, const batchspec_t &batchspec) = 0;
 
-    std::vector<datum_t> batch_cache;
+    vector_t<datum_t> batch_cache;
     size_t batch_cache_index;
     bool grouped;
 };
@@ -124,10 +124,10 @@ protected:
     bool ops_to_do() { return ops.size() != 0; }
 
 protected:
-    virtual std::vector<changespec_t> get_changespecs() {
+    virtual vector_t<changespec_t> get_changespecs() {
         rfail(base_exc_t::LOGIC, "%s", "Cannot call `changes` on an eager stream.");
     }
-    std::vector<transform_variant_t> transforms;
+    vector_t<transform_variant_t> transforms;
 
     virtual void add_transformation(transform_variant_t &&tv,
                                     backtrace_id_t bt);
@@ -141,12 +141,12 @@ private:
     virtual void accumulate_all(env_t *env, eager_acc_t *acc);
 
     done_t next_grouped_batch(env_t *env, const batchspec_t &bs, groups_t *out);
-    virtual std::vector<datum_t>
+    virtual vector_t<datum_t>
     next_batch_impl(env_t *env, const batchspec_t &bs);
-    virtual std::vector<datum_t>
+    virtual vector_t<datum_t>
     next_raw_batch(env_t *env, const batchspec_t &bs) = 0;
 
-    std::vector<scoped_ptr_t<op_t> > ops;
+    vector_t<scoped_ptr_t<op_t> > ops;
 };
 
 class wrapper_datum_stream_t : public eager_datum_stream_t {

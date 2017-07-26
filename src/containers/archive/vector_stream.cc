@@ -14,7 +14,7 @@ int64_t vector_stream_t::write(const void *p, int64_t n) {
     return n;
 }
 
-void vector_stream_t::swap(std::vector<char> *other) {
+void vector_stream_t::swap(vector_t<char> *other) {
     other->swap(vec_);
 }
 
@@ -22,7 +22,7 @@ void vector_stream_t::reserve(size_t reserve_size) {
     vec_.reserve(reserve_size);
 }
 
-vector_read_stream_t::vector_read_stream_t(std::vector<char> &&vector, int64_t offset)
+vector_read_stream_t::vector_read_stream_t(vector_t<char> &&vector, int64_t offset)
     : pos_(offset), vec_(std::move(vector)) {
     guarantee(pos_ >= 0);
     guarantee(static_cast<uint64_t>(pos_) <= vec_.size());
@@ -40,7 +40,7 @@ int64_t vector_read_stream_t::read(void *p, int64_t n) {
     return num_to_read;
 }
 
-void vector_read_stream_t::swap(std::vector<char> *other_vec, int64_t *other_pos) {
+void vector_read_stream_t::swap(vector_t<char> *other_vec, int64_t *other_pos) {
     int64_t temp_pos = *other_pos;
     *other_pos = pos_;
     pos_ = temp_pos;

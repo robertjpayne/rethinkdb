@@ -122,7 +122,7 @@ public:
         return vars[get_thread_id().threadnum]->get_watchable();
     }
 private:
-    std::vector<scoped_ptr_t<cross_thread_watchable_variable_t<value_t> > > vars;
+    vector_t<scoped_ptr_t<cross_thread_watchable_variable_t<value_t> > > vars;
 };
 
 template<class key_t, class value_t>
@@ -187,7 +187,7 @@ public:
     }
     void flush();
 private:
-    std::vector<scoped_ptr_t<cross_thread_watchable_map_var_t<key_t, value_t> > > vars;
+    vector_t<scoped_ptr_t<cross_thread_watchable_map_var_t<key_t, value_t> > > vars;
 };
 
 #include "concurrency/cross_thread_watchable.tcc"

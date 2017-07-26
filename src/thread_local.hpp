@@ -3,7 +3,7 @@
 #define THREAD_LOCAL_HPP_
 
 #ifdef THREADED_COROUTINES
-#include <vector>
+#include "containers/vector.hpp"
 #include "config/args.hpp"
 // For get_thread_id()
 #include "arch/runtime/coroutines.hpp"
@@ -94,12 +94,12 @@
     }
 
 #define TLS(type, name)                                                 \
-    static std::vector<cache_line_padded_t<type> >                      \
+    static vector_t<cache_line_padded_t<type> >                      \
         TLS_ ## name(MAX_THREADS);                                      \
     DEFINE_TLS_ACCESSORS(type, name)
 
 #define TLS_with_init(type, name, initial)                              \
-    static std::vector<cache_line_padded_t<type> >                      \
+    static vector_t<cache_line_padded_t<type> >                      \
         TLS_ ## name(MAX_THREADS, cache_line_padded_t<type>(initial));  \
     DEFINE_TLS_ACCESSORS(type, name)
 

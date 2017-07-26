@@ -107,10 +107,10 @@ public:
 
     // (To borrow Python syntax: returns [relative_offset(i) for i in range(0,
     // num_blocks())] + [back_relative_offset()].
-    std::vector<uint32_t> block_boundaries() const {
+    vector_t<uint32_t> block_boundaries() const {
         guarantee(state != state_reconstructing);
 
-        std::vector<uint32_t> ret;
+        vector_t<uint32_t> ret;
         for (auto it = block_infos.begin(); it != block_infos.end(); ++it) {
             ret.push_back(it->relative_offset);
         }
@@ -232,7 +232,7 @@ public:
         return info.relative_offset < relative_offset;
     }
 
-    std::vector<block_info_t>::const_iterator find_lower_bound_iter(uint32_t _relative_offset) const {
+    vector_t<block_info_t>::const_iterator find_lower_bound_iter(uint32_t _relative_offset) const {
         return std::lower_bound(block_infos.begin(),
                                 block_infos.end(),
                                 _relative_offset,
@@ -305,7 +305,7 @@ public:
 private:
     // Private because we cannot guarantee that our stats remain consistent if somebody
     // gets a non-const iterator.
-    std::vector<block_info_t>::iterator find_lower_bound_iter(uint32_t _relative_offset) {
+    vector_t<block_info_t>::iterator find_lower_bound_iter(uint32_t _relative_offset) {
         return std::lower_bound(block_infos.begin(),
                                 block_infos.end(),
                                 _relative_offset,
@@ -371,7 +371,7 @@ public:
 
 private:
     // Block information, ordered by relative offset.
-    std::vector<block_info_t> block_infos;
+    vector_t<block_info_t> block_infos;
 
     // Some stats we maintain to make certain operations faster
     uint32_t garbage_bytes_stat;
@@ -494,7 +494,7 @@ void unaligned_read_ahead_interval(const int64_t block_offset,
                                    const uint32_t ser_block_size,
                                    const int64_t extent_size,
                                    const int64_t read_ahead_size,
-                                   const std::vector<uint32_t> &boundaries,
+                                   const vector_t<uint32_t> &boundaries,
                                    int64_t *const offset_out,
                                    int64_t *const end_offset_out) {
     guarantee(!boundaries.empty());
@@ -542,7 +542,7 @@ void read_ahead_interval(const int64_t block_offset,
                          const int64_t extent_size,
                          const int64_t read_ahead_size,
                          const int64_t device_block_size,
-                         const std::vector<uint32_t> &boundaries,
+                         const vector_t<uint32_t> &boundaries,
                          int64_t *const offset_out,
                          int64_t *const end_offset_out) {
     int64_t unaligned_offset;
@@ -558,7 +558,7 @@ void read_ahead_interval(const int64_t block_offset,
 void read_ahead_offset_and_size(int64_t off_in,
                                 int64_t ser_block_size_in,
                                 int64_t extent_size,
-                                const std::vector<uint32_t> &boundaries,
+                                const vector_t<uint32_t> &boundaries,
                                 int64_t *offset_out, int64_t *size_out) {
     int64_t offset;
     int64_t end_offset;
@@ -575,7 +575,7 @@ void read_ahead_offset_and_size(int64_t off_in,
 
 class dbm_read_ahead_t {
 public:
-    static std::vector<uint32_t> get_boundaries(data_block_manager_t *parent,
+    static vector_t<uint32_t> get_boundaries(data_block_manager_t *parent,
                                                 int64_t off_in) {
         const gc_entry_t *entry
             = parent->entries.get(off_in / parent->static_config->extent_size());
@@ -590,7 +590,7 @@ public:
                                    void *const buf_out,
                                    file_account_t *const io_account,
                                    log_serializer_stats_t *const stats) {
-        const std::vector<uint32_t> boundaries = get_boundaries(parent, off_in);
+        const vector_t<uint32_t> boundaries = get_boundaries(parent, off_in);
 
         int64_t read_ahead_offset;
         int64_t read_ahead_size;
@@ -725,13 +725,13 @@ buf_ptr_t data_block_manager_t::read(int64_t off_in, block_size_t block_size,
     }
 }
 
-std::vector<counted_t<ls_block_token_pointee_t> >
-data_block_manager_t::many_writes(const std::vector<buf_write_info_t> &writes,
+vector_t<counted_t<ls_block_token_pointee_t> >
+data_block_manager_t::many_writes(const vector_t<buf_write_info_t> &writes,
                                   file_account_t *io_account,
                                   iocallback_t *cb) {
     // These tokens are grouped by extent.  You can do a contiguous write in each
     // extent.
-    std::vector<std::vector<counted_t<ls_block_token_pointee_t> > > token_groups
+    vector_t<vector_t<counted_t<ls_block_token_pointee_t> > > token_groups
         = gimme_some_new_offsets(writes);
 
     for (auto it = writes.begin(); it != writes.end(); ++it) {
@@ -804,7 +804,7 @@ data_block_manager_t::many_writes(const std::vector<buf_write_info_t> &writes,
     // earlier).
     intermediate_cb->on_io_complete();
 
-    std::vector<counted_t<ls_block_token_pointee_t> > ret;
+    vector_t<counted_t<ls_block_token_pointee_t> > ret;
     ret.reserve(writes.size());
     for (auto it = token_groups.begin(); it != token_groups.end(); ++it) {
         for (auto jt = it->begin(); jt != it->end(); ++jt) {
@@ -1153,7 +1153,7 @@ void data_block_manager_t::gc_one_extent(gc_state_t *gc_state) {
 
     // 2: Rewrite the blocks that are still live
     {
-        std::vector<gc_write_t> gc_writes;
+        vector_t<gc_write_t> gc_writes;
         {
             ASSERT_NO_CORO_WAITING;
 
@@ -1212,7 +1212,7 @@ void data_block_manager_t::gc_one_extent(gc_state_t *gc_state) {
 // `write_gcs` frees gc_blocks, which invalidates the buffer pointers in
 // `writes`. That's why those two values are passed in as rvalue references.
 void data_block_manager_t::write_gcs(
-        std::vector<gc_write_t> &&writes,
+        vector_t<gc_write_t> &&writes,
         gc_state_t *gc_state,
         scoped_device_block_aligned_ptr_t<char> &&gc_blocks,
         new_semaphore_in_line_t &&index_write_semaphore_acq) {
@@ -1223,19 +1223,19 @@ void data_block_manager_t::write_gcs(
     // We acquire block tokens for all the blocks before writing new
     // version.  The point of this is to make sure the _new_ block is
     // correctly "alive" when we write it.
-    std::vector<counted_t<ls_block_token_pointee_t> > old_block_tokens;
+    vector_t<counted_t<ls_block_token_pointee_t> > old_block_tokens;
     old_block_tokens.reserve(writes.size());
 
     // New block tokens, to hold the return value of
     // data_block_manager_t::write() instead of immediately discarding the
     // created token and causing the extent or block to be collected.
-    std::vector<counted_t<ls_block_token_pointee_t> > new_block_tokens;
+    vector_t<counted_t<ls_block_token_pointee_t> > new_block_tokens;
 
     {
         // Step 1: Write buffers to disk and assemble index operations
         ASSERT_NO_CORO_WAITING;
 
-        std::vector<buf_write_info_t> the_writes;
+        vector_t<buf_write_info_t> the_writes;
         the_writes.reserve(writes.size());
         for (size_t i = 0; i < writes.size(); ++i) {
             old_block_tokens.push_back(serializer->generate_block_token(writes[i].old_offset,
@@ -1298,7 +1298,7 @@ void data_block_manager_t::flush_gc_index_writes(signal_t *) {
     // Step 3A: Figure out index ops.  It's important that we do this
     // now, right before the index_write, so that the updates to the
     // index are done atomically.
-    std::vector<index_write_op_t> index_write_ops;
+    vector_t<index_write_op_t> index_write_ops;
     {
         ASSERT_NO_CORO_WAITING;
 
@@ -1418,8 +1418,8 @@ void data_block_manager_t::actually_shutdown() {
     }
 }
 
-std::vector<std::vector<counted_t<ls_block_token_pointee_t> > >
-data_block_manager_t::gimme_some_new_offsets(const std::vector<buf_write_info_t> &writes) {
+vector_t<vector_t<counted_t<ls_block_token_pointee_t> > >
+data_block_manager_t::gimme_some_new_offsets(const vector_t<buf_write_info_t> &writes) {
     ASSERT_NO_CORO_WAITING;
 
     // Start a new extent if necessary.
@@ -1431,9 +1431,9 @@ data_block_manager_t::gimme_some_new_offsets(const std::vector<buf_write_info_t>
 
     guarantee(active_extent->state == gc_entry_t::state_active);
 
-    std::vector<std::vector<counted_t<ls_block_token_pointee_t> > > ret;
+    vector_t<vector_t<counted_t<ls_block_token_pointee_t> > > ret;
 
-    std::vector<counted_t<ls_block_token_pointee_t> > tokens;
+    vector_t<counted_t<ls_block_token_pointee_t> > tokens;
     for (auto it = writes.begin(); it != writes.end(); ++it) {
         uint32_t relative_offset = valgrind_undefined<uint32_t>(UINT32_MAX);
         unsigned int block_index = valgrind_undefined<unsigned int>(UINT_MAX);

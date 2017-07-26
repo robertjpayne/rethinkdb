@@ -96,14 +96,14 @@ int rethinkdb_backtrace(void **buffer, int size) {
 #elif defined(_WIN32)
 
 #include <algorithm>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "windows.hpp"
 #define OPTIONAL
 #include <DbgHelp.h> // NOLINT
 
 int rethinkdb_backtrace(void **buffer, int size) {
-    std::vector<void *> addresses(size, nullptr);
+    vector_t<void *> addresses(size, nullptr);
     USHORT frames = CaptureStackBackTrace(0, size, addresses.data(), nullptr);
     if (frames > NUM_FRAMES_INSIDE_RETHINKDB_BACKTRACE) {
         std::move(addresses.begin() + NUM_FRAMES_INSIDE_RETHINKDB_BACKTRACE, addresses.begin() + frames, buffer);

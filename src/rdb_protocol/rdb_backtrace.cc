@@ -31,7 +31,7 @@ datum_t backtrace_registry_t::datum_backtrace(const exc_t &ex) const {
 datum_t backtrace_registry_t::datum_backtrace(backtrace_id_t bt,
                                               size_t dummy_frames) const {
     r_sanity_check(bt.get() < frames.size());
-    std::vector<datum_t> res;
+    vector_t<datum_t> res;
     for (const frame_t *f = &frames[bt.get()];
          !f->is_head(); f = &frames[f->parent.get()]) {
         r_sanity_check(f->parent.get() < frames.size());

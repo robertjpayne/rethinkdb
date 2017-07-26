@@ -283,18 +283,18 @@ private:
 
 optional<datum_t> apply_ops(
     const datum_t &val,
-    const std::vector<scoped_ptr_t<op_t> > &ops,
+    const vector_t<scoped_ptr_t<op_t> > &ops,
     env_t *env,
     const datum_t &key) THROWS_NOTHING {
     try {
         groups_t groups;
-        groups[datum_t()] = std::vector<datum_t>{val};
+        groups[datum_t()] = vector_t<datum_t>{val};
         for (const auto &op : ops) {
             (*op)(env, &groups, [&]() { return key; });
         }
         // TODO: when we support `.group.changes` this will need to change.
         guarantee(groups.size() <= 1);
-        std::vector<datum_t> *vec = &groups[datum_t()];
+        vector_t<datum_t> *vec = &groups[datum_t()];
         guarantee(groups.size() == 1);
         // TODO: when we support `.concatmap.changes` this will need to change.
         guarantee(vec->size() <= 1);
@@ -345,7 +345,7 @@ void server_t::limit_stop_mailbox_cb(signal_t *,
                                      client_t::addr_t addr,
                                      optional<std::string> sindex,
                                      uuid_u limit_uuid) {
-    std::vector<scoped_ptr_t<limit_manager_t> > destroyable_lms;
+    vector_t<scoped_ptr_t<limit_manager_t> > destroyable_lms;
     auto_drainer_t::lock_t lock(&drainer);
     rwlock_in_line_t spot(&clients_lock, access_t::read);
     spot.read_signal()->wait_lazily_unordered();
@@ -435,7 +435,7 @@ void server_t::add_limit_client(
         const uuid_u &client_uuid,
         const keyspec_t::limit_t &spec,
         limit_order_t lt,
-        std::vector<item_t> &&item_vec,
+        vector_t<item_t> &&item_vec,
         const auto_drainer_t::lock_t &keepalive) {
     keepalive.assert_is_holding(&drainer);
     rwlock_in_line_t spot(&clients_lock, access_t::read);
@@ -675,7 +675,7 @@ void server_t::prune_dead_limit(
     client_info_t *info,
     optional<std::string> sindex,
     size_t offset) {
-    std::vector<scoped_ptr_t<limit_manager_t> > destroyable_lms;
+    vector_t<scoped_ptr_t<limit_manager_t> > destroyable_lms;
 
     auto_drainer_t::lock_t lock;
     stealable_lock->assert_is_holding(&drainer);
@@ -775,9 +775,9 @@ sorting_t flip(sorting_t sorting) {
     unreachable();
 }
 
-std::vector<item_t> mangle_sort_truncate_stream(
+vector_t<item_t> mangle_sort_truncate_stream(
     raw_stream_t &&stream, is_primary_t is_primary, sorting_t sorting, size_t n) {
-    std::vector<item_t> vec;
+    vector_t<item_t> vec;
     vec.reserve(stream.size());
     for (auto &&item : stream) {
         guarantee(is_primary ==
@@ -868,7 +868,7 @@ limit_manager_t::limit_manager_t(
     client_t::addr_t _parent_client,
     keyspec_t::limit_t _spec,
     limit_order_t _gt,
-    std::vector<item_t> &&item_vec)
+    vector_t<item_t> &&item_vec)
     : region(std::move(_region)),
       table(std::move(_table)),
       sindex_id(std::move(_sindex_id)),
@@ -941,10 +941,10 @@ void limit_manager_t::del(
     }
 }
 
-class ref_visitor_t : public boost::static_visitor<std::vector<item_t>> {
+class ref_visitor_t : public boost::static_visitor<vector_t<item_t>> {
 public:
     ref_visitor_t(env_t *_env,
-                  std::vector<scoped_ptr_t<op_t> > *_ops,
+                  vector_t<scoped_ptr_t<op_t> > *_ops,
                   const key_range_t *_pk_range,
                   const keyspec_t::limit_t *_spec,
                   sorting_t _sorting,
@@ -958,7 +958,7 @@ public:
           start(std::move(_start)),
           item_queue(_item_queue) { }
 
-    std::vector<item_t> operator()(const primary_ref_t &ref) {
+    vector_t<item_t> operator()(const primary_ref_t &ref) {
         rget_read_response_t resp;
         key_range_t range = *pk_range;
         switch (sorting) {
@@ -988,7 +988,7 @@ public:
             ref.superblock,
             env,
             batchspec_t::all(),
-            std::vector<transform_variant_t>(),
+            vector_t<transform_variant_t>(),
             optional<terminal_variant_t>(
                 limit_read_t{
                     is_primary_t::YES,
@@ -1013,7 +1013,7 @@ public:
         }
         stream_t stream = groups_to_batch(gs->get_underlying_map());
         guarantee(stream.substreams.size() <= 1);
-        std::vector<item_t> item_vec;
+        vector_t<item_t> item_vec;
         if (stream.substreams.size() == 1) {
             raw_stream_t *raw_stream = &stream.substreams.begin()->second.stream;
             guarantee(raw_stream->size() <= n);
@@ -1025,7 +1025,7 @@ public:
         return item_vec;
     }
 
-    std::vector<item_t> operator()(const sindex_ref_t &ref) {
+    vector_t<item_t> operator()(const sindex_ref_t &ref) {
         rget_read_response_t resp;
         guarantee(spec->range.sindex);
         // `.limit().changes()` is currently only allowed on a single range
@@ -1066,7 +1066,7 @@ public:
             ref.superblock,
             env,
             batchspec_t::all(), // Terminal takes care of early termination
-            std::vector<transform_variant_t>(),
+            vector_t<transform_variant_t>(),
             optional<terminal_variant_t>(limit_read_t{
                     is_primary_t::NO,
                     n,
@@ -1093,7 +1093,7 @@ public:
         }
         stream_t stream = groups_to_batch(gs->get_underlying_map());
         guarantee(stream.substreams.size() <= 1);
-        std::vector<item_t> item_vec;
+        vector_t<item_t> item_vec;
         if (stream.substreams.size() == 1) {
             raw_stream_t *raw_stream = &stream.substreams.begin()->second.stream;
             item_vec = mangle_sort_truncate_stream(
@@ -1106,7 +1106,7 @@ public:
 
 private:
     env_t *env;
-    std::vector<scoped_ptr_t<op_t> > *ops;
+    vector_t<scoped_ptr_t<op_t> > *ops;
     const key_range_t *pk_range;
     const keyspec_t::limit_t *spec;
     sorting_t sorting;
@@ -1114,7 +1114,7 @@ private:
     const item_queue_t *item_queue;
 };
 
-std::vector<item_t> limit_manager_t::read_more(
+vector_t<item_t> limit_manager_t::read_more(
     const boost::variant<primary_ref_t, sindex_ref_t> &ref,
     const optional<item_t> &start) {
     guarantee(item_queue.size() < spec.limit);
@@ -1170,7 +1170,7 @@ void limit_manager_t::commit(
     }
     added.clear();
 
-    std::vector<std::string> truncated = item_queue.truncate_top(spec.limit);
+    vector_t<std::string> truncated = item_queue.truncate_top(spec.limit);
     for (auto &&id : truncated) {
         auto it = real_added.find_id(id);
         if (it != real_added.end()) {
@@ -1183,7 +1183,7 @@ void limit_manager_t::commit(
 
     bool anything_on_disk = real_deleted.size() != 0 || added_on_disk;
     if (item_queue.size() < spec.limit && anything_on_disk) {
-        std::vector<item_t> s;
+        vector_t<item_t> s;
         optional<exc_t> exc;
         try {
             s = read_more(sindex_ref, active_boundary);
@@ -1206,7 +1206,7 @@ void limit_manager_t::commit(
         }
         // We need to truncate again because `read_more` may read too much in
         // the secondary index case.
-        std::vector<std::string> read_trunc = item_queue.truncate_top(spec.limit);
+        vector_t<std::string> read_trunc = item_queue.truncate_top(spec.limit);
         for (auto &&id : read_trunc) {
             auto it = real_added.find_id(id);
             if (it != real_added.end()) {
@@ -1314,7 +1314,7 @@ public:
     void set_notes(response_t *res) const final { sub->set_notes(res); }
     feed_type_t cfeed_type() const final { return sub->cfeed_type(); }
     virtual bool is_infinite() const { return true; }
-    virtual std::vector<datum_t>
+    virtual vector_t<datum_t>
     next_raw_batch(env_t *env, const batchspec_t &bs) {
         rcheck(bs.get_batch_type() == batch_type_t::NORMAL
                || bs.get_batch_type() == batch_type_t::NORMAL_FIRST,
@@ -1325,7 +1325,7 @@ public:
     }
 protected:
     scoped_ptr_t<Sub> sub;
-    virtual std::vector<datum_t> next_stream_batch(env_t *env, const batchspec_t &bs) {
+    virtual vector_t<datum_t> next_stream_batch(env_t *env, const batchspec_t &bs) {
         batcher_t batcher = bs.to_batcher();
         return sub->get_els(&batcher,
                             env->return_empty_normal_batches,
@@ -1349,7 +1349,7 @@ public:
     virtual ~subscription_t();
     virtual feed_type_t cfeed_type() const = 0;
     void set_notes(response_t *res) const;
-    std::vector<datum_t> get_els(
+    vector_t<datum_t> get_els(
         batcher_t *batcher,
         return_empty_normal_batches_t return_empty_normal_batches,
         const signal_t *interruptor);
@@ -1365,7 +1365,7 @@ public:
     virtual counted_t<datum_stream_t> to_artificial_stream(
         const uuid_u &uuid,
         const std::string &primary_key_name,
-        const std::vector<datum_t> &initial_vals,
+        const vector_t<datum_t> &initial_vals,
         bool include_initial,
         scoped_ptr_t<subscription_t> &&self,
         backtrace_id_t bt) = 0;
@@ -1670,14 +1670,14 @@ private:
 
     template<class Sub>
     void each_sub_in_vec(
-        const std::vector<std::set<Sub *> > &vec,
+        const vector_t<std::set<Sub *> > &vec,
         rwlock_in_line_t *spot,
         const auto_drainer_t::lock_t &lock,
         const std::function<void(Sub *)> &f) THROWS_NOTHING;
     template<class Sub>
     void each_sub_in_vec_cb(const std::function<void(Sub *)> &f,
-                            const std::vector<std::set<Sub *> > &vec,
-                            const std::vector<int> &sub_threads,
+                            const vector_t<std::set<Sub *> > &vec,
+                            const vector_t<int> &sub_threads,
                             int i);
     void each_point_sub_cb(const std::function<void(point_sub_t *)> &f, int i);
     void each_point_sub_with_lock(
@@ -1688,13 +1688,13 @@ private:
         rwlock_in_line_t *spot,
         const std::function<void(limit_sub_t *)> &f) THROWS_NOTHING;
 
-    std::map<store_key_t, std::vector<std::set<point_sub_t *> > > point_subs;
+    std::map<store_key_t, vector_t<std::set<point_sub_t *> > > point_subs;
     rwlock_t point_subs_lock;
-    std::vector<std::set<empty_sub_t *> > empty_subs;
+    vector_t<std::set<empty_sub_t *> > empty_subs;
     rwlock_t empty_subs_lock;
-    std::vector<std::set<range_sub_t *> > range_subs;
+    vector_t<std::set<range_sub_t *> > range_subs;
     rwlock_t range_subs_lock;
-    std::map<uuid_u, std::vector<std::set<limit_sub_t *> > > limit_subs;
+    std::map<uuid_u, vector_t<std::set<limit_sub_t *> > > limit_subs;
     rwlock_t limit_subs_lock;
 
     // This stores the latest stamps we've received.  It's OK for this to
@@ -1756,8 +1756,8 @@ private:
     namespace_id_t table_id;
     mailbox_manager_t *manager;
     mailbox_t<stamped_msg_t> mailbox;
-    std::vector<server_t::addr_t> stop_addrs;
-    std::vector<scoped_ptr_t<disconnect_watcher_t> > disconnect_watchers;
+    vector_t<server_t::addr_t> stop_addrs;
+    vector_t<scoped_ptr_t<disconnect_watcher_t> > disconnect_watchers;
 
     struct queue_t {
         explicit queue_t(uint64_t _next) : next(_next) { }
@@ -1768,7 +1768,7 @@ private:
                 return left.stamp > right.stamp; // We want the min val to be on top.
             }
         };
-        std::priority_queue<stamped_msg_t, std::vector<stamped_msg_t>, lt_t> map;
+        std::priority_queue<stamped_msg_t, vector_t<stamped_msg_t>, lt_t> map;
     };
     // Maps from a `server_t`'s uuid_u.  We don't need a lock for this because
     // the set of `uuid_u`s never changes after it's initialized.
@@ -1955,7 +1955,7 @@ public:
     virtual counted_t<datum_stream_t> to_artificial_stream(
         const uuid_u &,
         const std::string &,
-        const std::vector<datum_t> &,
+        const vector_t<datum_t> &,
         bool _include_initial,
         scoped_ptr_t<subscription_t> &&self,
         backtrace_id_t bt) {
@@ -2111,7 +2111,7 @@ public:
     virtual counted_t<datum_stream_t> to_artificial_stream(
         const uuid_u &,
         const std::string &primary_key_name,
-        const std::vector<datum_t> &initial_values,
+        const vector_t<datum_t> &initial_values,
         bool _include_initial,
         scoped_ptr_t<subscription_t> &&self,
         backtrace_id_t bt) {
@@ -2360,7 +2360,7 @@ public:
     virtual counted_t<datum_stream_t> to_artificial_stream(
         const uuid_u &uuid,
         const std::string &pkey_name,
-        const std::vector<datum_t> &initial_vals,
+        const vector_t<datum_t> &initial_vals,
         bool include_initial,
         scoped_ptr_t<subscription_t> &&self,
         backtrace_id_t bt) {
@@ -2408,7 +2408,7 @@ private:
     }
 
     scoped_ptr_t<env_t> env;
-    std::vector<scoped_ptr_t<op_t> > ops;
+    vector_t<scoped_ptr_t<op_t> > ops;
 
     // The stamp (see `stamped_msg_t`) associated with our `changefeed_stamp_t`
     // read.  We use these to make sure we don't see changes from writes before
@@ -2418,7 +2418,7 @@ private:
     optional<std::map<store_key_t, uint64_t> > store_keys;
     optional<key_range_t> store_key_range;
     state_t state, sent_state;
-    std::vector<datum_t> artificial_initial_vals;
+    vector_t<datum_t> artificial_initial_vals;
     bool artificial_include_initial;
 
     auto_drainer_t *get_drainer() final { return &drainer; }
@@ -2509,7 +2509,7 @@ public:
             decltype(queued_changes) changes;
             changes.swap(queued_changes);
 
-            std::vector<limit_change_t> limit_changes;
+            vector_t<limit_change_t> limit_changes;
             limit_changes.reserve(changes.size()); // Important to keep iterators valid.
             // This has to be a multimap because of multi-indexes.
             std::multimap<datum_t, decltype(limit_changes.begin()),
@@ -2556,7 +2556,7 @@ public:
         }
     }
 
-    void init(const std::vector<std::pair<std::string, std::pair<datum_t, datum_t> > >
+    void init(const vector_t<std::pair<std::string, std::pair<datum_t, datum_t> > >
               &start_data) {
 #ifndef NDEBUG
         nap(randint(250)); // Nap up to 250ms to test queueing.
@@ -2787,7 +2787,7 @@ public:
         return make_counted<stream_t<subscription_t> >(std::move(self), bt);
     }
     NORETURN virtual counted_t<datum_stream_t> to_artificial_stream(
-        const uuid_u &, const std::string &, const std::vector<datum_t> &,
+        const uuid_u &, const std::string &, const vector_t<datum_t> &,
         bool, scoped_ptr_t<subscription_t> &&, backtrace_id_t) {
         crash("Cannot start a limit subscription on an artificial table.");
     }
@@ -2803,9 +2803,9 @@ public:
     std::set<data_it_t, data_it_lt_t> active_data;
 
     std::deque<datum_t> els;
-    std::vector<std::pair<optional<std::string>, optional<item_t> > >
+    vector_t<std::pair<optional<std::string>, optional<item_t> > >
         queued_changes;
-    std::vector<server_t::limit_addr_t> stop_addrs;
+    vector_t<server_t::limit_addr_t> stop_addrs;
     bool include_initial;
     bool include_offsets;
 
@@ -2882,7 +2882,7 @@ public:
             ASSERT_NO_CORO_WAITING;
             optional<std::string> sindex = sub->sindex();
             if (sindex) {
-                std::vector<indexed_datum_t> old_idxs, new_idxs;
+                vector_t<indexed_datum_t> old_idxs, new_idxs;
                 auto old_it = change.old_indexes.find(*sindex);
                 if (old_it != change.old_indexes.end()) {
                     for (const auto &idx : old_it->second) {
@@ -3035,8 +3035,8 @@ public:
     }
 
 private:
-    std::vector<datum_t> next_stream_batch(env_t *env, const batchspec_t &bs) final {
-        std::vector<datum_t> ret;
+    vector_t<datum_t> next_stream_batch(env_t *env, const batchspec_t &bs) final {
+        vector_t<datum_t> ret;
         batcher_t batcher = bs.to_batcher();
 
         while (ret.size() == 0) {
@@ -3084,7 +3084,7 @@ private:
             if (!src->is_exhausted() && !batcher.should_send_batch()) {
                 // Sorting must be UNORDERED for our last_read range calculation to work.
                 batchspec_t new_bs = bs.with_lazy_sorting_override(sorting_t::UNORDERED);
-                std::vector<datum_t> batch = src->next_batch(env, new_bs);
+                vector_t<datum_t> batch = src->next_batch(env, new_bs);
                 update_ranges();
                 r_sanity_check(active_state);
                 read_once = true;
@@ -3265,7 +3265,7 @@ void subscription_t::set_notes(response_t *res) const {
     if (include_states) res->add_note(Response::INCLUDES_STATES);
 }
 
-std::vector<datum_t>
+vector_t<datum_t>
 subscription_t::get_els(batcher_t *batcher,
                         return_empty_normal_batches_t return_empty_normal_batches,
                         const signal_t *interruptor) {
@@ -3273,7 +3273,7 @@ subscription_t::get_els(batcher_t *batcher,
     guarantee(cond == NULL); // Can't get while blocking.
     auto_drainer_t::lock_t lock(get_drainer());
 
-    std::vector<datum_t> ret;
+    vector_t<datum_t> ret;
 
     // We wait for data if we don't have any or if we're squashing and not
     // in the middle of a logical batch.
@@ -3575,7 +3575,7 @@ void feed_t::del_limit_sub(limit_sub_t *sub, const uuid_u &sub_uuid) THROWS_NOTH
 
 template<class Sub>
 void feed_t::each_sub_in_vec(
-    const std::vector<std::set<Sub *> > &vec,
+    const vector_t<std::set<Sub *> > &vec,
     rwlock_in_line_t *spot,
     const auto_drainer_t::lock_t &lock,
     const std::function<void(Sub *)> &f) THROWS_NOTHING {
@@ -3583,7 +3583,7 @@ void feed_t::each_sub_in_vec(
     guarantee(lock.has_lock());
     spot->read_signal()->wait_lazily_unordered();
 
-    std::vector<int> subscription_threads;
+    vector_t<int> subscription_threads;
     for (int i = 0; i < get_num_threads(); ++i) {
         if (vec[i].size() != 0) {
             subscription_threads.push_back(i);
@@ -4026,7 +4026,7 @@ counted_t<datum_stream_t> artificial_t::subscribe(
     env_t *env,
     const streamspec_t &ss,
     const std::string &primary_key_name,
-    const std::vector<datum_t> &initial_values,
+    const vector_t<datum_t> &initial_values,
     backtrace_id_t bt) {
     // It's OK not to switch threads here because `feed.get()` can be called
     // from any thread and `new_sub` ends up calling `feed_t::add_sub_with_lock`

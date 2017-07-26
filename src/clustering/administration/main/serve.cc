@@ -43,7 +43,7 @@
 #include "rpc/semilattice/semilattice_manager.hpp"
 #include "rpc/semilattice/view/field.hpp"
 
-peer_address_set_t look_up_peers_addresses(const std::vector<host_and_port_t> &names) {
+peer_address_set_t look_up_peers_addresses(const vector_t<host_and_port_t> &names) {
     peer_address_set_t peers;
     for (size_t i = 0; i < names.size(); ++i) {
         peer_address_t peer(std::set<host_and_port_t>{names[i]});

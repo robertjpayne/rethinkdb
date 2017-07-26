@@ -4,7 +4,7 @@
 
 #include <map>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "containers/archive/archive.hpp"
 #include "rdb_protocol/artificial_table/backend.hpp"
@@ -39,7 +39,7 @@ public:
     bool read_all_rows_as_vector(
             auth::user_context_t const &user_context,
             signal_t *interruptor,
-            std::vector<ql::datum_t> *rows_out,
+            vector_t<ql::datum_t> *rows_out,
             UNUSED admin_err_t *error_out) {
         random_delay(interruptor);
         on_thread_t thread_switcher(home_thread());

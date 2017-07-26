@@ -32,7 +32,7 @@ public:
             // Copy the string into a null-terminated c-string that we can write
             // to, so we can use RapidJSON in-situ parsing (and at least avoid
             // some additional copying).
-            std::vector<char> str_buf(data.size() + 1);
+            vector_t<char> str_buf(data.size() + 1);
             memcpy(str_buf.data(), data.data(), data.size());
             for (size_t i = 0; i < data.size(); ++i) {
                 rcheck(str_buf[i] != '\0', base_exc_t::LOGIC,

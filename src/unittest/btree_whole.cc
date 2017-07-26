@@ -64,7 +64,7 @@ public:
                 buf_lock_t sb_lock(&txn, SUPERBLOCK_ID, alt_create_t::create);
                 real_superblock_t superblock(std::move(sb_lock));
                 btree_slice_t::init_real_superblock(
-                    &superblock, std::vector<char>(), binary_blob_t());
+                    &superblock, vector_t<char>(), binary_blob_t());
             }
             txn.commit();
         }
@@ -374,7 +374,7 @@ void btree_fuzz_test(bool stay_small, bool random_timestamps, int iterations) {
     BTreeTestContext ctx;
     rng_t rng;
 
-    std::vector<btree_fuzz_op_t> op_table {
+    vector_t<btree_fuzz_op_t> op_table {
          btree_fuzz_op_t::set,
          btree_fuzz_op_t::set,
          btree_fuzz_op_t::set,

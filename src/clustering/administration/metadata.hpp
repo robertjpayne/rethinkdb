@@ -4,7 +4,7 @@
 
 #include <map>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 #include <utility>
 
 #include "clustering/administration/auth/user.hpp"
@@ -109,7 +109,7 @@ public:
     uint16_t cluster_port, reql_port;
     optional<uint16_t> http_admin_port;
     std::set<host_and_port_t> canonical_addresses;
-    std::vector<std::string> argv;
+    vector_t<std::string> argv;
 };
 
 RDB_DECLARE_SERIALIZABLE(proc_directory_metadata_t);

@@ -2,7 +2,7 @@
 #ifndef SERIALIZER_SERIALIZER_HPP_
 #define SERIALIZER_SERIALIZER_HPP_
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "arch/types.hpp"
 #include "concurrency/cond_var.hpp"
@@ -106,11 +106,11 @@ public:
     // though they might not have been persisted to disk yet.
     virtual void index_write(new_mutex_in_line_t *mutex_acq,
                              const std::function<void()> &on_writes_reflected,
-                             const std::vector<index_write_op_t> &write_ops) = 0;
+                             const vector_t<index_write_op_t> &write_ops) = 0;
 
     // Returns block tokens in the same order as write_infos.
-    virtual std::vector<counted_t<standard_block_token_t> >
-    block_writes(const std::vector<buf_write_info_t> &write_infos,
+    virtual vector_t<counted_t<standard_block_token_t> >
+    block_writes(const vector_t<buf_write_info_t> &write_infos,
                  file_account_t *io_account,
                  iocallback_t *cb) = 0;
 

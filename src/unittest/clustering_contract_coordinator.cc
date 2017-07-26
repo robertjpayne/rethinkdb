@@ -42,7 +42,7 @@ public:
     struct quick_shard_args_t {
     public:
         const char *quick_range_spec;
-        std::vector<server_id_t> replicas;
+        vector_t<server_id_t> replicas;
         server_id_t primary;
     };
     void set_config(std::initializer_list<quick_shard_args_t> qss) {

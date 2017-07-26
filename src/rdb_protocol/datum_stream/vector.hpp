@@ -9,12 +9,12 @@ class vector_datum_stream_t : public eager_datum_stream_t {
 public:
     vector_datum_stream_t(
             backtrace_id_t bt,
-            std::vector<datum_t> &&_rows,
+            vector_t<datum_t> &&_rows,
             optional<changefeed::keyspec_t> &&_changespec);
 private:
     datum_t next(env_t *env, const batchspec_t &bs);
     datum_t next_impl(env_t *);
-    std::vector<datum_t> next_raw_batch(env_t *env, const batchspec_t &bs);
+    vector_t<datum_t> next_raw_batch(env_t *env, const batchspec_t &bs);
 
     void add_transformation(
         transform_variant_t &&tv, backtrace_id_t bt);
@@ -24,9 +24,9 @@ private:
     bool is_array() const;
     bool is_infinite() const;
 
-    std::vector<changespec_t> get_changespecs();
+    vector_t<changespec_t> get_changespecs();
 
-    std::vector<datum_t> rows;
+    vector_t<datum_t> rows;
     size_t index;
     optional<changefeed::keyspec_t> changespec;
 };

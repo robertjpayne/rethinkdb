@@ -4,7 +4,7 @@
 
 #include <map>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "btree/keys.hpp"
 #include "btree/types.hpp"
@@ -48,7 +48,7 @@ public:
     public:
         store_key_t key;
         repli_timestamp_t recency;
-        optional<std::vector<char> > value;   /* empty indicates deletion */
+        optional<vector_t<char> > value;   /* empty indicates deletion */
         size_t get_mem_size() const {
             size_t s = sizeof(pair_t);
             if (static_cast<bool>(value)) {
@@ -95,7 +95,7 @@ public:
     Every pair carries a timestamp, which is greater than or equal to the timestamp of
     the actual query that last touched the key. */
     key_range_t range;
-    std::vector<pair_t> pairs;
+    vector_t<pair_t> pairs;
     repli_timestamp_t min_deletion_timestamp;
 
     /* TODO: For single-key items, this is not very memory-efficient, because we store
@@ -206,7 +206,7 @@ public:
         buf_parent_t buf_parent,
         const void *value_in_leaf_node,
         signal_t *interruptor,
-        std::vector<char> *value_out) = 0;
+        vector_t<char> *value_out) = 0;
     /* Similarly `size_value()` is responsible for retrieving the size of a given
     value in the leaf node. */
     virtual int64_t size_value(

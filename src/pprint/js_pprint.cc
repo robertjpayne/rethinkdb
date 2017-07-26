@@ -3,7 +3,7 @@
 
 #include <math.h>
 
-#include <vector>
+#include "containers/vector.hpp"
 #include <memory>
 
 #include "pprint/generic_term_walker.hpp"
@@ -18,7 +18,7 @@ class js_pretty_printer_t
     : public generic_term_walker_t<counted_t<const document_t> > {
     unsigned int depth;
     bool prepend_ok, in_r_expr;
-    typedef std::vector<counted_t<const document_t> > v;
+    typedef vector_t<counted_t<const document_t> > v;
 public:
     js_pretty_printer_t() : depth(0), prepend_ok(true), in_r_expr(false) {}
 protected:
@@ -111,7 +111,7 @@ private:
         r_sanity_check(t.num_optargs() == 0);
         bool old_r_expr = in_r_expr;
         in_r_expr = true;
-        std::vector<counted_t<const document_t> > term;
+        vector_t<counted_t<const document_t> > term;
         for (size_t i = 0; i < t.num_args(); ++i) {
             if (!term.empty()) { term.push_back(comma_linebreak); }
             term.push_back(visit_generic(t.arg(i)));
@@ -126,7 +126,7 @@ private:
     }
 
     counted_t<const document_t> to_js_natural_object(const ql::raw_term_t &t) {
-        std::vector<counted_t<const document_t> > term;
+        vector_t<counted_t<const document_t> > term;
         t.each_optarg([&](const ql::raw_term_t &item, const std::string &name) {
                 if (!term.empty()) { term.push_back(comma_linebreak); }
                 term.push_back(make_nc(
@@ -138,7 +138,7 @@ private:
     }
 
     counted_t<const document_t> to_js_wrapped_object(const ql::raw_term_t &t) {
-        std::vector<counted_t<const document_t> > term;
+        vector_t<counted_t<const document_t> > term;
         t.each_optarg([&](const ql::raw_term_t &item, const std::string &name) {
                 if (!term.empty()) { term.push_back(comma_linebreak); }
                 term.push_back(make_text(
@@ -164,7 +164,7 @@ private:
                              ? std::to_string(lrint(d.as_num()))
                              : std::to_string(d.as_num()));
         case ql::datum_t::type_t::R_BINARY: {
-            std::vector<counted_t<const document_t> > args;
+            vector_t<counted_t<const document_t> > args;
             args.push_back(make_text(encode_base64(d.as_binary().data(),
                                                    d.as_binary().size())));
             args.push_back(comma_linebreak);
@@ -175,7 +175,7 @@ private:
             return make_text(strprintf("\"%s\"", d.as_str().to_std().c_str()));
         case ql::datum_t::type_t::R_ARRAY:
         {
-            std::vector<counted_t<const document_t> > term;
+            vector_t<counted_t<const document_t> > term;
             for (size_t i = 0; i < d.arr_size(); ++i) {
                 if (!term.empty()) { term.push_back(comma_linebreak); }
                 term.push_back(to_js_datum(d.get(i)));
@@ -184,7 +184,7 @@ private:
         }
         case ql::datum_t::type_t::R_OBJECT:
         {
-            std::vector<counted_t<const document_t> > term;
+            vector_t<counted_t<const document_t> > term;
             term.push_back(lbrace);
             for (size_t i = 0; i < d.obj_size(); ++i) {
                 if (i != 0) { term.push_back(comma_linebreak); }
@@ -204,7 +204,7 @@ private:
     }
 
     counted_t<const document_t> render_optargs(const ql::raw_term_t &t) {
-        std::vector<counted_t<const document_t> > optargs;
+        vector_t<counted_t<const document_t> > optargs;
         t.each_optarg([&](const ql::raw_term_t &item, const std::string &name) {
                 if (!optargs.empty()) { optargs.push_back(comma_linebreak); }
                 counted_t<const document_t> inner = make_c(make_text(
@@ -218,7 +218,7 @@ private:
 
     optional<ql::raw_term_t>
         visit_stringing(const ql::raw_term_t &var,
-                        std::vector<counted_t<const document_t> > *stack,
+                        vector_t<counted_t<const document_t> > *stack,
                         bool *last_is_dot,
                         bool *last_should_r_wrap) {
         bool insert_trailing_comma = false;
@@ -306,7 +306,7 @@ private:
                 *last_should_r_wrap = should_use_rdot(var);
                 return make_optional(var.arg(0));
             default:
-                std::vector<counted_t<const document_t> > args;
+                vector_t<counted_t<const document_t> > args;
                 for (size_t i = var.num_args() - 1; i > 0; --i) {
                     if (!args.empty()) { args.push_back(comma_linebreak); }
                     args.push_back(visit_generic(var.arg(i)));
@@ -326,7 +326,7 @@ private:
     }
 
     counted_t<const document_t> string_dots_together(const ql::raw_term_t &t) {
-        std::vector<counted_t<const document_t> > stack;
+        vector_t<counted_t<const document_t> > stack;
         bool last_is_dot = false;
         bool last_should_r_wrap = false;
         optional<ql::raw_term_t> var(t);
@@ -352,7 +352,7 @@ private:
     }
 
     counted_t<const document_t>
-    reverse(std::vector<counted_t<const document_t> > stack, bool last_is_dot) {
+    reverse(vector_t<counted_t<const document_t> > stack, bool last_is_dot) {
         // this song & dance ensures the nest starts after the punctuation.
         if (last_is_dot) {
             stack.pop_back();
@@ -364,13 +364,13 @@ private:
     counted_t<const document_t> toplevel_funcall(const ql::raw_term_t &t) {
         r_sanity_check(t.num_args() >= 1);
         r_sanity_check(t.num_optargs() == 0);
-        std::vector<counted_t<const document_t> > term;
+        vector_t<counted_t<const document_t> > term;
         term.push_back(do_st);
         term.push_back(lparen);
         bool old_r_expr = in_r_expr;
         in_r_expr = true;
         ql::raw_term_t arg0 = t.arg(0);
-        std::vector<counted_t<const document_t> > args;
+        vector_t<counted_t<const document_t> > args;
         for (size_t i = 1; i < t.num_args(); ++i) {
             if (!args.empty()) { args.push_back(comma_linebreak); }
             args.push_back(visit_generic(t.arg(i)));
@@ -384,11 +384,11 @@ private:
     }
 
     counted_t<const document_t> standard_funcall(const ql::raw_term_t &t) {
-        std::vector<counted_t<const document_t> > term;
+        vector_t<counted_t<const document_t> > term;
         term.push_back(term_name(t));
         bool old_r_expr = in_r_expr;
         in_r_expr = true;
-        std::vector<counted_t<const document_t> > args;
+        vector_t<counted_t<const document_t> > args;
         for (size_t i = 0; i < t.num_args(); ++i) {
             if (!args.empty()) { args.push_back(comma_linebreak); }
             args.push_back(visit_generic(t.arg(i)));
@@ -581,7 +581,7 @@ private:
         counted_t<const document_t> arglist;
         ql::raw_term_t arg0 = t.arg(0);
         if (arg0.type() == Term::MAKE_ARRAY) {
-            std::vector<counted_t<const document_t> > args;
+            vector_t<counted_t<const document_t> > args;
             for (size_t i = 0; i < arg0.num_args(); ++i) {
                 ql::raw_term_t item = arg0.arg(i);
                 if (!args.empty()) { args.push_back(comma_linebreak); }
@@ -594,7 +594,7 @@ private:
         } else if (arg0.type() == Term::DATUM &&
                    arg0.datum().get_type() == ql::datum_t::type_t::R_ARRAY) {
             ql::datum_t d = arg0.datum();
-            std::vector<counted_t<const document_t> > args;
+            vector_t<counted_t<const document_t> > args;
             for (size_t i = 0; i < d.arr_size(); ++i) {
                 if (!args.empty()) { args.push_back(comma_linebreak); }
                 args.push_back(var_name(d.get(i)));

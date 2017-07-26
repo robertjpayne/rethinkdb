@@ -1,7 +1,7 @@
 // Copyright 2005 Google Inc. All Rights Reserved.
 
 #include <set>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/geo/s2/base/logging.h"
 #include "rdb_protocol/geo/s2/util/math/matrix3x3-inl.h"
@@ -16,7 +16,6 @@
 namespace geo {
 using std::set;
 using std::multiset;
-using std::vector;
 
 #ifdef NDEBUG
 const bool FLAGS_s2debug = false;
@@ -31,13 +30,13 @@ S2Polyline::S2Polyline()
     vertices_(NULL) {
 }
 
-S2Polyline::S2Polyline(vector<S2Point> const& vertices)
+S2Polyline::S2Polyline(vector_t<S2Point> const& vertices)
   : num_vertices_(0),
     vertices_(NULL) {
   Init(vertices);
 }
 
-S2Polyline::S2Polyline(vector<S2LatLng> const& vertices)
+S2Polyline::S2Polyline(vector_t<S2LatLng> const& vertices)
   : num_vertices_(0),
     vertices_(NULL) {
   Init(vertices);
@@ -47,7 +46,7 @@ S2Polyline::~S2Polyline() {
   delete[] vertices_;
 }
 
-void S2Polyline::Init(vector<S2Point> const& vertices) {
+void S2Polyline::Init(vector_t<S2Point> const& vertices) {
   if (FLAGS_s2debug) { CHECK(IsValid(vertices)); }
 
   delete[] vertices_;
@@ -59,7 +58,7 @@ void S2Polyline::Init(vector<S2Point> const& vertices) {
   }
 }
 
-void S2Polyline::Init(vector<S2LatLng> const& vertices) {
+void S2Polyline::Init(vector_t<S2LatLng> const& vertices) {
   delete[] vertices_;
   num_vertices_ = vertices.size();
   vertices_ = new S2Point[num_vertices_];
@@ -67,12 +66,12 @@ void S2Polyline::Init(vector<S2LatLng> const& vertices) {
     vertices_[i] = vertices[i].ToPoint();
   }
   if (FLAGS_s2debug) {
-    vector<S2Point> vertex_vector(vertices_, vertices_ + num_vertices_);
+    vector_t<S2Point> vertex_vector(vertices_, vertices_ + num_vertices_);
     CHECK(IsValid(vertex_vector));
   }
 }
 
-bool S2Polyline::IsValid(vector<S2Point> const& v) {
+bool S2Polyline::IsValid(vector_t<S2Point> const& v) {
   // All vertices must be unit length.
   int n = v.size();
   for (int i = 0; i < n; ++i) {
@@ -326,7 +325,7 @@ bool S2Polyline::Decode(Decoder* const decoder) {
   decoder->getn(vertices_, num_vertices_ * sizeof(*vertices_));
 
   if (FLAGS_s2debug) {
-    vector<S2Point> vertex_vector(vertices_, vertices_ + num_vertices_);
+    vector_t<S2Point> vertex_vector(vertices_, vertices_ + num_vertices_);
     CHECK(IsValid(vertex_vector));
   }
 
@@ -416,7 +415,7 @@ int FindEndVertex(S2Polyline const& polyline,
 }
 
 void S2Polyline::SubsampleVertices(S1Angle const& tolerance,
-                                   vector<int>* indices) const {
+                                   vector_t<int>* indices) const {
   indices->clear();
   if (num_vertices() == 0) return;
 
@@ -530,7 +529,7 @@ bool S2Polyline::NearlyCoversPolyline(S2Polyline const& covered,
   // O((n*m)^2).  Using set, the running time is O((n*m) log (n*m)).
   //
   // TODO(user): Benchmark this, and see if the set is worth it.
-  vector<SearchState> pending;
+  vector_t<SearchState> pending;
   set<SearchState> done;
 
   // Find all possible starting states.

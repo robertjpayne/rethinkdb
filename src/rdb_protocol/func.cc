@@ -17,7 +17,7 @@ func_t::func_t(backtrace_id_t _bt)
 func_t::~func_t() { }
 
 scoped_ptr_t<val_t> func_t::call(env_t *env, eval_flags_t eval_flags) const {
-    return call(env, std::vector<datum_t>(), eval_flags);
+    return call(env, vector_t<datum_t>(), eval_flags);
 }
 
 scoped_ptr_t<val_t> func_t::call(env_t *env,
@@ -40,7 +40,7 @@ void func_t::assert_deterministic(const char *extra_msg) const {
 }
 
 reql_func_t::reql_func_t(const var_scope_t &_captured_scope,
-                         std::vector<sym_t> _arg_names,
+                         vector_t<sym_t> _arg_names,
                          counted_t<const term_t> _body)
     : func_t(_body->backtrace()),
       captured_scope(_captured_scope),
@@ -49,7 +49,7 @@ reql_func_t::reql_func_t(const var_scope_t &_captured_scope,
 
 reql_func_t::reql_func_t(scoped_ptr_t<term_storage_t> &&_storage,
                          const var_scope_t &_captured_scope,
-                         std::vector<sym_t> _arg_names,
+                         vector_t<sym_t> _arg_names,
                          counted_t<const term_t> _body)
     : func_t(_body->backtrace()),
       captured_scope(_captured_scope),
@@ -60,7 +60,7 @@ reql_func_t::reql_func_t(scoped_ptr_t<term_storage_t> &&_storage,
 reql_func_t::~reql_func_t() { }
 
 scoped_ptr_t<val_t> reql_func_t::call(env_t *env,
-                                      const std::vector<datum_t> &args,
+                                      const vector_t<datum_t> &args,
                                       eval_flags_t eval_flags) const {
     try {
         // We allow arg_names.size() == 0 to specifically permit users (Ruby users
@@ -110,7 +110,7 @@ js_func_t::~js_func_t() { }
 
 scoped_ptr_t<val_t> js_func_t::call(
     env_t *env,
-    const std::vector<datum_t> &args,
+    const vector_t<datum_t> &args,
     UNUSED eval_flags_t eval_flags) const {
     try {
         js_runner_t::req_config_t config;
@@ -165,7 +165,7 @@ func_term_t::func_term_t(compile_env_t *env, const raw_term_t &t)
     raw_term_t vars = t.arg(0);
     raw_term_t raw_body = t.arg(1);
 
-    std::vector<sym_t> args;
+    vector_t<sym_t> args;
     if (vars.type() == Term::DATUM) {
         datum_t d = vars.datum();
         rcheck(d.get_type() == datum_t::type_t::R_ARRAY,

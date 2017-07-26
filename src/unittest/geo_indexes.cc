@@ -83,7 +83,7 @@ datum_t generate_polygon(rng_t *rng) {
         build_circle(lon_lat_point_t(lon, lat), r, num_vertices, WGS84_ELLIPSOID);
 
     // And maybe 1 or 2 holes...
-    std::vector<lon_lat_line_t> holes;
+    vector_t<lon_lat_line_t> holes;
     size_t num_holes = rng->randint(3);
     for (size_t i = 0; i < num_holes; ++i) {
         // Just some heuristics. These will not always lead to valid polygons.
@@ -108,8 +108,8 @@ datum_t generate_polygon(rng_t *rng) {
     }
 }
 
-std::vector<datum_t> generate_data(size_t num_docs, rng_t *rng) {
-    std::vector<datum_t> result;
+vector_t<datum_t> generate_data(size_t num_docs, rng_t *rng) {
+    vector_t<datum_t> result;
     result.reserve(num_docs);
 
     for (size_t i = 0; i < num_docs; ++i) {
@@ -127,7 +127,7 @@ std::vector<datum_t> generate_data(size_t num_docs, rng_t *rng) {
 
 void insert_data(namespace_interface_t *nsi,
                  order_source_t *osource,
-                 const std::vector<datum_t> &data) {
+                 const vector_t<datum_t> &data) {
     for (size_t i = 0; i < data.size(); ++i) {
         store_key_t pk(strprintf("%zu", i));
         write_t write(
@@ -156,8 +156,8 @@ void insert_data(namespace_interface_t *nsi,
 
 void prepare_namespace(namespace_interface_t *nsi,
                        order_source_t *osource,
-                       const std::vector<scoped_ptr_t<store_t> > *stores,
-                       const std::vector<datum_t> &data) {
+                       const vector_t<scoped_ptr_t<store_t> > *stores,
+                       const vector_t<datum_t> &data) {
     // Create an index
     std::string index_id = "geo";
 
@@ -183,7 +183,7 @@ void prepare_namespace(namespace_interface_t *nsi,
     insert_data(nsi, osource, data);
 }
 
-std::vector<nearest_geo_read_response_t::dist_pair_t> perform_get_nearest(
+vector_t<nearest_geo_read_response_t::dist_pair_t> perform_get_nearest(
         lon_lat_point_t center,
         uint64_t max_results,
         double max_distance,
@@ -221,11 +221,11 @@ std::vector<nearest_geo_read_response_t::dist_pair_t> perform_get_nearest(
         boost::get<nearest_geo_read_response_t>(&response.response);
     if (geo_response == nullptr) {
         ADD_FAILURE() << "got wrong type of result back";
-        return std::vector<nearest_geo_read_response_t::dist_pair_t>();
+        return vector_t<nearest_geo_read_response_t::dist_pair_t>();
     }
     if (boost::get<ql::exc_t>(&geo_response->results_or_error) != nullptr) {
         ADD_FAILURE() << boost::get<ql::exc_t>(&geo_response->results_or_error)->what();
-        return std::vector<nearest_geo_read_response_t::dist_pair_t>();
+        return vector_t<nearest_geo_read_response_t::dist_pair_t>();
     }
     return boost::get<nearest_geo_read_response_t::result_t>(geo_response->results_or_error);
 }
@@ -237,13 +237,13 @@ bool nearest_pairs_less(
     return p1.first < p2.first;
 }
 
-std::vector<nearest_geo_read_response_t::dist_pair_t> emulate_get_nearest(
+vector_t<nearest_geo_read_response_t::dist_pair_t> emulate_get_nearest(
         lon_lat_point_t center,
         uint64_t max_results,
         double max_distance,
-        const std::vector<datum_t> &data) {
+        const vector_t<datum_t> &data) {
 
-    std::vector<nearest_geo_read_response_t::dist_pair_t> result;
+    vector_t<nearest_geo_read_response_t::dist_pair_t> result;
     result.reserve(data.size());
     ql::datum_t point_center =
         construct_geo_point(center, ql::configured_limits_t());
@@ -269,18 +269,18 @@ std::vector<nearest_geo_read_response_t::dist_pair_t> emulate_get_nearest(
 }
 
 void test_get_nearest(lon_lat_point_t center,
-                      const std::vector<datum_t> &data,
+                      const vector_t<datum_t> &data,
                       namespace_interface_t *nsi,
                       order_source_t *osource) {
     const uint64_t max_results = 100;
     const double max_distance = 5000000.0; // 5000 km
 
     // 1. Run get_nearest
-    std::vector<nearest_geo_read_response_t::dist_pair_t> nearest_res =
+    vector_t<nearest_geo_read_response_t::dist_pair_t> nearest_res =
         perform_get_nearest(center, max_results, max_distance, nsi, osource);
 
     // 2. Compute an equivalent result directly from data
-    std::vector<nearest_geo_read_response_t::dist_pair_t> reference_res =
+    vector_t<nearest_geo_read_response_t::dist_pair_t> reference_res =
         emulate_get_nearest(center, max_results, max_distance, data);
 
     // 3. Compare both results
@@ -297,14 +297,14 @@ void test_get_nearest(lon_lat_point_t center,
 void run_get_nearest_test(
         namespace_interface_t *nsi,
         order_source_t *osource,
-        const std::vector<scoped_ptr_t<store_t> > *stores) {
+        const vector_t<scoped_ptr_t<store_t> > *stores) {
     // To reproduce a known failure: initialize the rng seed manually.
     const int rng_seed = randint(INT_MAX);
     debugf("Using RNG seed %i\n", rng_seed);
     rng_t rng(rng_seed);
 
     const size_t num_docs = 500;
-    std::vector<datum_t> data = generate_data(num_docs, &rng);
+    vector_t<datum_t> data = generate_data(num_docs, &rng);
     prepare_namespace(nsi, osource, stores, data);
 
     try {
@@ -320,7 +320,7 @@ void run_get_nearest_test(
     }
 }
 
-std::vector<datum_t> perform_get_intersecting(
+vector_t<datum_t> perform_get_intersecting(
         const datum_t &query_geometry,
         namespace_interface_t *nsi,
         order_source_t *osource) {
@@ -337,7 +337,7 @@ std::vector<datum_t> perform_get_intersecting(
                 datum_t()},
             table_name,
             ql::batchspec_t::all(),
-            std::vector<ql::transform_variant_t>(),
+            vector_t<ql::transform_variant_t>(),
             optional<ql::terminal_variant_t>(),
             sindex_rangespec_t(
                 idx_name,
@@ -362,28 +362,28 @@ std::vector<datum_t> perform_get_intersecting(
         boost::get<rget_read_response_t>(&response.response);
     if (geo_response == nullptr) {
         ADD_FAILURE() << "got wrong type of result back";
-        return std::vector<datum_t>();
+        return vector_t<datum_t>();
     }
     if (boost::get<ql::exc_t>(&geo_response->result) != nullptr) {
         ADD_FAILURE() << boost::get<ql::exc_t>(&geo_response->result)->what();
-        return std::vector<datum_t>();
+        return vector_t<datum_t>();
     }
 
     auto result = boost::get<ql::grouped_t<ql::stream_t> >(&geo_response->result);
     if (result == nullptr) {
         ADD_FAILURE() << "got wrong type of result back";
-        return std::vector<datum_t>();
+        return vector_t<datum_t>();
     }
-    std::vector<datum_t> result_datum;
+    vector_t<datum_t> result_datum;
     if (result->size() == 0) {
         return result_datum;
     } else if (result->size() != 1) {
         ADD_FAILURE() << "got grouped result for some reason";
-        return std::vector<datum_t>();
+        return vector_t<datum_t>();
     }
     if (result->begin()->first != datum_t::null()) {
         ADD_FAILURE() << "got grouped result for some reason";
-        return std::vector<datum_t>();
+        return vector_t<datum_t>();
     }
     const ql::stream_t &stream = (*result)[datum_t::null()];
     for (auto &&pair : stream.substreams) {
@@ -394,11 +394,11 @@ std::vector<datum_t> perform_get_intersecting(
     return result_datum;
 }
 
-std::vector<datum_t> emulate_get_intersecting(
+vector_t<datum_t> emulate_get_intersecting(
         const datum_t &query_geometry,
-        const std::vector<datum_t> &data) {
+        const vector_t<datum_t> &data) {
 
-    std::vector<datum_t> result;
+    vector_t<datum_t> result;
     result.reserve(data.size());
     for (size_t i = 0; i < data.size(); ++i) {
         if (geo_does_intersect(query_geometry, data[i])) {
@@ -410,15 +410,15 @@ std::vector<datum_t> emulate_get_intersecting(
 }
 
 void test_get_intersecting(const datum_t &query_geometry,
-                           const std::vector<datum_t> &data,
+                           const vector_t<datum_t> &data,
                            namespace_interface_t *nsi,
                            order_source_t *osource) {
     // 1. Run get_intersecting
-    std::vector<datum_t> intersecting_res =
+    vector_t<datum_t> intersecting_res =
         perform_get_intersecting(query_geometry, nsi, osource);
 
     // 2. Compute an equivalent result directly from data
-    std::vector<datum_t> reference_res =
+    vector_t<datum_t> reference_res =
         emulate_get_intersecting(query_geometry, data);
 
     // 3. Compare both results
@@ -431,14 +431,14 @@ void test_get_intersecting(const datum_t &query_geometry,
 void run_get_intersecting_test(
         namespace_interface_t *nsi,
         order_source_t *osource,
-        const std::vector<scoped_ptr_t<store_t> > *stores) {
+        const vector_t<scoped_ptr_t<store_t> > *stores) {
     // To reproduce a known failure: initialize the rng seed manually.
     const int rng_seed = randint(INT_MAX);
     debugf("Using RNG seed %i\n", rng_seed);
     rng_t rng(rng_seed);
 
     const size_t num_docs = 500;
-    std::vector<datum_t> data = generate_data(num_docs, &rng);
+    vector_t<datum_t> data = generate_data(num_docs, &rng);
     prepare_namespace(nsi, osource, stores, data);
 
     try {

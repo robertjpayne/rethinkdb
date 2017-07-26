@@ -106,9 +106,9 @@ private:
 
     virtual bool should_send_batch() = 0;
 
-    virtual void unshard(env_t *env, const std::vector<result_t *> &results) {
+    virtual void unshard(env_t *env, const vector_t<result_t *> &results) {
         guarantee(acc.size() == 0);
-        std::map<datum_t, std::vector<T *>, optional_datum_less_t> vecs;
+        std::map<datum_t, vector_t<T *>, optional_datum_less_t> vecs;
         r_sanity_check(results.size() != 0);
         for (auto res = results.begin(); res != results.end(); ++res) {
             guarantee(*res);
@@ -123,7 +123,7 @@ private:
             unshard_impl(env, &t_it->second, kv->second);
         }
     }
-    virtual void unshard_impl(env_t *env, T *acc, const std::vector<T *> &ts) = 0;
+    virtual void unshard_impl(env_t *env, T *acc, const vector_t<T *> &ts) = 0;
 
 protected:
     const T *get_default_val() { return &default_val; }
@@ -209,7 +209,7 @@ protected:
 
     void unshard_impl(env_t *,
                       stream_t *out,
-                      const std::vector<stream_t *> &streams) final {
+                      const vector_t<stream_t *> &streams) final {
         r_sanity_check(streams.size() > 0);
         for (auto &&stream : streams) {
             r_sanity_check(stream->substreams.size() > 0);
@@ -250,7 +250,7 @@ public:
         region_t region,
         store_key_t last_key,
         sorting_t _sorting,
-        std::vector<scoped_ptr_t<op_t> > *_ops)
+        vector_t<scoped_ptr_t<op_t> > *_ops)
         : append_t(region,
                    last_key,
                    _sorting,
@@ -347,7 +347,7 @@ private:
     is_primary_t is_primary;
     bool seen_distinct;
     size_t seen, n;
-    std::vector<scoped_ptr_t<op_t> > *ops;
+    vector_t<scoped_ptr_t<op_t> > *ops;
     batcher_t batcher;
 };
 
@@ -423,7 +423,7 @@ private:
                 // `is_sindex_sort` to not be none.
                 optional<bool> is_sindex_sort(false);
                 is_sindex_sort = r_nullopt;
-                std::vector<std::pair<raw_stream_t::iterator,
+                vector_t<std::pair<raw_stream_t::iterator,
                                       raw_stream_t::iterator> > v;
                 v.reserve(stream->substreams.size());
                 for (auto &&pair : stream->substreams) {
@@ -589,7 +589,7 @@ private:
                             T *t) = 0;
 
     virtual void unshard_impl(
-        env_t *env, T *out, const std::vector<T *> &ts) {
+        env_t *env, T *out, const vector_t<T *> &ts) {
         for (auto it = ts.begin(); it != ts.end(); ++it) {
             unshard_impl(env, out, *it);
         }
@@ -884,7 +884,7 @@ private:
         r_sanity_check(groups->size() == 1 && !groups->begin()->first.has());
         datums_t *ds = &groups->begin()->second;
         for (auto el = ds->begin(); el != ds->end(); ++el) {
-            std::vector<datum_t> arr;
+            vector_t<datum_t> arr;
             arr.reserve(funcs.size() + append_index);
             for (auto f = funcs.begin(); f != funcs.end(); ++f) {
                 try {
@@ -911,7 +911,7 @@ private:
             if (!multi) {
                 add(groups, std::move(arr), *el, env->limits());
             } else {
-                std::vector<std::vector<datum_t> > perms(arr.size());
+                vector_t<vector_t<datum_t> > perms(arr.size());
                 for (size_t i = 0; i < arr.size(); ++i) {
                     if (arr[i].get_type() != datum_t::R_ARRAY) {
                         perms[i].push_back(arr[i]);
@@ -922,7 +922,7 @@ private:
                         }
                     }
                 }
-                std::vector<datum_t> instance;
+                vector_t<datum_t> instance;
                 instance.reserve(perms.size());
                 add_perms(groups, &instance, &perms, 0, *el, env->limits());
                 r_sanity_check(instance.size() == 0);
@@ -939,7 +939,7 @@ private:
     }
 
     void add(groups_t *groups,
-             std::vector<datum_t> &&arr,
+             vector_t<datum_t> &&arr,
              const datum_t &el,
              const configured_limits_t &limits) {
         datum_t group = arr.size() == 1
@@ -950,15 +950,15 @@ private:
     }
 
     void add_perms(groups_t *groups,
-                   std::vector<datum_t> *instance,
-                   std::vector<std::vector<datum_t> > *arr,
+                   vector_t<datum_t> *instance,
+                   vector_t<vector_t<datum_t> > *arr,
                    size_t index,
                    const datum_t &el,
                    const configured_limits_t &limits) {
         r_sanity_check(index == instance->size());
         if (index >= arr->size()) {
             r_sanity_check(instance->size() == arr->size());
-            add(groups, std::vector<datum_t>(*instance), el, limits);
+            add(groups, vector_t<datum_t>(*instance), el, limits);
         } else {
             auto vec = (*arr)[index];
             if (vec.size() != 0) {
@@ -975,7 +975,7 @@ private:
         }
     }
 
-    std::vector<counted_t<const func_t> > funcs;
+    vector_t<counted_t<const func_t> > funcs;
     bool append_index, multi;
     backtrace_id_t bt;
 };

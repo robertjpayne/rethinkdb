@@ -489,7 +489,7 @@ bool real_reql_cluster_interface_t::table_estimate_doc_counts(
         counted_t<const ql::db_t> db,
         const name_string_t &name,
         ql::env_t *env,
-        std::vector<int64_t> *doc_counts_out,
+        vector_t<int64_t> *doc_counts_out,
         admin_err_t *error_out) {
     guarantee(db->name != name_string_t::guarantee_valid("rethinkdb"),
         "real_reql_cluster_interface_t should never get queries for system tables");
@@ -512,7 +512,7 @@ bool real_reql_cluster_interface_t::table_estimate_doc_counts(
 
         /* Match the results of the distribution query against the table's shard
         boundaries */
-        *doc_counts_out = std::vector<int64_t>(config.shard_scheme.num_shards(), 0);
+        *doc_counts_out = vector_t<int64_t>(config.shard_scheme.num_shards(), 0);
         for (auto it = counts.begin(); it != counts.end(); ++it) {
             /* Calculate the range of shards that this key-range overlaps with */
             size_t left_shard = config.shard_scheme.find_shard_for_key(it->first);

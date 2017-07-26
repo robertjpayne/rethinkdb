@@ -3,7 +3,7 @@
 #define BTREE_PARALLEL_TRAVERSAL_HPP_
 
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "concurrency/access.hpp"
 #include "btree/traversal_progress.hpp"
@@ -174,9 +174,9 @@ public:
     progress_completion_fraction_t guess_completion() const;
 
 private:
-    std::vector<int> learned; //How many nodes at each level we believe exist
-    std::vector<int> acquired; //How many nodes at each level we've acquired
-    std::vector<int> released; //How many nodes at each level we've released
+    vector_t<int> learned; //How many nodes at each level we believe exist
+    vector_t<int> acquired; //How many nodes at each level we've acquired
+    vector_t<int> released; //How many nodes at each level we've released
 
     int height; //The height we've learned the tree has. Or -1 if we're still unsure;
 

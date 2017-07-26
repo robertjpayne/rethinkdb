@@ -70,7 +70,7 @@ public:
 protected:
     // Union term is a friend so we can steal arguments from an array in an optarg.
     friend class union_term_t;
-    virtual const std::vector<counted_t<const term_t> > &get_original_args() const {
+    virtual const vector_t<counted_t<const term_t> > &get_original_args() const {
         rfail(base_exc_t::INTERNAL,
                "This is in term_t to allow stealing args from an"
                "optarg in union_term_t. Only call this on an op_term_t.");

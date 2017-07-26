@@ -21,7 +21,7 @@ private:
                                 name(),
                                 d.get_type_name().c_str()));
 
-        std::vector<datum_t> arr;
+        vector_t<datum_t> arr;
         arr.reserve(d.obj_size());
         for (size_t i = 0; i < d.obj_size(); ++i) {
             arr.push_back(datum_t(d.get_pair(i).first));
@@ -46,7 +46,7 @@ private:
                       strprintf("Cannot call `%s` on objects of type `%s`.",
                                 name(),
                                 d.get_type_name().c_str()));
-        std::vector<datum_t> arr;
+        vector_t<datum_t> arr;
         arr.reserve(d.obj_size());
         for (size_t i = 0; i < d.obj_size(); ++i) {
             arr.push_back(datum_t(d.get_pair(i).second));

@@ -6,7 +6,7 @@
 #include <set>
 #include <string>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "containers/counted.hpp"
 #include "containers/archive/archive.hpp"
@@ -20,7 +20,7 @@ public:
     var_visibility_t();
 
     // Updates the implicit variable visibility according to the rules.
-    var_visibility_t with_func_arg_name_list(const std::vector<sym_t> &arg_names) const;
+    var_visibility_t with_func_arg_name_list(const vector_t<sym_t> &arg_names) const;
 
     bool contains_var(sym_t varname) const;
     bool implicit_is_accessible() const;
@@ -55,8 +55,8 @@ public:
     var_scope_t();
 
     var_scope_t with_func_arg_list(
-        const std::vector<sym_t> &arg_names,
-        const std::vector<datum_t> &arg_values) const;
+        const vector_t<sym_t> &arg_names,
+        const vector_t<datum_t> &arg_values) const;
 
     var_scope_t filtered_by_captures(const var_captures_t &captures) const;
 

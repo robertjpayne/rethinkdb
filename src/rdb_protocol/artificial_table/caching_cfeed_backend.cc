@@ -98,7 +98,7 @@ caching_cfeed_artificial_table_backend_t::caching_machinery_t::~caching_machiner
 
 bool caching_cfeed_artificial_table_backend_t::caching_machinery_t::get_initial_values(
         const new_mutex_acq_t *proof,
-        std::vector<ql::datum_t> *out,
+        vector_t<ql::datum_t> *out,
         signal_t *interruptor) {
     proof->guarantee_is_holding(&mutex);
 
@@ -268,7 +268,7 @@ bool caching_cfeed_artificial_table_backend_t::caching_machinery_t::get_values(
     ql::env_t env(interruptor,
                   ql::return_empty_normal_batches_t::NO,
                   reql_version_t::LATEST);
-    std::vector<ql::datum_t> datums;
+    vector_t<ql::datum_t> datums;
     try {
         datums = stream->next_batch(&env, ql::batchspec_t::all());
     } catch (const ql::base_exc_t &) {

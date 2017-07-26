@@ -2,7 +2,7 @@
 #include "rdb_protocol/geo/geojson.hpp"
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "containers/scoped.hpp"
 #include "rdb_protocol/datum_string.hpp"
@@ -44,7 +44,7 @@ ql::datum_t construct_geo_point(
     dup = result.add("type", datum_t("Point"));
     r_sanity_check(!dup);
 
-    std::vector<datum_t> coordinates;
+    vector_t<datum_t> coordinates;
     coordinates.reserve(2);
     coordinates.push_back(datum_t(point.longitude));
     coordinates.push_back(datum_t(point.latitude));
@@ -55,13 +55,13 @@ ql::datum_t construct_geo_point(
     return std::move(result).to_datum();
 }
 
-std::vector<datum_t> construct_line_coordinates(
+vector_t<datum_t> construct_line_coordinates(
         const lon_lat_line_t &line,
         const configured_limits_t &limits) {
-    std::vector<datum_t> coordinates;
+    vector_t<datum_t> coordinates;
     coordinates.reserve(line.size());
     for (size_t i = 0; i < line.size(); ++i) {
-        std::vector<datum_t> point;
+        vector_t<datum_t> point;
         point.reserve(2);
         point.push_back(datum_t(line[i].longitude));
         point.push_back(datum_t(line[i].latitude));
@@ -70,10 +70,10 @@ std::vector<datum_t> construct_line_coordinates(
     return coordinates;
 }
 
-std::vector<datum_t> construct_loop_coordinates(
+vector_t<datum_t> construct_loop_coordinates(
         const lon_lat_line_t &line,
         const configured_limits_t &limits) {
-    std::vector<datum_t> loop_coordinates =
+    vector_t<datum_t> loop_coordinates =
         construct_line_coordinates(line, limits);
     // Close the line
     if (line.size() >= 1 && line[0] != line[line.size()-1]) {
@@ -104,13 +104,13 @@ ql::datum_t construct_geo_line(
 ql::datum_t construct_geo_polygon(
         const lon_lat_line_t &shell,
         const configured_limits_t &limits) {
-    std::vector<lon_lat_line_t> holes;
+    vector_t<lon_lat_line_t> holes;
     return construct_geo_polygon(shell, holes, limits);
 }
 
 ql::datum_t construct_geo_polygon(
         const lon_lat_line_t &shell,
-        const std::vector<lon_lat_line_t> &holes,
+        const vector_t<lon_lat_line_t> &holes,
         const configured_limits_t &limits) {
     datum_object_builder_t result;
     bool dup;
@@ -120,13 +120,13 @@ ql::datum_t construct_geo_polygon(
     dup = result.add("type", datum_t("Polygon"));
     r_sanity_check(!dup);
 
-    std::vector<datum_t> coordinates;
-    std::vector<datum_t> shell_coordinates =
+    vector_t<datum_t> coordinates;
+    vector_t<datum_t> shell_coordinates =
         construct_loop_coordinates(shell, limits);
     coordinates.push_back(
         datum_t(std::move(shell_coordinates), limits));
     for (size_t i = 0; i < holes.size(); ++i) {
-        std::vector<datum_t> hole_coordinates =
+        vector_t<datum_t> hole_coordinates =
             construct_loop_coordinates(holes[i], limits);
         coordinates.push_back(
             datum_t(std::move(hole_coordinates), limits));
@@ -149,7 +149,7 @@ ql::datum_t construct_geo_latlngrect(
     dup = result.add("type", datum_t("$reql_LatLngRect$"));
     r_sanity_check(!dup);
 
-    std::vector<datum_t> coordinates;
+    vector_t<datum_t> coordinates;
     coordinates.reserve(4);
     coordinates.push_back(datum_t(rect.lat().lo()));
     coordinates.push_back(datum_t(rect.lat().hi()));
@@ -285,7 +285,7 @@ scoped_ptr_t<S2Polyline> coordinates_to_s2polyline(const datum_t &coords) {
         throw geo_exception_t(
             "GeoJSON LineString must have at least two positions.");
     }
-    std::vector<S2Point> points;
+    vector_t<S2Point> points;
     points.reserve(coords.arr_size());
     for (size_t i = 0; i < coords.arr_size(); ++i) {
         points.push_back(position_to_s2point(coords.get(i)));
@@ -303,7 +303,7 @@ scoped_ptr_t<S2Loop> coordinates_to_s2loop(const datum_t &coords) {
         throw geo_exception_t(
             "GeoJSON LinearRing must have at least four positions.");
     }
-    std::vector<S2Point> points;
+    vector_t<S2Point> points;
     points.reserve(coords.arr_size());
     for (size_t i = 0; i < coords.arr_size(); ++i) {
         points.push_back(position_to_s2point(coords.get(i)));
@@ -333,7 +333,7 @@ scoped_ptr_t<S2Polygon> coordinates_to_s2polygon(const datum_t &coords) {
          coordinate arrays. For Polygons with multiple rings, the first must be the
          exterior ring and any others must be interior rings or holes."
     */
-    std::vector<scoped_ptr_t<S2Loop> > loops;
+    vector_t<scoped_ptr_t<S2Loop> > loops;
     loops.reserve(coords.arr_size());
     for (size_t i = 0; i < coords.arr_size(); ++i) {
         scoped_ptr_t<S2Loop> loop = coordinates_to_s2loop(coords.get(i));

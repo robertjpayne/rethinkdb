@@ -131,9 +131,9 @@ void outdated_index_issue_tracker_t::log_outdated_indexes(
     }
 }
 
-std::vector<scoped_ptr_t<issue_t> > outdated_index_issue_tracker_t::get_issues(
+vector_t<scoped_ptr_t<issue_t> > outdated_index_issue_tracker_t::get_issues(
         signal_t *interruptor) const {
-    std::vector<scoped_ptr_t<issue_t> > res;
+    vector_t<scoped_ptr_t<issue_t> > res;
     outdated_index_issue_t::index_map_t index_map;
 
     std::map<namespace_id_t, table_config_and_shards_t> configs;

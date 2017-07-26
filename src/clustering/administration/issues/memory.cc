@@ -63,8 +63,8 @@ RDB_IMPL_EQUALITY_COMPARABLE_3(memory_issue_t,
                                reporting_server_ids,
                                message);
 
-std::vector<memory_issue_t> memory_issue_tracker_t::get_issues() {
-    std::vector<memory_issue_t> issues;
+vector_t<memory_issue_t> memory_issue_tracker_t::get_issues() {
+    vector_t<memory_issue_t> issues;
     if (static_cast<bool>(error_message)) {
         issues.push_back(memory_issue_t(*error_message));
     }
@@ -82,8 +82,8 @@ void memory_issue_tracker_t::report_error(const std::string &message) {
 }
 
 void memory_issue_tracker_t::combine(
-    std::vector<memory_issue_t> &&issues,
-    std::vector<scoped_ptr_t<issue_t> > *issues_out) {
+    vector_t<memory_issue_t> &&issues,
+    vector_t<scoped_ptr_t<issue_t> > *issues_out) {
     std::map<std::string, memory_issue_t*> combined_issues;
     for (auto &issue : issues) {
         auto combined_it = combined_issues.find(issue.message);

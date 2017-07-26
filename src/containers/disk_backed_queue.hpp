@@ -3,7 +3,7 @@
 #define CONTAINERS_DISK_BACKED_QUEUE_HPP_
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "concurrency/fifo_checker.hpp"
 #include "concurrency/mutex.hpp"

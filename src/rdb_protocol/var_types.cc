@@ -11,7 +11,7 @@ namespace ql {
 
 var_visibility_t::var_visibility_t() : implicit_depth(0) { }
 
-var_visibility_t var_visibility_t::with_func_arg_name_list(const std::vector<sym_t> &arg_names) const {
+var_visibility_t var_visibility_t::with_func_arg_name_list(const vector_t<sym_t> &arg_names) const {
     var_visibility_t ret = *this;
     ret.visibles.insert(arg_names.begin(), arg_names.end());
     if (function_emits_implicit_variable(arg_names)) {
@@ -52,8 +52,8 @@ var_captures_t &var_captures_t::operator=(var_captures_t &&movee) {
 var_scope_t::var_scope_t() : implicit_depth(0) { }
 
 var_scope_t var_scope_t::with_func_arg_list(
-    const std::vector<sym_t> &arg_names,
-    const std::vector<datum_t> &arg_values) const {
+    const vector_t<sym_t> &arg_names,
+    const vector_t<datum_t> &arg_values) const {
     r_sanity_check(arg_names.size() == arg_values.size());
     var_scope_t ret = *this;
     if (function_emits_implicit_variable(arg_names)) {

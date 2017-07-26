@@ -41,12 +41,12 @@ build_comparison(const term_t* target,
     }
 }
 
-std::vector<std::pair<order_direction_t, counted_t<const func_t> > >
+vector_t<std::pair<order_direction_t, counted_t<const func_t> > >
 build_comparisons_from_raw_term(const term_t *target,
                                 scope_env_t *env,
                                 args_t *args,
                                 const raw_term_t &raw_term) {
-    std::vector<std::pair<order_direction_t, counted_t<const func_t> > > comparisons;
+    vector_t<std::pair<order_direction_t, counted_t<const func_t> > > comparisons;
 
     check_r_args(target, raw_term.arg(0));
     // For order by, first argument is the stream
@@ -59,12 +59,12 @@ build_comparisons_from_raw_term(const term_t *target,
     return comparisons;
 }
 
-std::vector<std::pair<order_direction_t, counted_t<const func_t> > >
+vector_t<std::pair<order_direction_t, counted_t<const func_t> > >
 build_comparisons_from_single_term(const term_t *target,
                                    scope_env_t *,
                                    scoped_ptr_t<val_t> &&arg,
                                    const raw_term_t &raw_term) {
-    std::vector<std::pair<order_direction_t, counted_t<const func_t> > > comparisons;
+    vector_t<std::pair<order_direction_t, counted_t<const func_t> > > comparisons;
 
     comparisons.push_back(build_comparison(target,
                                            std::move(arg),
@@ -72,13 +72,13 @@ build_comparisons_from_single_term(const term_t *target,
 
     return comparisons;
 }
-std::vector<std::pair<order_direction_t, counted_t<const func_t> > >
+vector_t<std::pair<order_direction_t, counted_t<const func_t> > >
 build_comparisons_from_optional_terms(const term_t *target,
                                      scope_env_t *,
-                                     std::vector<scoped_ptr_t<val_t> > &&args,
+                                     vector_t<scoped_ptr_t<val_t> > &&args,
                                      const raw_term_t &raw_term)
 {
-    std::vector<std::pair<order_direction_t, counted_t<const func_t> > > comparisons;
+    vector_t<std::pair<order_direction_t, counted_t<const func_t> > > comparisons;
 
     // For ordered union, first element is an optional arg
     for (size_t i = 0; i < raw_term.num_args(); ++i) {
@@ -90,7 +90,7 @@ build_comparisons_from_optional_terms(const term_t *target,
     return comparisons;
 }
 
-lt_cmp_t::lt_cmp_t(std::vector<std::pair<order_direction_t, counted_t<const func_t> > > _comparisons)
+lt_cmp_t::lt_cmp_t(vector_t<std::pair<order_direction_t, counted_t<const func_t> > > _comparisons)
             : comparisons(std::move(_comparisons)) { }
 
 bool lt_cmp_t::operator()(env_t *env,

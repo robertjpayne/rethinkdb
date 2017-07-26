@@ -1,7 +1,7 @@
 // Copyright 2010-2015 RethinkDB, all rights reserved.
 #include "rdb_protocol/terms/terms.hpp"
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/error.hpp"
 #include "rdb_protocol/func.hpp"
@@ -111,7 +111,7 @@ private:
             return f->call(env->env, flags);
         } else {
             scoped_ptr_t<val_t> arg1 = args->arg(env, 1, flags);
-            std::vector<datum_t> arg_datums(1);
+            vector_t<datum_t> arg_datums(1);
             arg_datums.reserve(args->num_args() - 1);
             for (size_t i = 2; i < args->num_args(); ++i) {
                 arg_datums.push_back(args->arg(env, i, flags)->as_datum());

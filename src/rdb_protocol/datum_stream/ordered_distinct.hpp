@@ -9,7 +9,7 @@ class ordered_distinct_datum_stream_t : public wrapper_datum_stream_t {
 public:
     explicit ordered_distinct_datum_stream_t(counted_t<datum_stream_t> _source);
 private:
-    std::vector<datum_t>
+    vector_t<datum_t>
     next_raw_batch(env_t *env, const batchspec_t &batchspec);
     datum_t last_val;
 };

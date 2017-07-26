@@ -151,7 +151,7 @@ void blocker_pool_t::on_event(DEBUG_VAR int event) {
     rassert(event == poll_event_in);
     ce_signal.consume_wakey_wakeys();   // So pipe doesn't get backed up
 
-    std::vector<job_t *> local_completed_events;
+    vector_t<job_t *> local_completed_events;
 
     {
         system_mutex_t::lock_t ce_lock(&ce_mutex);

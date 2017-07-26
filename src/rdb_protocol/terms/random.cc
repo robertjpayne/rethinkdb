@@ -41,7 +41,7 @@ public:
             seq = v->as_seq(env->env);
         }
 
-        std::vector<datum_t> result;
+        vector_t<datum_t> result;
         result.reserve(num);
         size_t element_number = 0;
         batchspec_t batchspec = batchspec_t::user(batch_type_t::TERMINAL, env->env);

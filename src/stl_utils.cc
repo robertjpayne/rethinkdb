@@ -1,9 +1,9 @@
 #include "stl_utils.hpp"
 
-std::vector<std::string> split_string(const std::string &s, char sep) {
+vector_t<std::string> split_string(const std::string &s, char sep) {
     const size_t n = s.size();
 
-    std::vector<std::string> builder;
+    vector_t<std::string> builder;
     size_t i = 0;
     for (;;) {
         size_t j = i;

@@ -138,7 +138,7 @@ void internal_disk_backed_queue_t::pop(buffer_group_viewer_t *viewer) {
 
     /* Grab the data from the blob and delete it. */
 
-    std::vector<char> data_vec;
+    vector_t<char> data_vec;
 
     blob_t blob(cache->max_block_size(), buffer, DBQ_MAX_REF_SIZE);
     {

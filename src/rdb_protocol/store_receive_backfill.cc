@@ -143,7 +143,7 @@ public:
         const key_range_t::right_bound_t &progress,
         scoped_ptr_t<txn_t> &&txn,
         buf_lock_t &&sindex_block,
-        std::vector<rdb_modification_report_t> &&mod_reports
+        vector_t<rdb_modification_report_t> &&mod_reports
         )> commit_cb;
 };
 
@@ -174,7 +174,7 @@ void apply_empty_range(
             &tokens.info->commit_fifo_sink, tokens.write_token);
         exiter.wait_lazily_unordered();
         tokens.commit_cb(empty_range, std::move(txn), buf_lock_t(),
-            std::vector<rdb_modification_report_t>());
+            vector_t<rdb_modification_report_t>());
 
     } catch (const interrupted_exc_t &exc) {
         /* The call to `receive_backfill()` was interrupted. Ignore. */
@@ -188,7 +188,7 @@ void apply_item_pair(
         btree_slice_t *slice,
         real_superblock_t *superblock,
         backfill_item_t::pair_t &&pair,
-        std::vector<rdb_modification_report_t> *mod_reports_out,
+        vector_t<rdb_modification_report_t> *mod_reports_out,
         promise_t<superblock_t *> *pass_back_superblock) {
     rdb_live_deletion_context_t deletion_context;
     mod_reports_out->resize(mod_reports_out->size() + 1);
@@ -250,7 +250,7 @@ void apply_single_key_item(
         }
 
         /* Actually apply the change, releasing the superblock in the process. */
-        std::vector<rdb_modification_report_t> mod_reports;
+        vector_t<rdb_modification_report_t> mod_reports;
         apply_item_pair(tokens.info->slice, superblock.get(),
             std::move(item.pairs[0]), &mod_reports, nullptr);
 
@@ -294,7 +294,7 @@ void apply_multi_key_item(
         size_t next_pair = 0;
         key_range_t::right_bound_t threshold(item.range.left);
         while (threshold != item.range.right) {
-            std::vector<rdb_modification_report_t> mod_reports;
+            vector_t<rdb_modification_report_t> mod_reports;
 
             /* Block until there's not too much unsaved data. Note that
             `MAX_CHANGES_PER_TXN` might be an overestimate, but that's OK. */
@@ -461,7 +461,7 @@ continue_bool_t store_t::receive_backfill(
                 const key_range_t::right_bound_t &progress,
                 scoped_ptr_t<txn_t> &&txn,
                 buf_lock_t &&sindex_block,
-                std::vector<rdb_modification_report_t> &&mod_reports) {
+                vector_t<rdb_modification_report_t> &&mod_reports) {
             /* Apply the modifications */
             if (!mod_reports.empty()) {
                 update_sindexes(txn.get(), &sindex_block, mod_reports, true);

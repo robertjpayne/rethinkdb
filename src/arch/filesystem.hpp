@@ -6,7 +6,7 @@
 #endif
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "errors.hpp"
 
@@ -21,7 +21,7 @@ std::string strdirname(const std::string path) {
     guarantee_xerr(!err, err, "_makepath_s failed");
     return ret;
 #else
-    std::vector<char> path_copy(path.begin(), path.end());
+    vector_t<char> path_copy(path.begin(), path.end());
     path_copy.push_back('\0');
     return ::dirname(path_copy.data());
 #endif

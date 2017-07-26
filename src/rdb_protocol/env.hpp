@@ -6,7 +6,7 @@
 #include <stack>
 #include <string>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "clustering/administration/auth/user_context.hpp"
 #include "concurrency/one_per_thread.hpp"

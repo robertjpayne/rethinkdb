@@ -32,7 +32,7 @@ permissions_artificial_table_backend_t::permissions_artificial_table_backend_t(
 bool permissions_artificial_table_backend_t::read_all_rows_as_vector(
         UNUSED auth::user_context_t const &user_context,
         UNUSED signal_t *interruptor,
-        std::vector<ql::datum_t> *rows_out,
+        vector_t<ql::datum_t> *rows_out,
         UNUSED admin_err_t *error_out) {
     rows_out->clear();
     on_thread_t on_thread(home_thread());

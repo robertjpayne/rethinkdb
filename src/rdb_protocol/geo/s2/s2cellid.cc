@@ -6,7 +6,7 @@
 
 #include <algorithm>
 #include <iomanip>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/geo/s2/base/integral_types.h"
 #include "rdb_protocol/geo/s2/base/logging.h"
@@ -22,7 +22,6 @@ using std::max;
 using std::swap;
 using std::reverse;
 using std::setprecision;
-using std::vector;
 
 
 // The following lookup tables are used to convert efficiently between an
@@ -422,7 +421,7 @@ void S2CellId::GetEdgeNeighbors(S2CellId neighbors[4]) const {
 }
 
 void S2CellId::AppendVertexNeighbors(int _level,
-                                     vector<S2CellId>* output) const {
+                                     vector_t<S2CellId>* output) const {
   // "level" must be strictly less than this cell's level so that we can
   // determine which vertex this cell is closest to.
   DCHECK_LT(_level, this->level());
@@ -463,7 +462,7 @@ void S2CellId::AppendVertexNeighbors(int _level,
 }
 
 void S2CellId::AppendAllNeighbors(int nbr_level,
-                                  vector<S2CellId>* output) const {
+                                  vector_t<S2CellId>* output) const {
   int i, j;
   int _face = ToFaceIJOrientation(&i, &j, NULL);
 

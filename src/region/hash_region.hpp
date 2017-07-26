@@ -5,7 +5,7 @@
 #include <inttypes.h>
 
 #include <algorithm>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "containers/archive/archive.hpp"
 #include "rpc/serialize_macros.hpp"
@@ -123,7 +123,7 @@ hash_region_t<inner_region_t> region_intersection(const hash_region_t<inner_regi
 }
 
 template <class inner_region_t>
-bool all_have_same_hash_interval(const std::vector< hash_region_t<inner_region_t> > &vec) {
+bool all_have_same_hash_interval(const vector_t< hash_region_t<inner_region_t> > &vec) {
     rassert(!vec.empty());
 
     for (int i = 1, e = vec.size(); i < e; ++i) {
@@ -135,7 +135,7 @@ bool all_have_same_hash_interval(const std::vector< hash_region_t<inner_region_t
 }
 
 template <class inner_region_t>
-bool all_have_same_inner(const std::vector< hash_region_t<inner_region_t> > &vec) {
+bool all_have_same_inner(const vector_t< hash_region_t<inner_region_t> > &vec) {
     rassert(!vec.empty());
     for (int i = 1, e = vec.size(); i < e; ++i) {
         if (vec[0].inner != vec[i].inner) {
@@ -147,7 +147,7 @@ bool all_have_same_inner(const std::vector< hash_region_t<inner_region_t> > &vec
 
 // Uh, yeah, this key_range_t dependency here is... fine.  Whatever.  A bit
 // convoluted in dependency order, we are.
-MUST_USE region_join_result_t region_join(const std::vector<hash_region_t<key_range_t> > &vec,
+MUST_USE region_join_result_t region_join(const vector_t<hash_region_t<key_range_t> > &vec,
                                           hash_region_t<key_range_t> *out);
 
 // hash_value must equal hash_region_hasher(key.contents(), key.size()).
@@ -169,15 +169,15 @@ hash_region_t<inner_region_t> drop_cpu_sharding(const hash_region_t<inner_region
 }
 
 template <class inner_region_t>
-std::vector< hash_region_t<inner_region_t> > region_subtract_many(const hash_region_t<inner_region_t> &minuend,
-                                                                  const std::vector< hash_region_t<inner_region_t> > &subtrahends) {
-    std::vector< hash_region_t<inner_region_t> > buf;
-    std::vector< hash_region_t<inner_region_t> > temp_result_buf;
+vector_t< hash_region_t<inner_region_t> > region_subtract_many(const hash_region_t<inner_region_t> &minuend,
+                                                                  const vector_t< hash_region_t<inner_region_t> > &subtrahends) {
+    vector_t< hash_region_t<inner_region_t> > buf;
+    vector_t< hash_region_t<inner_region_t> > temp_result_buf;
 
     buf.push_back(minuend);
 
-    for (typename std::vector<hash_region_t<inner_region_t> >::const_iterator s = subtrahends.begin(); s != subtrahends.end(); ++s) {
-        for (typename std::vector<hash_region_t<inner_region_t> >::const_iterator m = buf.begin(); m != buf.end(); ++m) {
+    for (typename vector_t<hash_region_t<inner_region_t> >::const_iterator s = subtrahends.begin(); s != subtrahends.end(); ++s) {
+        for (typename vector_t<hash_region_t<inner_region_t> >::const_iterator m = buf.begin(); m != buf.end(); ++m) {
             // Subtract s from m, push back onto temp_result_buf.
             // (See the "subtraction drawing" after this function.)
             // We first subtract the hash range of s from the one from m,
@@ -209,8 +209,8 @@ std::vector< hash_region_t<inner_region_t> > region_subtract_many(const hash_reg
 
             if (isect_beg < isect_end) {
                 // The hash intersection is non-empty. Add l and r if necessary.
-                const std::vector<inner_region_t> s_vec = {s->inner};
-                const std::vector<inner_region_t> lr_inner =
+                const vector_t<inner_region_t> s_vec = {s->inner};
+                const vector_t<inner_region_t> lr_inner =
                     region_subtract_many(m->inner, s_vec);
 
                 for (auto it = lr_inner.begin(); it != lr_inner.end(); ++it) {

@@ -4,7 +4,7 @@
 
 #include <pthread.h>
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "arch/runtime/event_queue.hpp"
 #include "arch/io/concurrency.hpp"
@@ -31,13 +31,13 @@ public:
 private:
     static void *event_loop(void*);
 
-    std::vector<pthread_t> threads;
+    vector_t<pthread_t> threads;
     bool shutting_down;
-    std::vector<job_t*> outstanding_requests;
+    vector_t<job_t*> outstanding_requests;
     system_mutex_t or_mutex;
     system_cond_t or_cond;
 
-    std::vector<job_t*> completed_events;
+    vector_t<job_t*> completed_events;
     linux_event_queue_t *queue;
     system_event_t ce_signal;
     system_mutex_t ce_mutex;

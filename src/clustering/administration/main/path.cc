@@ -21,7 +21,7 @@ path_t parse_as_path(const std::string &path) {
 
 std::string render_as_path(const path_t &path) {
     std::string res;
-    for (std::vector<std::string>::const_iterator it =  path.nodes.begin();
+    for (vector_t<std::string>::const_iterator it =  path.nodes.begin();
                                                   it != path.nodes.end();
                                                   ++it) {
         if (it != path.nodes.begin() || path.is_absolute) {

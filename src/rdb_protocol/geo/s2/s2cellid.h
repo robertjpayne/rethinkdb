@@ -7,7 +7,7 @@
 #include <functional>
 #include <iostream>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #ifndef SWIG
 #include <unordered_set>
@@ -23,7 +23,6 @@ namespace geo {
 using std::ostream;
 using std::cout;
 using std::endl;
-using std::vector;
 
 class S2LatLng;
 
@@ -257,7 +256,7 @@ class S2CellId {
   //
   // Requires: level < this->level(), so that we can determine which vertex is
   // closest (in particular, level == kMaxLevel is not allowed).
-  void AppendVertexNeighbors(int level, vector<S2CellId>* output) const;
+  void AppendVertexNeighbors(int level, vector_t<S2CellId>* output) const;
 
   // Append all neighbors of this cell at the given level to "output".  Two
   // cells X and Y are neighbors if their boundaries intersect but their
@@ -266,7 +265,7 @@ class S2CellId {
   //
   // Requires: nbr_level >= this->level().  Note that for cells adjacent to a
   // face vertex, the same neighbor may be appended more than once.
-  void AppendAllNeighbors(int nbr_level, vector<S2CellId>* output) const;
+  void AppendAllNeighbors(int nbr_level, vector_t<S2CellId>* output) const;
 
   /////////////////////////////////////////////////////////////////////
   // Low-level methods.

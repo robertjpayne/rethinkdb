@@ -7,7 +7,7 @@ TEST(DBMTest, ReadAheadInterval) {
     int64_t offset;
     int64_t end_offset;
 
-    std::vector<uint32_t> boundaries = { 0, 20, 40, 60, 80, 100 };
+    vector_t<uint32_t> boundaries = { 0, 20, 40, 60, 80, 100 };
 
     unaligned_read_ahead_interval(20, 20, 100, 60, boundaries, &offset, &end_offset);
     ASSERT_EQ(0, offset);

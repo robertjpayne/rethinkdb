@@ -191,7 +191,7 @@ void migrate_databases(const metadata_v1_16::cluster_semilattice_metadata_t &met
 
 ::branch_history_t migrate_branch_ids(
         const namespace_id_t &table_id,
-        const std::vector<regioned_version_t> &table_versions,
+        const vector_t<regioned_version_t> &table_versions,
         const metadata_v1_16::branch_history_t &branch_history,
         metadata_file_t::write_txn_t *out,
         signal_t *interruptor) {
@@ -266,7 +266,7 @@ void migrate_databases(const metadata_v1_16::cluster_semilattice_metadata_t &met
 // process of shutting down before the upgrade.
 template <typename... Args>
 multi_table_manager_timestamp_t max_versioned_timestamp(const versioned_t<Args> &...args) {
-    std::vector<time_t> times = { args.get_timestamp()... };
+    vector_t<time_t> times = { args.get_timestamp()... };
     time_t ts = *std::max_element(times.begin(), times.end());
 
     multi_table_manager_timestamp_t res;
@@ -413,7 +413,7 @@ void check_for_obsolete_sindexes(io_backender_t *io_backender,
                                               &file_opener, &dummy_stats));
                 merger_serializer_t merger_serializer(std::move(inner_serializer),
                                                       MERGER_SERIALIZER_MAX_ACTIVE_WRITES);
-                std::vector<serializer_t *> underlying({ &merger_serializer });
+                vector_t<serializer_t *> underlying({ &merger_serializer });
                 serializer_multiplexer_t multiplexer(underlying);
 
                 pmap(CPU_SHARDING_FACTOR, [&](int index) {
@@ -459,10 +459,10 @@ void migrate_tables(io_backender_t *io_backender,
                                               &file_opener, &dummy_stats));
                 merger_serializer_t merger_serializer(std::move(inner_serializer),
                                                       MERGER_SERIALIZER_MAX_ACTIVE_WRITES);
-                std::vector<serializer_t *> underlying({ &merger_serializer });
+                vector_t<serializer_t *> underlying({ &merger_serializer });
                 serializer_multiplexer_t multiplexer(underlying);
 
-                std::vector<regioned_version_t> table_versions;
+                vector_t<regioned_version_t> table_versions;
                 std::map<std::string, std::pair<sindex_config_t, sindex_status_t> > sindex_list;
 
                 pmap(CPU_SHARDING_FACTOR, [&](int index) {

@@ -312,7 +312,7 @@ template<class state_t>
 void raft_member_t<state_t>::check_invariants(
         const std::set<raft_member_t<state_t> *> &members) {
     /* We acquire each member's mutex to ensure we don't catch them in invalid states */
-    std::vector<scoped_ptr_t<new_mutex_acq_t> > mutex_acqs;
+    vector_t<scoped_ptr_t<new_mutex_acq_t> > mutex_acqs;
     for (raft_member_t<state_t> *member : members) {
         signal_timer_t timeout;
         timeout.start(10000);

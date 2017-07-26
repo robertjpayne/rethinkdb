@@ -20,7 +20,7 @@ changes it receives and their order. */
 class dummy_raft_state_t {
 public:
     typedef uuid_u change_t;
-    std::vector<uuid_u> state;
+    vector_t<uuid_u> state;
     void apply_change(const change_t &uuid) {
         state.push_back(uuid);
     }
@@ -54,7 +54,7 @@ public:
     dummy_raft_cluster_t(
         size_t num,
         const dummy_raft_state_t &initial_state,
-        std::vector<raft_member_id_t> *member_ids_out);
+        vector_t<raft_member_id_t> *member_ids_out);
     ~dummy_raft_cluster_t();
 
     /* `join()` adds a new member to the cluster. The caller is responsible for running a

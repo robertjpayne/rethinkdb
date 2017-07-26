@@ -3,7 +3,7 @@
 #define CLUSTERING_ADMINISTRATION_SERVERS_SERVER_STATUS_HPP_
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "clustering/administration/metadata.hpp"
 #include "clustering/administration/servers/server_common.hpp"

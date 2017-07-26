@@ -91,8 +91,8 @@ bool debug_stats_artificial_table_backend_t::stats_for_server(
     }
 
     /* Make a filter that includes everything */
-    std::set<std::vector<std::string> > filter;
-    filter.insert(std::vector<stat_manager_t::stat_id_t>());
+    std::set<vector_t<std::string> > filter;
+    filter.insert(vector_t<stat_manager_t::stat_id_t>());
 
     return fetch_stats_from_server(
         mailbox_manager,

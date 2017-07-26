@@ -4,7 +4,7 @@
 #define UTIL_GEOMETRY_S2LOOP_H__
 
 #include <map>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/geo/s2/base/logging.h"
 #include "rdb_protocol/geo/s2/base/macros.h"
@@ -16,7 +16,6 @@
 namespace geo {
 using std::map;
 using std::multimap;
-using std::vector;
 
 
 class S2Loop;
@@ -66,12 +65,12 @@ class S2Loop : public S2Region {
   S2Loop();
 
   // Convenience constructor that calls Init() with the given vertices.
-  explicit S2Loop(vector<S2Point> const& vertices);
+  explicit S2Loop(vector_t<S2Point> const& vertices);
 
   // Initialize a loop connecting the given vertices.  The last vertex is
   // implicitly connected to the first.  All points should be unit length.
   // Loops must have at least 3 vertices.
-  void Init(vector<S2Point> const& vertices);
+  void Init(vector_t<S2Point> const& vertices);
 
   // This parameter should be removed as soon as people stop using the
   // deprecated version of IsValid.
@@ -85,7 +84,7 @@ class S2Loop : public S2Region {
 
   // These two versions are deprecated and ignore max_adjacent.
   // DEPRECATED.
-  static bool IsValid(vector<S2Point> const& vertices, int max_adjacent);
+  static bool IsValid(vector_t<S2Point> const& vertices, int max_adjacent);
   // DEPRECATED.
   bool IsValid(int max_adjacent) const;
 

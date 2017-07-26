@@ -52,7 +52,7 @@ sindex_config_t sindex_config_from_string(
         base_exc_t::LOGIC,
         "Cannot create an sindex except from a reql_index_function returned from "
         "`index_status` in the field `function`.");
-    std::vector<char> vec(data + prefix_sz, data + sz);
+    vector_t<char> vec(data + prefix_sz, data + sz);
     sindex_disk_info_t sindex_info;
     try {
         deserialize_sindex_info(vec, &sindex_info,

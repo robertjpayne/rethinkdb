@@ -4,7 +4,7 @@
 
 #include <memory>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/artificial_table/caching_cfeed_backend.hpp"
 #include "clustering/administration/metadata.hpp"
@@ -34,7 +34,7 @@ public:
     bool read_all_rows_as_vector(
             auth::user_context_t const &user_context,
             signal_t *interruptor_on_caller,
-            std::vector<ql::datum_t> *rows_out,
+            vector_t<ql::datum_t> *rows_out,
             admin_err_t *error_out);
 
     bool read_row(
@@ -54,13 +54,13 @@ public:
 
 private:
     void get_peer_stats(const peer_id_t &peer,
-                        const std::set<std::vector<std::string> > &filter,
+                        const std::set<vector_t<std::string> > &filter,
                         ql::datum_t *result_out,
                         signal_t *interruptor_on_home);
 
-    void perform_stats_request(const std::vector<peer_id_t> &peers,
-                               const std::set<std::vector<std::string> > &filter,
-                               std::vector<ql::datum_t> *results_out,
+    void perform_stats_request(const vector_t<peer_id_t> &peers,
+                               const std::set<vector_t<std::string> > &filter,
+                               vector_t<ql::datum_t> *results_out,
                                signal_t *interruptor_on_home);
 
     clone_ptr_t<watchable_t<change_tracking_map_t<peer_id_t,

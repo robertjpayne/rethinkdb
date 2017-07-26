@@ -38,7 +38,7 @@ std::string stats_artificial_table_backend_t::get_primary_key_name() {
 // the behavior is undefined if `interruptor` is pulsed.
 void stats_artificial_table_backend_t::get_peer_stats(
         const peer_id_t &peer,
-        const std::set<std::vector<std::string> > &filter,
+        const std::set<vector_t<std::string> > &filter,
         ql::datum_t *result_out,
         signal_t *interruptor_on_home) {
     // Loop up peer in directory - find get stats mailbox
@@ -66,9 +66,9 @@ void stats_artificial_table_backend_t::get_peer_stats(
 }
 
 void stats_artificial_table_backend_t::perform_stats_request(
-        const std::vector<peer_id_t> &peers,
-        const std::set<std::vector<std::string> > &filter,
-        std::vector<ql::datum_t> *results_out,
+        const vector_t<peer_id_t> &peers,
+        const std::set<vector_t<std::string> > &filter,
+        vector_t<ql::datum_t> *results_out,
         signal_t *interruptor_on_home) {
     results_out->resize(peers.size());
     pmap(peers.size(),
@@ -89,7 +89,7 @@ void maybe_append_result(const stats_request_t &request,
                          server_config_client_t *server_config_client,
                          table_meta_client_t *table_meta_client,
                          admin_identifier_format_t admin_format,
-                         std::vector<ql::datum_t> *rows_out) {
+                         vector_t<ql::datum_t> *rows_out) {
     ql::datum_t row;
     if (request.to_datum(parsed_stats, metadata, server_config_client, table_meta_client,
             admin_format, &row)) {
@@ -100,7 +100,7 @@ void maybe_append_result(const stats_request_t &request,
 bool stats_artificial_table_backend_t::read_all_rows_as_vector(
         UNUSED auth::user_context_t const &user_context,
         signal_t *interruptor_on_caller,
-        std::vector<ql::datum_t> *rows_out,
+        vector_t<ql::datum_t> *rows_out,
         UNUSED admin_err_t *error_out) {
     cross_thread_signal_t interruptor_on_home(interruptor_on_caller, home_thread());
     on_thread_t rethreader(home_thread());
@@ -108,11 +108,11 @@ bool stats_artificial_table_backend_t::read_all_rows_as_vector(
 
     cluster_semilattice_metadata_t metadata = cluster_sl_view->get();
 
-    std::set<std::vector<std::string> > filter = stats_request_t::global_stats_filter();
-    std::vector<peer_id_t> peers =
+    std::set<vector_t<std::string> > filter = stats_request_t::global_stats_filter();
+    vector_t<peer_id_t> peers =
         stats_request_t::all_peers(directory_view->get().get_inner());
 
-    std::vector<ql::datum_t> results;
+    vector_t<ql::datum_t> results;
     perform_stats_request(peers, filter, &results, &interruptor_on_home);
     parsed_stats_t parsed_stats(results);
 
@@ -187,9 +187,9 @@ bool stats_artificial_table_backend_t::read_row(
         return true;
     }
 
-    std::vector<peer_id_t> peers = request->get_peers(
+    vector_t<peer_id_t> peers = request->get_peers(
         directory_view->get().get_inner(), server_config_client);
-    std::vector<ql::datum_t> results_map;
+    vector_t<ql::datum_t> results_map;
     perform_stats_request(
         peers, request->get_filter(), &results_map, &interruptor_on_home);
     parsed_stats_t parsed_stats(results_map);

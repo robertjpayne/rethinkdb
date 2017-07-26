@@ -5,7 +5,7 @@
 #include <functional>
 #include <set>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "containers/scoped.hpp"
 
@@ -21,12 +21,12 @@ void run_with_namespace_interface(
         std::function<void(
             namespace_interface_t *,
             order_source_t *,
-            const std::vector<scoped_ptr_t<store_t> > *)> fun,
+            const vector_t<scoped_ptr_t<store_t> > *)> fun,
         bool oversharding = false,
         int num_restarts = 1);
 
 void wait_for_sindex(
-    const std::vector<scoped_ptr_t<store_t> > *stores,
+    const vector_t<scoped_ptr_t<store_t> > *stores,
     const std::string &id);
 
 } /* namespace unittest */

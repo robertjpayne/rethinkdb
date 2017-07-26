@@ -23,7 +23,7 @@
 #include <set>
 #include <stdexcept>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "arch/compiler.hpp"
 #include "config/args.hpp"
@@ -557,6 +557,6 @@ private:
     auto_drainer_t drainer;
 };
 
-std::vector<std::string> get_ips();
+vector_t<std::string> get_ips();
 
 #endif // ARCH_IO_NETWORK_HPP_

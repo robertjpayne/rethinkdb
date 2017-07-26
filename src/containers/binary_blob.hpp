@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "containers/archive/archive.hpp"
 #include "rpc/serialize_macros.hpp"
@@ -49,7 +49,7 @@ public:
     }
 
 private:
-    std::vector<uint8_t> storage;
+    vector_t<uint8_t> storage;
 };
 
 inline bool operator==(const binary_blob_t &left, const binary_blob_t &right) {

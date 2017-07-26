@@ -5,7 +5,7 @@
 #include <poll.h>
 
 #include <map>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "arch/runtime/event_queue_types.hpp"
 #include "arch/runtime/runtime_utils.hpp"
@@ -29,7 +29,7 @@ public:
 private:
     linux_queue_parent_t *parent;
 
-    std::vector<pollfd> watched_fds;
+    vector_t<pollfd> watched_fds;
     std::map<fd_t, linux_event_callback_t *> callbacks;
 
     DISABLE_COPYING(poll_event_queue_t);

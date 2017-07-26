@@ -3,7 +3,7 @@
 #define BUFFER_CACHE_ALT_HPP_
 
 #include <map>
-#include <vector>
+#include "containers/vector.hpp"
 #include <utility>
 
 #include "buffer_cache/page_cache.hpp"

@@ -64,7 +64,7 @@ continue_bool_t store_t::send_backfill_pre(
     start timestamps for different regions. But `btree_send_backfill_pre()` expects a
     single homogeneous timestamp. So we have to do each sub-region of `start_point`
     individually. */
-    std::vector<std::pair<key_range_t, repli_timestamp_t> > reference_timestamps;
+    vector_t<std::pair<key_range_t, repli_timestamp_t> > reference_timestamps;
     start_point.visit(
         start_point.get_domain(),
             [&](const region_t &sp_region, const state_timestamp_t &tstamp) {
@@ -177,7 +177,7 @@ public:
             buf_parent_t parent,
             const void *value_in_leaf_node,
             UNUSED signal_t *interruptor2,
-            std::vector<char> *value_out) {
+            vector_t<char> *value_out) {
         const rdb_value_t *v =
             static_cast<const rdb_value_t *>(value_in_leaf_node);
         rdb_blob_wrapper_t blob_wrapper(
@@ -229,7 +229,7 @@ continue_bool_t store_t::send_backfill(
     /* Just like in `send_backfill_pre()`, we first break `start_point` up into regions
     with homogeneous start timestamps, then backfill each region as a series of multiple
     B-tree transactions to avoid holding the superblock too long. */
-    std::vector<std::pair<key_range_t, repli_timestamp_t> > reference_timestamps;
+    vector_t<std::pair<key_range_t, repli_timestamp_t> > reference_timestamps;
     start_point.visit(
         start_point.get_domain(),
         [&](const region_t &sp_region, const state_timestamp_t &tstamp) {

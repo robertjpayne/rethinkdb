@@ -3,13 +3,12 @@
 #include <stdarg.h> // For va_list and related operations
 #include <stdio.h> // MSVC requires this for _vsnprintf
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/geo/s2/base/stringprintf.h"
 #include "rdb_protocol/geo/s2/base/logging.h"
 
 namespace geo {
-using std::vector;
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push

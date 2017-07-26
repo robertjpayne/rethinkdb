@@ -2,7 +2,7 @@
 #ifndef CONTAINERS_LAZY_ERASE_VECTOR_HPP_
 #define CONTAINERS_LAZY_ERASE_VECTOR_HPP_
 
-#include <vector>
+#include "containers/vector.hpp"
 
 /* lazy_erase_vector_t is like an std::vector, except that it offers an erase_front()
 operation that batches small deletions together to be a bit more efficient.
@@ -41,7 +41,7 @@ public:
     }
 
 private:
-    std::vector<type_t> vec_;
+    vector_t<type_t> vec_;
     // This many elements have been erased from the front of `vec`
     size_t erased_offset_;
     // Actually erase from vec_ once erased_offset_ becomes larger than this.

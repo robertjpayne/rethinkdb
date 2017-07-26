@@ -4,7 +4,7 @@
 
 #include <memory>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "clustering/administration/metadata.hpp"
 #include "clustering/table_manager/table_meta_client.hpp"

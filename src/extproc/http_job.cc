@@ -456,7 +456,7 @@ void transfer_url_opt(const std::string &url,
     exc_setopt(curl_handle, CURLOPT_URL, full_url.c_str(), "URL");
 }
 
-void transfer_header_opt(const std::vector<std::string> &header,
+void transfer_header_opt(const vector_t<std::string> &header,
                          CURL *curl_handle,
                          curl_data_t *curl_data) {
     for (auto it = header.begin(); it != header.end(); ++it) {
@@ -484,7 +484,7 @@ void transfer_verify_opt(bool verify, CURL *curl_handle) {
     exc_setopt(curl_handle, CURLOPT_SSL_VERIFYHOST, val, "SSL VERIFY HOST");
 }
 
-void transfer_cookies(const std::vector<std::string> &cookies, CURL *curl_handle) {
+void transfer_cookies(const vector_t<std::string> &cookies, CURL *curl_handle) {
     for (auto const &cookie : cookies) {
         exc_setopt(curl_handle, CURLOPT_COOKIELIST, cookie.c_str(), "COOKIELIST");
     }

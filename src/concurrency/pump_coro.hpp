@@ -4,7 +4,7 @@
 
 #include <functional>
 #include <map>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "concurrency/auto_drainer.hpp"
 #include "concurrency/mutex_assertion.hpp"

@@ -275,7 +275,7 @@ void store_t::reset_data(
         cond_t non_interruptor;
 
         rdb_live_deletion_context_t deletion_context;
-        std::vector<rdb_modification_report_t> mod_reports;
+        vector_t<rdb_modification_report_t> mod_reports;
         key_range_t deleted_range;
         done_erasing = rdb_erase_small_range(btree.get(),
                                              &key_tester,
@@ -548,7 +548,7 @@ void store_t::emergency_deregister_sindex_queue(
 void store_t::update_sindexes(
             txn_t *txn,
             buf_lock_t *sindex_block,
-            const std::vector<rdb_modification_report_t> &mod_reports,
+            const vector_t<rdb_modification_report_t> &mod_reports,
             bool release_sindex_block) {
     new_mutex_in_line_t acq = get_in_line_for_sindex_queue(sindex_block);
     {
@@ -589,7 +589,7 @@ void store_t::sindex_queue_push(const rdb_modification_report_t &mod_report,
 }
 
 void store_t::sindex_queue_push(
-        const std::vector<rdb_modification_report_t> &mod_reports,
+        const vector_t<rdb_modification_report_t> &mod_reports,
         const new_mutex_in_line_t *acq) {
     assert_thread();
     acq->acq_signal()->wait_lazily_unordered();
@@ -623,7 +623,7 @@ microtime_t store_t::get_sindex_start_time(uuid_u const &id) {
 
 optional<uuid_u> store_t::add_sindex_internal(
         const sindex_name_t &name,
-        const std::vector<char> &opaque_definition,
+        const vector_t<char> &opaque_definition,
         buf_lock_t *sindex_block) {
     secondary_index_t sindex;
     if (::get_secondary_index(sindex_block, name, &sindex)) {
@@ -689,7 +689,7 @@ public:
             return continue_bool_t::CONTINUE;
         }
     }
-    const std::vector<store_key_t> &get_keys() const {
+    const vector_t<store_key_t> &get_keys() const {
         return collected_keys;
     }
     store_key_t get_last_traversed_key() const {
@@ -698,7 +698,7 @@ public:
     static const size_t CHUNK_SIZE = 32;
 private:
     key_range_t pkey_range;
-    std::vector<store_key_t> collected_keys;
+    vector_t<store_key_t> collected_keys;
     size_t num_traversed;
     store_key_t last_traversed_key;
 };
@@ -778,7 +778,7 @@ void store_t::clear_sindex_data(
             store_key_t());
 
         /* 2. Actually delete them */
-        const std::vector<store_key_t> &keys = traversal_cb.get_keys();
+        const vector_t<store_key_t> &keys = traversal_cb.get_keys();
         for (size_t i = 0; i < keys.size(); ++i) {
             promise_t<superblock_t *> superblock_promise;
             {
@@ -918,8 +918,8 @@ void store_t::drop_sindex(uuid_u sindex_id) THROWS_NOTHING {
     txn->commit();
 }
 
-bool secondary_indexes_are_equivalent(const std::vector<char> &left,
-                                      const std::vector<char> &right) {
+bool secondary_indexes_are_equivalent(const vector_t<char> &left,
+                                      const vector_t<char> &right) {
     sindex_disk_info_t sindex_info_left;
     sindex_disk_info_t sindex_info_right;
     deserialize_sindex_info_or_crash(left, &sindex_info_left);
@@ -1018,7 +1018,7 @@ MUST_USE bool store_t::acquire_sindex_superblock_for_read(
         const std::string &table_name,
         real_superblock_t *superblock,
         scoped_ptr_t<sindex_superblock_t> *sindex_sb_out,
-        std::vector<char> *opaque_definition_out,
+        vector_t<char> *opaque_definition_out,
         uuid_u *sindex_uuid_out)
     THROWS_ONLY(sindex_not_ready_exc_t) {
     assert_thread();

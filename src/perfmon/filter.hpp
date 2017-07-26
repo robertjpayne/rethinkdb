@@ -4,7 +4,7 @@
 
 #include <set>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include <re2/re2.h>
 
@@ -16,12 +16,12 @@ template <class> class scoped_ptr_t;
 
 class perfmon_filter_t {
 public:
-    explicit perfmon_filter_t(const std::set<std::vector<std::string> > &paths);
+    explicit perfmon_filter_t(const std::set<vector_t<std::string> > &paths);
     ql::datum_t filter(const ql::datum_t &stats) const;
 private:
     ql::datum_t subfilter(const ql::datum_t &stats,
-                          size_t depth, std::vector<bool> active) const;
-    std::vector<std::vector<scoped_ptr_t<RE2> > > regexps; //regexps[PATH][DEPTH]
+                          size_t depth, vector_t<bool> active) const;
+    vector_t<vector_t<scoped_ptr_t<RE2> > > regexps; //regexps[PATH][DEPTH]
     DISABLE_COPYING(perfmon_filter_t);
 };
 

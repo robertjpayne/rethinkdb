@@ -9,7 +9,7 @@
 #include <set>
 #include <string>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "cjson/json.hpp"
 #include "containers/archive/archive.hpp"
@@ -195,21 +195,21 @@ public:
     explicit datum_t(datum_string_t _str);
     explicit datum_t(const std::string &string);
     explicit datum_t(const char *cstr);
-    explicit datum_t(std::vector<datum_t> &&_array,
+    explicit datum_t(vector_t<datum_t> &&_array,
                      const configured_limits_t &limits);
 
     enum class no_array_size_limit_check_t { };
     // Constructs a datum_t without checking the array size.  Used by
     // datum_array_builder_t to maintain identical non-checking behavior with insert
     // and splice operations -- see https://github.com/rethinkdb/rethinkdb/issues/2697
-    datum_t(std::vector<datum_t> &&_array,
+    datum_t(vector_t<datum_t> &&_array,
             no_array_size_limit_check_t);
     // This calls maybe_sanitize_ptype(allowed_pts).
     // The complexity of this constructor is O(object.size()).
     explicit datum_t(std::map<datum_string_t, datum_t> &&object,
                      const std::set<std::string> &allowed_pts = _allowed_pts);
     // This calls maybe_sanitize_ptype(allowed_pts).
-    explicit datum_t(std::vector<std::pair<datum_string_t, datum_t> > &&object,
+    explicit datum_t(vector_t<std::pair<datum_string_t, datum_t> > &&object,
                      const std::set<std::string> &allowed_pts = _allowed_pts);
 
     enum class no_sanitize_ptype_t { };
@@ -368,7 +368,7 @@ private:
     // The key must already exist.
     void replace_field(const datum_string_t &key, datum_t val);
 
-    static std::vector<std::pair<datum_string_t, datum_t> > to_sorted_vec(
+    static vector_t<std::pair<datum_string_t, datum_t> > to_sorted_vec(
             std::map<datum_string_t, datum_t> &&map);
 
     template <class json_writer_t>
@@ -432,9 +432,9 @@ private:
         explicit data_wrapper_t(double num);
         explicit data_wrapper_t(datum_string_t str);
         explicit data_wrapper_t(const char *cstr);
-        explicit data_wrapper_t(std::vector<datum_t> &&array);
+        explicit data_wrapper_t(vector_t<datum_t> &&array);
         explicit data_wrapper_t(
-                std::vector<std::pair<datum_string_t, datum_t> > &&object);
+                vector_t<std::pair<datum_string_t, datum_t> > &&object);
         data_wrapper_t(type_t type, shared_buf_ref_t<char> &&_buf_ref);
 
         ~data_wrapper_t();
@@ -446,8 +446,8 @@ private:
             bool r_bool;
             double r_num;
             datum_string_t r_str;
-            counted_t<countable_wrapper_t<std::vector<datum_t> > > r_array;
-            counted_t<countable_wrapper_t<std::vector< //NOLINT(whitespace/operators)
+            counted_t<countable_wrapper_t<vector_t<datum_t> > > r_array;
+            counted_t<countable_wrapper_t<vector_t< //NOLINT(whitespace/operators)
                 std::pair<datum_string_t, datum_t> > > > r_object;
             shared_buf_ref_t<char> buf_ref;
         };
@@ -555,7 +555,7 @@ public:
     datum_t to_datum() RVALUE_THIS;
 
 private:
-    std::vector<datum_t> vector;
+    vector_t<datum_t> vector;
     configured_limits_t limits;
 
     DISABLE_COPYING(datum_array_builder_t);

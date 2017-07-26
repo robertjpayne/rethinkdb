@@ -1,6 +1,6 @@
 // Copyright 2010-2014 RethinkDB, all rights reserved.
 #include <functional>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "arch/io/disk/conflict_resolving.hpp"
 #include "arch/io/disk/accounting.hpp"
@@ -25,10 +25,10 @@ struct test_driver_t {
 
     // We avoid deallocating actions during the test to make sure that each action
     // has a unique pointer value.
-    std::vector<scoped_ptr_t<action_t> > allocated_actions;
+    vector_t<scoped_ptr_t<action_t> > allocated_actions;
 
     std::set<accounting_diskmgr_action_t *> running_actions;
-    std::vector<char> data;
+    vector_t<char> data;
 
     conflict_resolving_diskmgr_t conflict_resolver;
 
@@ -169,7 +169,7 @@ struct write_test_t {
 
     test_driver_t *driver;
     int64_t offset;
-    std::vector<char> data;
+    vector_t<char> data;
     test_driver_t::action_t *action;
 
     bool was_sent() {

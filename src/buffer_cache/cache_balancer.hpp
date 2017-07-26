@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <set>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "errors.hpp"
 #include "time.hpp"
@@ -147,11 +147,11 @@ private:
     // Helper function to collect stats from each thread so we don't need
     //  atomic variables slowing down normal operations
     void collect_stats_from_thread(int index,
-                                   scoped_array_t<std::vector<cache_data_t> > *data_out,
+                                   scoped_array_t<vector_t<cache_data_t> > *data_out,
                                    scoped_array_t<bool> *zero_access_counts_out);
     // Helper function that rebalances all the shards on a given thread
     void apply_rebalance_to_thread(int index,
-                                   const scoped_array_t<std::vector<cache_data_t> > *new_sizes,
+                                   const scoped_array_t<vector_t<cache_data_t> > *new_sizes,
                                    bool new_read_ahead_ok);
 
     clone_ptr_t<watchable_t<uint64_t> > total_cache_size_watchable;

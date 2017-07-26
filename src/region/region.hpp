@@ -1,7 +1,7 @@
 #ifndef REGION_REGION_HPP_
 #define REGION_REGION_HPP_
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "btree/keys.hpp"
 #include "region/hash_region.hpp"
@@ -25,8 +25,8 @@ inline bool region_overlaps(const key_range_t &r1, const key_range_t &r2) THROWS
     return r1.overlaps(r2);
 }
 
-MUST_USE region_join_result_t region_join(const std::vector<key_range_t> &vec, key_range_t *out) THROWS_NOTHING;
+MUST_USE region_join_result_t region_join(const vector_t<key_range_t> &vec, key_range_t *out) THROWS_NOTHING;
 
-std::vector<key_range_t> region_subtract_many(key_range_t a, const std::vector<key_range_t>& b);
+vector_t<key_range_t> region_subtract_many(key_range_t a, const vector_t<key_range_t>& b);
 
 #endif  // REGION_REGION_HPP_

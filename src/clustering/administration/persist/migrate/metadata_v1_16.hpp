@@ -5,7 +5,7 @@
 #include <map>
 #include <set>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "btree/keys.hpp"
 #include "buffer_cache/types.hpp"
@@ -100,7 +100,7 @@ struct write_ack_config_t {
         mode_t mode;   /* must not be `complex` */
     };
     mode_t mode;
-    std::vector<req_t> complex_reqs; /* `complex_reqs` must be empty unless `mode` is `complex`. */
+    vector_t<req_t> complex_reqs; /* `complex_reqs` must be empty unless `mode` is `complex`. */
 };
 
 ARCHIVE_PRIM_MAKE_RANGED_SERIALIZABLE(write_ack_config_t::mode_t, int8_t,
@@ -116,7 +116,7 @@ struct table_config_t {
         std::set<server_id_t> replicas;
         server_id_t primary_replica;
     };
-    std::vector<shard_t> shards;
+    vector_t<shard_t> shards;
     write_ack_config_t write_ack_config;
     ::write_durability_t durability;
 };
@@ -130,7 +130,7 @@ struct table_shard_scheme_t {
     size_t num_shards() const;
     key_range_t get_shard_range(size_t i) const;
 
-    std::vector<store_key_t> split_points;
+    vector_t<store_key_t> split_points;
 };
 
 RDB_DECLARE_SERIALIZABLE(table_shard_scheme_t);

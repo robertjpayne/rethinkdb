@@ -741,7 +741,7 @@ void rdb_r_unshard_visitor_t::operator()(const changefeed_subscribe_t &) {
 
 void rdb_r_unshard_visitor_t::operator()(const changefeed_limit_subscribe_t &) {
     int64_t shards = 0;
-    std::vector<ql::changefeed::server_t::limit_addr_t> limit_addrs;
+    vector_t<ql::changefeed::server_t::limit_addr_t> limit_addrs;
     for (size_t i = 0; i < count; ++i) {
         auto res = boost::get<changefeed_limit_subscribe_response_t>(
             &responses[i].response);
@@ -759,7 +759,7 @@ void rdb_r_unshard_visitor_t::operator()(const changefeed_limit_subscribe_t &) {
         changefeed_limit_subscribe_response_t(shards, std::move(limit_addrs));
 }
 
-void unshard_stamps(const std::vector<changefeed_stamp_response_t *> &resps,
+void unshard_stamps(const vector_t<changefeed_stamp_response_t *> &resps,
                     changefeed_stamp_response_t *out) {
     out->stamp_infos.set(std::map<uuid_u, shard_stamp_info_t>());
     for (auto &&resp : resps) {
@@ -786,7 +786,7 @@ void rdb_r_unshard_visitor_t::operator()(const changefeed_stamp_t &) {
     response_out->response = changefeed_stamp_response_t();
     auto *out = boost::get<changefeed_stamp_response_t>(&response_out->response);
     guarantee(out != nullptr);
-    std::vector<changefeed_stamp_response_t *> resps;
+    vector_t<changefeed_stamp_response_t *> resps;
     resps.reserve(count);
     for (size_t i = 0; i < count; ++i) {
         auto *resp = boost::get<changefeed_stamp_response_t>(&responses[i].response);
@@ -822,7 +822,7 @@ void rdb_r_unshard_visitor_t::operator()(const nearest_geo_read_t &query) {
         nearest_geo_read_response_t::result_t::const_iterator it;
         nearest_geo_read_response_t::result_t::const_iterator end;
     };
-    std::vector<iter_range_t> iters;
+    vector_t<iter_range_t> iters;
     iters.reserve(count);
     uint64_t total_size = 0;
     for (size_t i = 0; i < count; ++i) {
@@ -901,8 +901,8 @@ void rdb_r_unshard_visitor_t::unshard_range_batch(const query_t &q, sorting_t so
     out->reql_version = reql_version_t::EARLIEST;
 
     // Fill in `truncated` and `last_key`, get responses, abort if there's an error.
-    std::vector<ql::result_t *> results(count);
-    std::vector<changefeed_stamp_response_t *> stamp_resps(count);
+    vector_t<ql::result_t *> results(count);
+    vector_t<changefeed_stamp_response_t *> stamp_resps(count);
     key_le_t key_le(sorting);
     for (size_t i = 0; i < count; ++i) {
         auto resp = boost::get<query_response_t>(&responses[i].response);
@@ -958,7 +958,7 @@ void rdb_r_unshard_visitor_t::unshard_range_batch(const query_t &q, sorting_t so
 void rdb_r_unshard_visitor_t::operator()(const distribution_read_t &dg) {
     // TODO: do this without copying so much and/or without dynamic memory
     // Sort results by region
-    std::vector<distribution_read_response_t> results(count);
+    vector_t<distribution_read_response_t> results(count);
     guarantee(count > 0);
 
     for (size_t i = 0; i < count; ++i) {
@@ -1112,7 +1112,7 @@ bool read_t::route_to_primary() const THROWS_NOTHING {
 
 // TODO: This entire type is suspect, given the performance for
 // batched_replaces_t.  Is it used in anything other than assertions?
-region_t region_from_keys(const std::vector<store_key_t> &keys) {
+region_t region_from_keys(const vector_t<store_key_t> &keys) {
     // It shouldn't be empty, but we let the places that would break use a
     // guarantee.
     rassert(!keys.empty());
@@ -1153,7 +1153,7 @@ struct rdb_w_get_region_visitor : public boost::static_visitor<region_t> {
         return region_from_keys(br.keys);
     }
     region_t operator()(const batched_insert_t &bi) const {
-        std::vector<store_key_t> keys;
+        vector_t<store_key_t> keys;
         keys.reserve(bi.inserts.size());
         for (auto it = bi.inserts.begin(); it != bi.inserts.end(); ++it) {
             keys.emplace_back((*it).get_field(datum_string_t(bi.pkey)).print_primary());
@@ -1214,7 +1214,7 @@ struct rdb_w_shard_visitor_t : public boost::static_visitor<bool> {
     }
 
     bool operator()(const batched_replace_t &br) const {
-        std::vector<store_key_t> shard_keys;
+        vector_t<store_key_t> shard_keys;
         for (auto it = br.keys.begin(); it != br.keys.end(); ++it) {
             if (region_contains_key(*region, *it)) {
                 shard_keys.push_back(*it);
@@ -1239,7 +1239,7 @@ struct rdb_w_shard_visitor_t : public boost::static_visitor<bool> {
     }
 
     bool operator()(const batched_insert_t &bi) const {
-        std::vector<ql::datum_t> shard_inserts;
+        vector_t<ql::datum_t> shard_inserts;
         for (auto it = bi.inserts.begin(); it != bi.inserts.end(); ++it) {
             store_key_t key((*it).get_field(datum_string_t(bi.pkey)).print_primary());
             if (region_contains_key(*region, key)) {
@@ -1315,7 +1315,7 @@ bool write_t::shard(const region_t &region,
 }
 
 batched_insert_t::batched_insert_t(
-        std::vector<ql::datum_t> &&_inserts,
+        vector_t<ql::datum_t> &&_inserts,
         const std::string &_pkey,
         const optional<counted_t<const ql::func_t> > &_write_hook,
         conflict_behavior_t _conflict_behavior,

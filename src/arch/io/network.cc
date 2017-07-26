@@ -1741,8 +1741,8 @@ signal_t *linux_repeated_nonthrowing_tcp_listener_t::get_bound_signal() {
     return &bound_cond;
 }
 
-std::vector<std::string> get_ips() {
-    std::vector<std::string> ret;
+vector_t<std::string> get_ips() {
+    vector_t<std::string> ret;
 
 #ifdef _WIN32
     const ULONG SIZE_INCREMENT = 15000;

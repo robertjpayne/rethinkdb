@@ -26,7 +26,7 @@ archive_result_t deserialize_universal(read_stream_t *s, std::string *out) {
 
     // Unfortunately we have to do an extra copy before dumping data
     // into a std::string.
-    std::vector<char> v(sz);
+    vector_t<char> v(sz);
 
     int64_t num_read = force_read(s, v.data(), sz);
     if (num_read == -1) {

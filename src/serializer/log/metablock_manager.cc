@@ -11,8 +11,8 @@
 #include "serializer/log/log_serializer.hpp"
 #include "version.hpp"
 
-std::vector<int64_t> initial_metablock_offsets(int64_t extent_size) {
-    std::vector<int64_t> offsets;
+vector_t<int64_t> initial_metablock_offsets(int64_t extent_size) {
+    vector_t<int64_t> offsets;
 
     const int64_t metablocks_per_extent = std::min<int64_t>(extent_size / METABLOCK_SIZE, MB_BLOCKS_PER_EXTENT);
 
@@ -89,7 +89,7 @@ metablock_manager_t<metablock_t>::~metablock_manager_t() {
 template<class metablock_t>
 void metablock_manager_t<metablock_t>::create(file_t *dbfile, int64_t extent_size, metablock_t *initial) {
 
-    std::vector<int64_t> metablock_offsets = initial_metablock_offsets(extent_size);
+    vector_t<int64_t> metablock_offsets = initial_metablock_offsets(extent_size);
 
     dbfile->set_file_size_at_least(metablock_offsets[metablock_offsets.size() - 1] + METABLOCK_SIZE,
                                    extent_size);

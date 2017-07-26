@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <set>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/geo/s2/base/basictypes.h"
 #include "rdb_protocol/geo/s2/base/scoped_ptr.h"
@@ -20,7 +20,6 @@ using std::set;
 using std::multiset;
 using std::pair;
 using std::make_pair;
-using std::vector;
 
 
 class S2Loop;
@@ -195,7 +194,7 @@ class S2PolygonBuilder {
   void AddPolygon(S2Polygon const* polygon);
 
   // This type is used to return any edges that could not be assembled.
-  typedef vector<pair<S2Point, S2Point> > EdgeList;
+  typedef vector_t<pair<S2Point, S2Point> > EdgeList;
 
   // Assembles the given edges into as many non-crossing loops as possible.
   // When there is a choice about how to assemble the loops, then CCW loops
@@ -209,7 +208,7 @@ class S2PolygonBuilder {
   // not be able to assemble all loops due to its preference for CCW loops.
   //
   // This method resets the S2PolygonBuilder state so that it can be reused.
-  bool AssembleLoops(vector<S2Loop*>* loops, EdgeList* unused_edges);
+  bool AssembleLoops(vector_t<S2Loop*>* loops, EdgeList* unused_edges);
 
   // Like AssembleLoops, but normalizes all the loops so that they enclose
   // less than half the sphere, and then assembles the loops into a polygon.
@@ -286,7 +285,7 @@ class S2PolygonBuilder {
 
   // Unique collection of the starting (first) vertex of all edges,
   // in the order they are added to edges_.
-  vector<S2Point> starting_vertices_;
+  vector_t<S2Point> starting_vertices_;
 };
 
 inline S2PolygonBuilderOptions S2PolygonBuilderOptions::DIRECTED_XOR() {

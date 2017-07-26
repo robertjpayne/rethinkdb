@@ -42,7 +42,7 @@ TPTEST(BTreeSindex, LowLevelOps) {
             buf_lock_t sb_lock(&txn, SUPERBLOCK_ID, alt_create_t::create);
             real_superblock_t superblock(std::move(sb_lock));
             btree_slice_t::init_real_superblock(
-                &superblock, std::vector<char>(), binary_blob_t());
+                &superblock, vector_t<char>(), binary_blob_t());
         }
         txn.commit();
     }
@@ -197,7 +197,7 @@ TPTEST(BTreeSindex, BtreeStoreAPI) {
                     access_t::write);
 
                 index_id = store.add_sindex_internal(
-                    name, std::vector<char>(), &sindex_block);
+                    name, vector_t<char>(), &sindex_block);
                 guarantee(index_id);
             }
             txn->commit();
@@ -285,7 +285,7 @@ TPTEST(BTreeSindex, BtreeStoreAPI) {
                     &dummy_interruptor, true);
 
             {
-                std::vector<char> opaque_definition;
+                vector_t<char> opaque_definition;
                 bool sindex_exists = store.acquire_sindex_superblock_for_read(
                         name,
                         "",

@@ -26,7 +26,7 @@ std::string cluster_config_artificial_table_backend_t::get_primary_key_name() {
 bool cluster_config_artificial_table_backend_t::read_all_rows_as_vector(
         UNUSED auth::user_context_t const &user_context,
         signal_t *interruptor,
-        std::vector<ql::datum_t> *rows_out,
+        vector_t<ql::datum_t> *rows_out,
         admin_err_t *error_out) {
     rows_out->clear();
 

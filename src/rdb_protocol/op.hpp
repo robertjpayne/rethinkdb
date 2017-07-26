@@ -7,7 +7,7 @@
 #include <map>
 #include <string>
 #include <set>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/env.hpp"
 #include "rdb_protocol/error.hpp"
@@ -76,7 +76,7 @@ class op_term_t;
 
 class argvec_t {
 public:
-    explicit argvec_t(std::vector<counted_t<const runtime_term_t> > &&v);
+    explicit argvec_t(vector_t<counted_t<const runtime_term_t> > &&v);
     // Retrieves the arg.  The arg is removed (leaving an empty pointer in its
     // slot), forcing you to call this function exactly once per argument.
     MUST_USE counted_t<const runtime_term_t> remove(size_t i);
@@ -84,7 +84,7 @@ public:
     size_t size() const { return vec.size(); }
     bool empty() const { return vec.empty(); }
 private:
-    std::vector<counted_t<const runtime_term_t> > vec;
+    vector_t<counted_t<const runtime_term_t> > vec;
 };
 
 class args_t {
@@ -138,7 +138,7 @@ protected:
     // a subclass).
     virtual void accumulate_captures(var_captures_t *captures) const;
 
-    const std::vector<counted_t<const term_t> > &get_original_args() const;
+    const vector_t<counted_t<const term_t> > &get_original_args() const;
 
     virtual deterministic_t is_deterministic() const;
 

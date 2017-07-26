@@ -211,7 +211,7 @@ void server_config_client_t::on_directory_change(
         }
         peer_to_server_map.delete_key(peer_id);
         server_to_peer_map.delete_key(*server_id);
-        std::vector<std::pair<server_id_t, server_id_t> > connection_pairs_to_delete;
+        vector_t<std::pair<server_id_t, server_id_t> > connection_pairs_to_delete;
         connections_map.read_all(
         [&](const std::pair<server_id_t, server_id_t> &pair, const empty_value_t *) {
             if (pair.first == *server_id) {

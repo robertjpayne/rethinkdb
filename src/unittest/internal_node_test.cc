@@ -1,6 +1,6 @@
 // Copyright 2010-2013 RethinkDB, all rights reserved.
 #include <algorithm>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "unittest/gtest.hpp"
 
@@ -22,11 +22,11 @@ void verify(block_size_t block_size, const internal_node_t *buf) {
     ASSERT_LE(offsetof(internal_node_t, pair_offsets) + sizeof(*buf->pair_offsets) * buf->npairs, buf->frontmost_offset);
     ASSERT_LE(buf->frontmost_offset, block_size.value());
 
-    std::vector<uint16_t> offsets(buf->pair_offsets, buf->pair_offsets + buf->npairs);
+    vector_t<uint16_t> offsets(buf->pair_offsets, buf->pair_offsets + buf->npairs);
     std::sort(offsets.begin(), offsets.end());
 
     uint16_t expected = buf->frontmost_offset;
-    for (std::vector<uint16_t>::const_iterator p = offsets.begin(), e = offsets.end(); p < e; ++p) {
+    for (vector_t<uint16_t>::const_iterator p = offsets.begin(), e = offsets.end(); p < e; ++p) {
         ASSERT_LE(expected, block_size.value());
         ASSERT_EQ(expected, *p);
         expected += internal_node::pair_size(internal_node::get_pair(buf, *p));

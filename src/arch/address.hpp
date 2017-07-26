@@ -16,7 +16,7 @@
 #include <algorithm>
 #include <string>
 #include <set>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "containers/archive/archive.hpp"
 #include "containers/archive/stl_types.hpp"
@@ -218,7 +218,7 @@ public:
         return erased;
     }
     size_t size() const { return vec.size(); }
-    typedef std::vector<peer_address_t>::const_iterator iterator;
+    typedef vector_t<peer_address_t>::const_iterator iterator;
     iterator begin() const { return vec.begin(); }
     iterator end() const { return vec.end(); }
     iterator find(const peer_address_t &addr) const {
@@ -230,7 +230,7 @@ public:
     }
     bool empty() const { return vec.empty(); }
 private:
-    std::vector<peer_address_t> vec;
+    vector_t<peer_address_t> vec;
 };
 
 void debug_print(printf_buffer_t *buf, const ip_address_t &addr);

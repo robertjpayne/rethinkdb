@@ -7,7 +7,7 @@
 #include <functional>
 #include <map>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 #include <utility>
 
 #include "errors.hpp"
@@ -47,7 +47,7 @@ struct sindex_disk_info_t;
 
 // The string is the btree index key
 typedef std::pair<ql::datum_t, std::string> index_pair_t;
-typedef std::map<std::string, std::vector<index_pair_t> > index_vals_t;
+typedef std::map<std::string, vector_t<index_pair_t> > index_vals_t;
 
 namespace ql {
 
@@ -65,19 +65,19 @@ namespace changefeed {
 typedef std::pair<std::string, std::pair<datum_t, datum_t> > item_t;
 typedef std::pair<const std::string, std::pair<datum_t, datum_t> > const_item_t;
 
-std::vector<item_t> mangle_sort_truncate_stream(
+vector_t<item_t> mangle_sort_truncate_stream(
     raw_stream_t &&stream, is_primary_t is_primary, sorting_t sorting, size_t n);
 
 optional<datum_t> apply_ops(
     const datum_t &val,
-    const std::vector<scoped_ptr_t<op_t> > &ops,
+    const vector_t<scoped_ptr_t<op_t> > &ops,
     env_t *env,
     const datum_t &key) THROWS_NOTHING;
 
 struct msg_t {
     struct limit_start_t {
         uuid_u sub;
-        std::vector<item_t> start_data;
+        vector_t<item_t> start_data;
         limit_start_t() { }
         limit_start_t(uuid_u _sub, decltype(start_data) _start_data)
             : sub(std::move(_sub)), start_data(std::move(_start_data)) { }
@@ -133,7 +133,7 @@ typedef mailbox_addr_t<stamped_msg_t> client_addr_t;
 
 struct keyspec_t {
     struct range_t {
-        std::vector<transform_variant_t> transforms;
+        vector_t<transform_variant_t> transforms;
         optional<std::string> sindex;
         sorting_t sorting;
         datumspec_t datumspec;
@@ -347,8 +347,8 @@ public:
     iterator top() {
         return size() == 0 ? end() : *index.begin();
     }
-    std::vector<Id> truncate_top(size_t n) {
-        std::vector<Id> ret;
+    vector_t<Id> truncate_top(size_t n) {
+        vector_t<Id> ret;
         while (index.size() > n) {
             ret.push_back((*index.begin())->first);
             data.erase(*index.begin());
@@ -409,7 +409,7 @@ public:
         client_t::addr_t _parent_client,
         keyspec_t::limit_t _spec,
         limit_order_t _lt,
-        std::vector<item_t> &&item_vec);
+        vector_t<item_t> &&item_vec);
 
     void add(rwlock_in_line_t *spot,
              store_key_t sk,
@@ -432,7 +432,7 @@ public:
     const uuid_u uuid;
 private:
     // Can throw `exc_t` exceptions if an error occurs while reading from disk.
-    std::vector<item_t> read_more(
+    vector_t<item_t> read_more(
         const boost::variant<primary_ref_t, sindex_ref_t> &ref,
         const optional<item_t> &start);
     void send(msg_t &&msg);
@@ -443,7 +443,7 @@ private:
     client_t::addr_t parent_client;
 
     keyspec_t::limit_t spec;
-    std::vector<scoped_ptr_t<op_t> > ops;
+    vector_t<scoped_ptr_t<op_t> > ops;
 
     limit_order_t gt;
     item_queue_t item_queue;
@@ -482,7 +482,7 @@ public:
         const uuid_u &client_uuid,
         const keyspec_t::limit_t &spec,
         limit_order_t lt,
-        std::vector<item_t> &&start_data,
+        vector_t<item_t> &&start_data,
         const auto_drainer_t::lock_t &keepalive);
     // `key` should be non-NULL if there is a key associated with the message.
     void send_all(
@@ -533,9 +533,9 @@ private:
         client_info_t();
         scoped_ptr_t<cond_t> cond;
         uint64_t stamp;
-        std::vector<region_t> regions;
+        vector_t<region_t> regions;
         std::map<optional<std::string>,
-                 std::vector<scoped_ptr_t<limit_manager_t>>> limit_clients;
+                 vector_t<scoped_ptr_t<limit_manager_t>>> limit_clients;
         scoped_ptr_t<rwlock_t> limit_clients_lock;
     };
     std::map<client_t::addr_t, client_info_t> clients;
@@ -593,7 +593,7 @@ public:
         env_t *env,
         const streamspec_t &ss,
         const std::string &primary_key_name,
-        const std::vector<datum_t> &initial_values,
+        const vector_t<datum_t> &initial_values,
         backtrace_id_t bt);
 
     void send_all(const msg_t &msg);

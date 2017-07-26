@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <map>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "clustering/generic/multi_client_metadata.hpp"
 #include "clustering/generic/registrar.hpp"

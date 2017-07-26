@@ -4,7 +4,7 @@
 
 #include <map>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "backtrace.hpp"
 #include "concurrency/new_semaphore.hpp"
@@ -175,12 +175,12 @@ private:
                     read_stream_t *stream);
     void on_local_message(connectivity_cluster_t::connection_t *connection,
                           auto_drainer_t::lock_t connection_keepalive,
-                          std::vector<char> &&data);
+                          vector_t<char> &&data);
 
     enum force_yield_t {FORCE_YIELD, MAYBE_YIELD};
     void mailbox_read_coroutine(threadnum_t dest_thread,
                                 raw_mailbox_t::id_t dest_mailbox_id,
-                                std::vector<char> *stream_data,
+                                vector_t<char> *stream_data,
                                 int64_t stream_data_offset,
                                 force_yield_t force_yield);
 };

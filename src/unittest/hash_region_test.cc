@@ -25,7 +25,7 @@ TEST(HashRegionTest, RegionJoinHashwise) {
 
     key_range_t kr(key_range_t::closed, store_key_t("Alpha"), key_range_t::open, store_key_t("Beta"));
 
-    std::vector<hash_region_t<key_range_t> > vec;
+    vector_t<hash_region_t<key_range_t> > vec;
     vec.push_back(hash_region_t<key_range_t>(0, 10, kr));
     vec.push_back(hash_region_t<key_range_t>(20, 30, kr));
     vec.push_back(hash_region_t<key_range_t>(10, 20, kr));
@@ -41,7 +41,7 @@ TEST(HashRegionTest, RegionJoinHashwise) {
 
 TEST(HashRegionTest, RegionJoinEmpty) {
 
-    std::vector<hash_region_t<key_range_t> > vec;
+    vector_t<hash_region_t<key_range_t> > vec;
 
     hash_region_t<key_range_t> r;
     region_join_result_t res = region_join(vec, &r);
@@ -52,7 +52,7 @@ TEST(HashRegionTest, RegionJoinEmpty) {
 
 TEST(HashRegionTest, RegionJoinEmpties) {
 
-    std::vector<hash_region_t<key_range_t> > vec;
+    vector_t<hash_region_t<key_range_t> > vec;
     vec.push_back(hash_region_t<key_range_t>());
     vec.push_back(hash_region_t<key_range_t>());
     vec.push_back(hash_region_t<key_range_t>());
@@ -72,7 +72,7 @@ TEST(HashRegionTest, RegionJoin2D) {
     key_range_t kr3(key_range_t::closed, store_key_t("Alpha"), key_range_t::none, store_key_t());
     key_range_t kr4(key_range_t::closed, store_key_t("Chi"), key_range_t::none, store_key_t());
 
-    std::vector<hash_region_t<key_range_t> > vec;
+    vector_t<hash_region_t<key_range_t> > vec;
     vec.push_back(hash_region_t<key_range_t>(1, 5, kr2));
     vec.push_back(hash_region_t<key_range_t>(5, 10, kr2));
     vec.push_back(hash_region_t<key_range_t>(5, 10, kr));
@@ -97,7 +97,7 @@ TEST(HashRegionTest, SpecialNonSquareRegionJoin) {
     uint64_t half = quarter * 2;
     uint64_t whole = HASH_REGION_HASH_SIZE;
 
-    std::vector<hash_region_t<key_range_t> > vec;
+    vector_t<hash_region_t<key_range_t> > vec;
     vec.push_back(hash_region_t<key_range_t>(0, quarter, zt));
     vec.push_back(hash_region_t<key_range_t>(0, quarter, tinf));
     vec.push_back(hash_region_t<key_range_t>(half, whole, zt));

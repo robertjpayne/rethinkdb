@@ -17,8 +17,7 @@
 #include <wchar.h>
 #include <string>
 
-#include <vector>
-using std::vector;
+#include "containers/vector.hpp"
 
 #include <functional>
 using std::less;

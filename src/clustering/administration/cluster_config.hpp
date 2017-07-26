@@ -4,7 +4,7 @@
 
 #include <memory>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "clustering/administration/metadata.hpp"
 #include "rdb_protocol/artificial_table/caching_cfeed_backend.hpp"
@@ -33,7 +33,7 @@ public:
     bool read_all_rows_as_vector(
             auth::user_context_t const &user_context,
             signal_t *interruptor,
-            std::vector<ql::datum_t> *rows_out,
+            vector_t<ql::datum_t> *rows_out,
             admin_err_t *error_out);
 
     bool read_row(

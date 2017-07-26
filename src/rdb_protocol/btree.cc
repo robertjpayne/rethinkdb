@@ -6,7 +6,7 @@
 #include <iterator>
 #include <set>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "btree/concurrent_traversal.hpp"
 #include "btree/get_distribution.hpp"
@@ -186,7 +186,7 @@ kv_location_set(keyvalue_location_t *kv_location,
 MUST_USE ql::serialization_result_t
 kv_location_set(keyvalue_location_t *kv_location,
                 const store_key_t &key,
-                const std::vector<char> &value_ref,
+                const vector_t<char> &value_ref,
                 repli_timestamp_t timestamp,
                 const deletion_context_t *deletion_context) {
     // Detach/Delete the old value.
@@ -337,7 +337,7 @@ ql::datum_t btree_batched_replacer_t::apply_write_hook(
         ql::datum_t modified;
         try {
             modified = write_hook->call(env,
-                                        std::vector<ql::datum_t>{
+                                        vector_t<ql::datum_t>{
                                             primary_key,
                                                 d,
                                                 res})->as_datum();
@@ -420,7 +420,7 @@ void do_a_replace_from_batched_replace(
 batched_replace_response_t rdb_batched_replace(
     const btree_info_t &info,
     scoped_ptr_t<real_superblock_t> *superblock,
-    const std::vector<store_key_t> &keys,
+    const vector_t<store_key_t> &keys,
     const btree_batched_replacer_t *replacer,
     rdb_modification_report_cb_t *sindex_cb,
     ql::configured_limits_t limits,
@@ -628,7 +628,7 @@ class job_data_t {
 public:
     job_data_t(ql::env_t *_env,
                const ql::batchspec_t &batchspec,
-               const std::vector<transform_variant_t> &_transforms,
+               const vector_t<transform_variant_t> &_transforms,
                const optional<terminal_variant_t> &_terminal,
                region_t region,
                store_key_t last_key,
@@ -658,7 +658,7 @@ private:
     friend class rget_cb_t;
     ql::env_t *const env;
     scoped_ptr_t<ql::batcher_t> batcher;
-    std::vector<scoped_ptr_t<ql::op_t> > transformers;
+    vector_t<scoped_ptr_t<ql::op_t> > transformers;
     sorting_t sorting;
     scoped_ptr_t<ql::accumulator_t> accumulator;
 };
@@ -1006,7 +1006,7 @@ void rdb_rget_slice(
         superblock_t *superblock,
         ql::env_t *ql_env,
         const ql::batchspec_t &batchspec,
-        const std::vector<transform_variant_t> &transforms,
+        const vector_t<transform_variant_t> &transforms,
         const optional<terminal_variant_t> &terminal,
         sorting_t sorting,
         rget_read_response_t *response,
@@ -1078,7 +1078,7 @@ void rdb_rget_secondary_slice(
         sindex_superblock_t *superblock,
         ql::env_t *ql_env,
         const ql::batchspec_t &batchspec,
-        const std::vector<transform_variant_t> &transforms,
+        const vector_t<transform_variant_t> &transforms,
         const optional<terminal_variant_t> &terminal,
         const key_range_t &pk_range,
         sorting_t sorting,
@@ -1147,7 +1147,7 @@ void rdb_get_intersecting_slice(
         sindex_superblock_t *superblock,
         ql::env_t *ql_env,
         const ql::batchspec_t &batchspec,
-        const std::vector<ql::transform_variant_t> &transforms,
+        const vector_t<ql::transform_variant_t> &transforms,
         const optional<ql::terminal_variant_t> &terminal,
         const key_range_t &pk_range,
         const sindex_disk_info_t &sindex_info,
@@ -1249,7 +1249,7 @@ void rdb_distribution_get(int max_depth,
                           real_superblock_t *superblock,
                           distribution_read_response_t *response) {
     int64_t key_count_out;
-    std::vector<store_key_t> key_splits;
+    vector_t<store_key_t> key_splits;
     get_btree_key_distribution(superblock, max_depth,
                                &key_count_out, &key_splits);
 
@@ -1261,7 +1261,7 @@ void rdb_distribution_get(int max_depth,
     }
     response->key_counts[left_key] = keys_per_bucket;
 
-    for (std::vector<store_key_t>::iterator it  = key_splits.begin();
+    for (vector_t<store_key_t>::iterator it  = key_splits.begin();
                                             it != key_splits.end();
                                             ++it) {
         response->key_counts[*it] = keys_per_bucket;
@@ -1328,7 +1328,7 @@ rdb_modification_report_cb_t::rdb_modification_report_cb_t(
 rdb_modification_report_cb_t::~rdb_modification_report_cb_t() { }
 
 bool rdb_modification_report_cb_t::has_pkey_cfeeds(
-    const std::vector<store_key_t> &keys) {
+    const vector_t<store_key_t> &keys) {
     const store_key_t *min = nullptr, *max = nullptr;
     for (const auto &key : keys) {
         if (min == nullptr || key < *min) min = &key;
@@ -1464,7 +1464,7 @@ void rdb_modification_report_cb_t::on_mod_report_sub(
     done_cond->pulse();
 }
 
-std::vector<std::string> expand_geo_key(
+vector_t<std::string> expand_geo_key(
         reql_version_t reql_version,
         const ql::datum_t &key,
         const store_key_t &primary_key,
@@ -1473,14 +1473,14 @@ std::vector<std::string> expand_geo_key(
     // TODO (daniel): This needs to be changed once compound geo index
     // support gets added.
     if (!key.is_ptype(ql::pseudo::geometry_string)) {
-        return std::vector<std::string>();
+        return vector_t<std::string>();
     }
 
     try {
-        std::vector<std::string> grid_keys =
+        vector_t<std::string> grid_keys =
             compute_index_grid_keys(key, GEO_INDEX_GOAL_GRID_CELLS);
 
-        std::vector<std::string> result;
+        vector_t<std::string> result;
         result.reserve(grid_keys.size());
         for (size_t i = 0; i < grid_keys.size(); ++i) {
             // TODO (daniel): Something else that needs change for compound index
@@ -1509,8 +1509,8 @@ std::vector<std::string> expand_geo_key(
 void compute_keys(const store_key_t &primary_key,
                   ql::datum_t doc,
                   const sindex_disk_info_t &index_info,
-                  std::vector<std::pair<store_key_t, ql::datum_t> > *keys_out,
-                  std::vector<index_pair_t> *cfeed_keys_out) {
+                  vector_t<std::pair<store_key_t, ql::datum_t> > *keys_out,
+                  vector_t<index_pair_t> *cfeed_keys_out) {
 
     guarantee(keys_out->empty());
 
@@ -1532,7 +1532,7 @@ void compute_keys(const store_key_t &primary_key,
         for (uint64_t i = 0; i < index.arr_size(); ++i) {
             const ql::datum_t &skey = index.get(i, ql::THROW);
             if (index_info.geo == sindex_geo_bool_t::GEO) {
-                std::vector<std::string> geo_keys = expand_geo_key(reql_version,
+                vector_t<std::string> geo_keys = expand_geo_key(reql_version,
                                                                    skey,
                                                                    primary_key,
                                                                    make_optional(i));
@@ -1571,7 +1571,7 @@ void compute_keys(const store_key_t &primary_key,
         }
     } else {
         if (index_info.geo == sindex_geo_bool_t::GEO) {
-            std::vector<std::string> geo_keys = expand_geo_key(reql_version,
+            vector_t<std::string> geo_keys = expand_geo_key(reql_version,
                                                                index,
                                                                primary_key,
                                                                r_nullopt);
@@ -1617,7 +1617,7 @@ void serialize_sindex_info(write_message_t *wm,
 }
 
 void deserialize_sindex_info(
-        const std::vector<char> &data,
+        const vector_t<char> &data,
         sindex_disk_info_t *info_out,
         const std::function<void(obsolete_reql_version_t)> &obsolete_cb) {
     buffer_read_stream_t read_stream(data.data(), data.size());
@@ -1701,7 +1701,7 @@ void deserialize_sindex_info(
 }
 
 void deserialize_sindex_info_or_crash(
-        const std::vector<char> &data,
+        const vector_t<char> &data,
         sindex_disk_info_t *info_out)
             THROWS_ONLY(archive_exc_t) {
     deserialize_sindex_info(data, info_out,
@@ -1733,8 +1733,8 @@ void rdb_update_single_sindex(
         size_t *updates_left,
         auto_drainer_t::lock_t,
         cond_t *keys_available_cond,
-        std::vector<index_pair_t> *cfeed_old_keys_out,
-        std::vector<index_pair_t> *cfeed_new_keys_out)
+        vector_t<index_pair_t> *cfeed_old_keys_out,
+        vector_t<index_pair_t> *cfeed_new_keys_out)
     THROWS_NOTHING {
     // Note if you get this error it's likely that you've passed in a default
     // constructed mod_report. Don't do that.  Mod reports should always be passed
@@ -1764,7 +1764,7 @@ void rdb_update_single_sindex(
         try {
             ql::datum_t deleted = modification->info.deleted.first;
 
-            std::vector<std::pair<store_key_t, ql::datum_t> > keys;
+            vector_t<std::pair<store_key_t, ql::datum_t> > keys;
             compute_keys(
                 modification->primary_key, deleted, sindex_info,
                 &keys, cfeed_old_keys_out);
@@ -1832,7 +1832,7 @@ void rdb_update_single_sindex(
         try {
             ql::datum_t added = modification->info.added.first;
 
-            std::vector<std::pair<store_key_t, ql::datum_t> > keys;
+            vector_t<std::pair<store_key_t, ql::datum_t> > keys;
 
             compute_keys(
                 modification->primary_key, added, sindex_info,
@@ -2053,7 +2053,7 @@ public:
         mod_report.info.added
             = std::make_pair(
                 get_data(rdb_value, buf_parent_t(keyvalue.expose_buf())),
-                std::vector<char>(rdb_value->value_ref(),
+                vector_t<char>(rdb_value->value_ref(),
                     rdb_value->value_ref() + rdb_value->inline_size(block_size)));
 
         // Store the value into the secondary indexes

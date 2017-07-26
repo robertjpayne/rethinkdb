@@ -49,10 +49,10 @@ jobs_manager_business_card_t jobs_manager_t::get_business_card() {
 void jobs_manager_t::on_get_job_reports(
         signal_t *interruptor,
         const business_card_t::return_mailbox_t::address_t &reply_address) {
-    std::vector<query_job_report_t> query_job_reports;
-    std::vector<disk_compaction_job_report_t> disk_compaction_job_reports;
-    std::vector<index_construction_job_report_t> index_construction_job_reports;
-    std::vector<backfill_job_report_t> backfill_job_reports;
+    vector_t<query_job_report_t> query_job_reports;
+    vector_t<disk_compaction_job_report_t> disk_compaction_job_reports;
+    vector_t<index_construction_job_report_t> index_construction_job_reports;
+    vector_t<backfill_job_report_t> backfill_job_reports;
 
     if (drainer.is_draining()) {
         // We're shutting down, send an empty reponse since we can't acquire a `drainer`
@@ -76,7 +76,7 @@ void jobs_manager_t::on_get_job_reports(
     pmap(get_num_threads(), [&](int32_t threadnum) {
         // Here we need to store `query_job_report_t` locally to prevent multiple threads
         // from inserting into the outer `job_reports`.
-        std::vector<query_job_report_t> query_job_reports_inner;
+        vector_t<query_job_report_t> query_job_reports_inner;
         {
             on_thread_t thread((threadnum_t(threadnum)));
 

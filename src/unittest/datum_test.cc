@@ -71,7 +71,7 @@ TEST(DatumTest, NumericSerialization) {
                       6.02214179e23,
     };
 
-    std::vector<ql::datum_t> vec;
+    vector_t<ql::datum_t> vec;
     for (size_t i = 0; i < sizeof(nums) / sizeof(nums[0]); ++i) {
         auto const positive = ql::datum_t(nums[i]);
         vec.push_back(positive);
@@ -93,14 +93,14 @@ TEST(DatumTest, NumericSerialization) {
 // in the new buffer-backable format yet.
 TEST(DatumTest, LegacyDeserialization) {
     // An array of two nulls
-    std::vector<char> legacy_array = {0x01, 0x02, 0x03, 0x03};
+    vector_t<char> legacy_array = {0x01, 0x02, 0x03, 0x03};
     ql::datum_t reference_array(
-        std::vector<ql::datum_t>
+        vector_t<ql::datum_t>
             {ql::datum_t::null(),
              ql::datum_t::null()},
             ql::configured_limits_t::unlimited);
     // An object {a: null, b: null}
-    std::vector<char> legacy_object =
+    vector_t<char> legacy_object =
         {0x05, 0x02, 0x01, 'a', 0x03, 0x01, 'b', 0x03};
     ql::datum_t reference_object(std::map<datum_string_t, ql::datum_t>
         {std::make_pair(datum_string_t("a"), ql::datum_t::null()),
@@ -147,12 +147,12 @@ TEST(DatumTest, ObjectSerialization) {
 TEST(DatumTest, ArraySerialization) {
     {
         ql::datum_t test_array(
-            std::vector<ql::datum_t>(), ql::configured_limits_t::unlimited);
+            vector_t<ql::datum_t>(), ql::configured_limits_t::unlimited);
         test_datum_serialization(test_array);
     }
     {
         ql::datum_t test_array(
-            std::vector<ql::datum_t>
+            vector_t<ql::datum_t>
                 {ql::datum_t::null(),
                  ql::datum_t::null()},
                 ql::configured_limits_t::unlimited);
@@ -160,10 +160,10 @@ TEST(DatumTest, ArraySerialization) {
     }
     {
         ql::datum_t test_array(
-            std::vector<ql::datum_t>
+            vector_t<ql::datum_t>
                 {ql::datum_t::null(),
                  ql::datum_t::null(),
-                 ql::datum_t(std::vector<ql::datum_t>
+                 ql::datum_t(vector_t<ql::datum_t>
                      {ql::datum_t::null(),
                       ql::datum_t::null()},
                      ql::configured_limits_t::unlimited)},
@@ -179,7 +179,7 @@ TEST(DatumTest, OffsetScaling) {
         // 8 bit
         ql::datum_t test_string(datum_string_t(std::string(1, 'A')));
         ql::datum_t test_array(
-            std::vector<ql::datum_t>{test_string, test_string},
+            vector_t<ql::datum_t>{test_string, test_string},
             ql::configured_limits_t::unlimited);
         test_datum_serialization(test_array);
     }
@@ -188,7 +188,7 @@ TEST(DatumTest, OffsetScaling) {
         for (size_t sz = 200; sz < 300; ++sz) {
             ql::datum_t test_string(datum_string_t(std::string(sz/2, 'A')));
             ql::datum_t test_array(
-                std::vector<ql::datum_t>{test_string, test_string},
+                vector_t<ql::datum_t>{test_string, test_string},
                 ql::configured_limits_t::unlimited);
             test_datum_serialization(test_array);
         }
@@ -198,7 +198,7 @@ TEST(DatumTest, OffsetScaling) {
         for (size_t sz = 65500; sz < 65540; ++sz) {
             ql::datum_t test_string(datum_string_t(std::string(sz/2, 'A')));
             ql::datum_t test_array(
-                std::vector<ql::datum_t>{test_string, test_string},
+                vector_t<ql::datum_t>{test_string, test_string},
                 ql::configured_limits_t::unlimited);
             test_datum_serialization(test_array);
         }

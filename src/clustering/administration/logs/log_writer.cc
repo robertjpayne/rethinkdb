@@ -552,7 +552,7 @@ thread_pool_log_writer_t::~thread_pool_log_writer_t() {
     pmap(get_num_threads(), std::bind(&thread_pool_log_writer_t::uninstall_on_thread, this, ph::_1));
 }
 
-std::vector<log_message_t> thread_pool_log_writer_t::tail(
+vector_t<log_message_t> thread_pool_log_writer_t::tail(
         int max_lines,
         struct timespec min_timestamp,
         struct timespec max_timestamp,
@@ -570,7 +570,7 @@ std::vector<log_message_t> thread_pool_log_writer_t::tail(
     } subscription(&cancel);
     subscription.reset(interruptor);
 
-    std::vector<log_message_t> log_messages;
+    vector_t<log_message_t> log_messages;
     std::string error_message;
 
 
@@ -638,7 +638,7 @@ void thread_pool_log_writer_t::tail_blocking(
         timespec min_timestamp,
         timespec max_timestamp,
         volatile bool *cancel,
-        std::vector<log_message_t> *messages_out,
+        vector_t<log_message_t> *messages_out,
         std::string *error_out,
         bool *ok_out) {
     try {

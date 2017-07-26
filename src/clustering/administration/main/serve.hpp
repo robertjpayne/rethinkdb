@@ -5,7 +5,7 @@
 #include <set>
 #include <string>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 #include <memory>
 
 #include "clustering/administration/metadata.hpp"
@@ -107,17 +107,17 @@ public:
     shared_ssl_ctx_t cluster;
 };
 
-peer_address_set_t look_up_peers_addresses(const std::vector<host_and_port_t> &names);
+peer_address_set_t look_up_peers_addresses(const vector_t<host_and_port_t> &names);
 
 class serve_info_t {
 public:
-    serve_info_t(std::vector<host_and_port_t> &&_joins,
+    serve_info_t(vector_t<host_and_port_t> &&_joins,
                  std::string &&_reql_http_proxy,
                  std::string &&_web_assets,
                  update_check_t _do_version_checking,
                  service_address_ports_t _ports,
                  optional<std::string> _config_file,
-                 std::vector<std::string> &&_argv,
+                 vector_t<std::string> &&_argv,
                  const int _join_delay_secs,
                  const int _node_reconnect_timeout_secs,
                  tls_configs_t _tls_configs) :
@@ -138,7 +138,7 @@ public:
         peers = look_up_peers_addresses(joins);
     }
 
-    const std::vector<host_and_port_t> joins;
+    const vector_t<host_and_port_t> joins;
     peer_address_set_t peers;
     std::string reql_http_proxy;
     std::string web_assets;
@@ -147,7 +147,7 @@ public:
     optional<std::string> config_file;
     /* The original arguments, so we can display them in `server_status`. All the
     argument parsing has already been completed at this point. */
-    std::vector<std::string> argv;
+    vector_t<std::string> argv;
     int join_delay_secs;
     int node_reconnect_timeout_secs;
     tls_configs_t tls_configs;

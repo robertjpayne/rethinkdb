@@ -5,7 +5,7 @@
 
 #include <queue>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/geo/s2/base/macros.h"
 #include "rdb_protocol/geo/s2/base/scoped_ptr.h"
@@ -16,7 +16,6 @@ namespace geo {
 using std::priority_queue;
 using std::pair;
 using std::make_pair;
-using std::vector;
 
 class S2CellUnion;
 
@@ -29,7 +28,7 @@ class S2CellUnion;
 // S2RegionCoverer coverer;
 // coverer.set_max_cells(5);
 // S2Cap cap = S2Cap::FromAxisAngle(...);
-// vector<S2CellId> covering;
+// vector_t<S2CellId> covering;
 // coverer.GetCovering(cap, &covering);
 //
 // This yields a vector of at most 5 cells that is guaranteed to cover the
@@ -115,8 +114,8 @@ class S2RegionCoverer {
   // Return a vector of cell ids that covers (GetCovering) or is contained
   // within (GetInteriorCovering) the given region and satisfies the various
   // restrictions specified above.
-  void GetCovering(S2Region const& region, vector<S2CellId>* covering);
-  void GetInteriorCovering(S2Region const& region, vector<S2CellId>* interior);
+  void GetCovering(S2Region const& region, vector_t<S2CellId>* covering);
+  void GetInteriorCovering(S2Region const& region, vector_t<S2CellId>* interior);
 
   // Return a normalized cell union that covers (GetCellUnion) or is contained
   // within (GetInteriorCellUnion) the given region and satisfies the
@@ -131,13 +130,13 @@ class S2RegionCoverer {
   // Given a connected region and a starting point, return a set of cells at
   // the given level that cover the region.
   static void GetSimpleCovering(S2Region const& region, S2Point const& start,
-                                int level, vector<S2CellId>* output);
+                                int level, vector_t<S2CellId>* output);
 
  private:
   struct Candidate {
     S2Cell cell;
     bool is_terminal;        // Cell should not be expanded further.
-    std::vector<Candidate*> children;  // Size may be 0, 4, 16, or 64 elements.
+    vector_t<Candidate*> children;  // Size may be 0, 4, 16, or 64 elements.
   };
 
   // If the cell intersects the given region, return a new candidate with no
@@ -171,7 +170,7 @@ class S2RegionCoverer {
   // edge-connected cells at the same level that intersect "region".
   // The output cells are returned in arbitrary order.
   static void FloodFill(S2Region const& region, S2CellId const& start,
-                        vector<S2CellId>* output);
+                        vector_t<S2CellId>* output);
 
   int min_level_;
   int max_level_;
@@ -185,14 +184,14 @@ class S2RegionCoverer {
 
   // A temporary variable used by GetCovering() that holds the cell ids that
   // have been added to the covering so far.
-  scoped_ptr<vector<S2CellId> > result_;
+  scoped_ptr<vector_t<S2CellId> > result_;
 
   // We keep the candidates in a priority queue.  We specify a vector to hold
   // the queue entries since for some reason priority_queue<> uses a deque by
   // default.
   struct CompareQueueEntries;
   typedef pair<int, Candidate*> QueueEntry;
-  typedef priority_queue<QueueEntry, vector<QueueEntry>,
+  typedef priority_queue<QueueEntry, vector_t<QueueEntry>,
                          CompareQueueEntries> CandidateQueue;
   scoped_ptr<CandidateQueue> pq_;
 

@@ -9,7 +9,7 @@
 #include <map>
 #include <set>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "containers/printf_buffer.hpp"
 
@@ -54,7 +54,7 @@ void debug_print(printf_buffer_t *buf, const std::set<T> &set) {
 }
 
 template <class T>
-void debug_print(printf_buffer_t *buf, const std::vector<T> &vec) {
+void debug_print(printf_buffer_t *buf, const vector_t<T> &vec) {
     buf->appendf("[");
     debug_print_iterators(buf, vec.begin(), vec.end());
     buf->appendf("]");

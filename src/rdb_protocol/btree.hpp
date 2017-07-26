@@ -6,7 +6,7 @@
 #include <set>
 #include <string>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "btree/types.hpp"
 #include "concurrency/auto_drainer.hpp"
@@ -114,7 +114,7 @@ struct btree_point_replacer_t {
 batched_replace_response_t rdb_batched_replace(
     const btree_info_t &info,
     scoped_ptr_t<real_superblock_t> *superblock,
-    const std::vector<store_key_t> &keys,
+    const vector_t<store_key_t> &keys,
     const btree_batched_replacer_t *replacer,
     rdb_modification_report_cb_t *sindex_cb,
     ql::configured_limits_t limits,
@@ -148,7 +148,7 @@ void rdb_rget_slice(
     superblock_t *superblock,
     ql::env_t *ql_env,
     const ql::batchspec_t &batchspec,
-    const std::vector<ql::transform_variant_t> &transforms,
+    const vector_t<ql::transform_variant_t> &transforms,
     const optional<ql::terminal_variant_t> &terminal,
     sorting_t sorting,
     rget_read_response_t *response,
@@ -162,7 +162,7 @@ void rdb_rget_secondary_slice(
     sindex_superblock_t *superblock,
     ql::env_t *ql_env,
     const ql::batchspec_t &batchspec,
-    const std::vector<ql::transform_variant_t> &transforms,
+    const vector_t<ql::transform_variant_t> &transforms,
     const optional<ql::terminal_variant_t> &terminal,
     const key_range_t &pk_range,
     sorting_t sorting,
@@ -179,7 +179,7 @@ void rdb_get_intersecting_slice(
     sindex_superblock_t *superblock,
     ql::env_t *ql_env,
     const ql::batchspec_t &batchspec,
-    const std::vector<ql::transform_variant_t> &transforms,
+    const vector_t<ql::transform_variant_t> &transforms,
     const optional<ql::terminal_variant_t> &terminal,
     const key_range_t &pk_range,
     const sindex_disk_info_t &sindex_info,
@@ -206,7 +206,7 @@ void rdb_distribution_get(int max_depth,
 /* Secondary Indexes */
 
 struct rdb_modification_info_t {
-    typedef std::pair<ql::datum_t, std::vector<char> > data_pair_t;
+    typedef std::pair<ql::datum_t, vector_t<char> > data_pair_t;
     data_pair_t deleted;
     data_pair_t added;
 };
@@ -277,14 +277,14 @@ void serialize_sindex_info(write_message_t *wm,
 // Note that the behavior for how this reacts to obsolete indexes is controlled
 // by the `outdated_cb`.  All other errors will throw an `archive_exc_t`.
 void deserialize_sindex_info(
-        const std::vector<char> &data,
+        const vector_t<char> &data,
         sindex_disk_info_t *info_out,
         const std::function<void(obsolete_reql_version_t)> &obsolete_cb);
 
 // Utility function that will call deserialize_sindex_info with an `obsolete_cb`
 // that will `fail_due_to_user_error` when an obsolete index is encountered.
 void deserialize_sindex_info_or_crash(
-        const std::vector<char> &data,
+        const vector_t<char> &data,
         sindex_disk_info_t *info_out)
     THROWS_ONLY(archive_exc_t);
 
@@ -306,7 +306,7 @@ public:
                        bool update_pkey_cfeeds,
                        new_mutex_in_line_t *sindex_spot,
                        rwlock_in_line_t *stamp_spot);
-    bool has_pkey_cfeeds(const std::vector<store_key_t> &keys);
+    bool has_pkey_cfeeds(const vector_t<store_key_t> &keys);
     void finish(btree_slice_t *btree, real_superblock_t *superblock);
 
 private:

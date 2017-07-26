@@ -7,11 +7,11 @@ namespace ql {
 
 class map_datum_stream_t : public eager_datum_stream_t {
 public:
-    map_datum_stream_t(std::vector<counted_t<datum_stream_t> > &&_streams,
+    map_datum_stream_t(vector_t<counted_t<datum_stream_t> > &&_streams,
                        counted_t<const func_t> &&_func,
                        backtrace_id_t bt);
 
-    virtual std::vector<datum_t>
+    virtual vector_t<datum_t>
     next_raw_batch(env_t *env, const batchspec_t &batchspec);
 
     virtual bool is_array() const {
@@ -26,7 +26,7 @@ public:
     }
 
 private:
-    std::vector<counted_t<datum_stream_t> > streams;
+    vector_t<counted_t<datum_stream_t> > streams;
     counted_t<const func_t> func;
     feed_type_t union_type;
     bool is_array_map, is_infinite_map;
@@ -36,8 +36,8 @@ private:
     // changefeed stream and return a partial batch.  (We still time out and
     // return partial batches, or even empty batches, for the web UI in the case
     // of a changefeed stream.)
-    std::vector<std::deque<datum_t> > cache;
-    std::vector<datum_t> args;
+    vector_t<std::deque<datum_t> > cache;
+    vector_t<datum_t> args;
 };
 
 }  // namespace ql

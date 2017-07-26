@@ -6,7 +6,7 @@
 #include <limits>
 #include <map>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "arch/runtime/coroutines.hpp"
 #include "btree/concurrent_traversal.hpp"
@@ -46,7 +46,7 @@ T groups_to_batch(std::map<datum_t, T, optional_datum_less_t> *g) {
 
 // This stuff previously resided in the protocol, but has been broken out since
 // we want to use this logic in multiple places.
-typedef std::vector<ql::datum_t> datums_t;
+typedef vector_t<ql::datum_t> datums_t;
 typedef std::map<ql::datum_t, datums_t, optional_datum_less_t> groups_t;
 
 struct rget_item_t {
@@ -94,7 +94,7 @@ private:
 
 void debug_print(printf_buffer_t *, const rget_item_t &);
 
-typedef std::vector<rget_item_t> raw_stream_t;
+typedef vector_t<rget_item_t> raw_stream_t;
 struct keyed_stream_t {
     raw_stream_t stream;
     store_key_t last_key;
@@ -372,7 +372,7 @@ struct limit_read_t {
     region_t shard;
     store_key_t last_key;
     sorting_t sorting;
-    std::vector<scoped_ptr_t<op_t> > *ops;
+    vector_t<scoped_ptr_t<op_t> > *ops;
 };
 // Note that this is serializable because it goes in a serializable variant, but
 // it is a runtime error to serialize it.
@@ -402,7 +402,7 @@ public:
             // Returns a datum that might be null
             const std::function<datum_t()> &lazy_sindex_val) = 0;
     virtual void finish(continue_bool_t last_cb, result_t *out);
-    virtual void unshard(env_t *env, const std::vector<result_t *> &results) = 0;
+    virtual void unshard(env_t *env, const vector_t<result_t *> &results) = 0;
 protected:
     void mark_finished();
 private:

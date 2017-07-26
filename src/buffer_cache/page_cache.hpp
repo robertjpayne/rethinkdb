@@ -7,7 +7,7 @@
 #include <set>
 #include <unordered_map>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "buffer_cache/block_version.hpp"
 #include "buffer_cache/cache_account.hpp"
@@ -403,19 +403,19 @@ private:
     friend class page_txn_t;
     static void do_flush_changes(page_cache_t *page_cache,
                                  std::map<block_id_t, block_change_t> &&changes,
-                                 const std::vector<page_txn_t *> &txns,
+                                 const vector_t<page_txn_t *> &txns,
                                  fifo_enforcer_write_token_t index_write_token);
     static void do_flush_txn_set(page_cache_t *page_cache,
                                  std::map<block_id_t, block_change_t> *changes_ptr,
-                                 const std::vector<page_txn_t *> &txns);
+                                 const vector_t<page_txn_t *> &txns);
 
     static void remove_txn_set_from_graph(page_cache_t *page_cache,
-                                          const std::vector<page_txn_t *> &txns);
+                                          const vector_t<page_txn_t *> &txns);
 
     static std::map<block_id_t, block_change_t>
-    compute_changes(const std::vector<page_txn_t *> &txns);
+    compute_changes(const vector_t<page_txn_t *> &txns);
 
-    static std::vector<page_txn_t *> maximal_flushable_txn_set(page_txn_t *base);
+    static vector_t<page_txn_t *> maximal_flushable_txn_set(page_txn_t *base);
 
     void im_waiting_for_flush(page_txn_t *txns);
 
@@ -621,10 +621,10 @@ private:
 
     // The transactions that must be committed before or at the same time as this
     // transaction.
-    std::vector<page_txn_t *> preceders_;
+    vector_t<page_txn_t *> preceders_;
 
     // txn's that we precede -- preceders_[i]->subseqers_ always contains us once.
-    std::vector<page_txn_t *> subseqers_;
+    vector_t<page_txn_t *> subseqers_;
 
     // Pages for which this page_txn_t is the last_write_acquirer_ of that page.  We
     // wouldn't mind a std::vector inside the backindex_bag_t, but it's a

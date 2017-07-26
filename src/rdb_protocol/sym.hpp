@@ -4,7 +4,7 @@
 
 #include <stdint.h>
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "containers/archive/archive.hpp"
 #include "rpc/serialize_macros.hpp"
@@ -20,7 +20,7 @@ public:
     explicit sym_t(int64_t _value) : value(_value) { }
 };
 
-bool function_emits_implicit_variable(const std::vector<sym_t> &arg_names);
+bool function_emits_implicit_variable(const vector_t<sym_t> &arg_names);
 
 inline bool operator<(sym_t x, sym_t y) {
     return x.value < y.value;

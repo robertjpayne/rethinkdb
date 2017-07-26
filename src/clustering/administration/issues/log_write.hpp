@@ -47,13 +47,13 @@ class log_write_issue_tracker_t :
 public:
     log_write_issue_tracker_t() { }
 
-    std::vector<log_write_issue_t> get_issues();
+    vector_t<log_write_issue_t> get_issues();
 
     void report_success();
     void report_error(const std::string &message);
 
-    static void combine(std::vector<log_write_issue_t> &&issues,
-                        std::vector<scoped_ptr_t<issue_t> > *issues_out);
+    static void combine(vector_t<log_write_issue_t> &&issues,
+                        vector_t<scoped_ptr_t<issue_t> > *issues_out);
 
 private:
     void do_update();

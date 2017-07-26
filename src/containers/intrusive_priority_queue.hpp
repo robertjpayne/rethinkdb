@@ -3,7 +3,7 @@
 #define CONTAINERS_INTRUSIVE_PRIORITY_QUEUE_HPP_
 
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "errors.hpp"
 
@@ -185,7 +185,7 @@ private:
     }
 
     // TODO: Vectors are O(n).
-    std::vector<node_t *> nodes;
+    vector_t<node_t *> nodes;
 
     DISABLE_COPYING(intrusive_priority_queue_t);
 };

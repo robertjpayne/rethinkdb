@@ -2,7 +2,7 @@
 #include "rdb_protocol/geo/indexing.hpp"
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "btree/keys.hpp"
 #include "btree/leaf_node.hpp"
@@ -36,29 +36,29 @@ using ql::datum_t;
 //   (...at index creation?)
 extern const int GEO_INDEX_GOAL_GRID_CELLS = 8;
 
-class compute_covering_t : public s2_geo_visitor_t<scoped_ptr_t<std::vector<S2CellId> > > {
+class compute_covering_t : public s2_geo_visitor_t<scoped_ptr_t<vector_t<S2CellId> > > {
 public:
     explicit compute_covering_t(int goal_cells) {
         coverer_.set_max_cells(goal_cells);
     }
 
-    scoped_ptr_t<std::vector<S2CellId> > on_point(const S2Point &point) {
-        scoped_ptr_t<std::vector<S2CellId> > result(new std::vector<S2CellId>());
+    scoped_ptr_t<vector_t<S2CellId> > on_point(const S2Point &point) {
+        scoped_ptr_t<vector_t<S2CellId> > result(new vector_t<S2CellId>());
         result->push_back(S2CellId::FromPoint(point));
         return result;
     }
-    scoped_ptr_t<std::vector<S2CellId> > on_line(const S2Polyline &line) {
-        scoped_ptr_t<std::vector<S2CellId> > result(new std::vector<S2CellId>());
+    scoped_ptr_t<vector_t<S2CellId> > on_line(const S2Polyline &line) {
+        scoped_ptr_t<vector_t<S2CellId> > result(new vector_t<S2CellId>());
         coverer_.GetCovering(line, result.get());
         return result;
     }
-    scoped_ptr_t<std::vector<S2CellId> > on_polygon(const S2Polygon &polygon) {
-        scoped_ptr_t<std::vector<S2CellId> > result(new std::vector<S2CellId>());
+    scoped_ptr_t<vector_t<S2CellId> > on_polygon(const S2Polygon &polygon) {
+        scoped_ptr_t<vector_t<S2CellId> > result(new vector_t<S2CellId>());
         coverer_.GetCovering(polygon, result.get());
         return result;
     }
-    scoped_ptr_t<std::vector<S2CellId> > on_latlngrect(const S2LatLngRect &rect) {
-        scoped_ptr_t<std::vector<S2CellId> > result(new std::vector<S2CellId>());
+    scoped_ptr_t<vector_t<S2CellId> > on_latlngrect(const S2LatLngRect &rect) {
+        scoped_ptr_t<vector_t<S2CellId> > result(new vector_t<S2CellId>());
         coverer_.GetCovering(rect, result.get());
         return result;
     }
@@ -71,31 +71,31 @@ private:
 contained in the geometry. This is useful for avoiding unnecessary intersection
 tests during post-filtering. */
 class compute_interior_covering_t :
-    public s2_geo_visitor_t<scoped_ptr_t<std::vector<S2CellId> > > {
+    public s2_geo_visitor_t<scoped_ptr_t<vector_t<S2CellId> > > {
 public:
-    explicit compute_interior_covering_t(const std::vector<S2CellId> &exterior_covering)
+    explicit compute_interior_covering_t(const vector_t<S2CellId> &exterior_covering)
         : exterior_covering_(exterior_covering) { }
 
-    scoped_ptr_t<std::vector<S2CellId> > on_point(const S2Point &) {
-        scoped_ptr_t<std::vector<S2CellId> > result(new std::vector<S2CellId>());
+    scoped_ptr_t<vector_t<S2CellId> > on_point(const S2Point &) {
+        scoped_ptr_t<vector_t<S2CellId> > result(new vector_t<S2CellId>());
         // A point's interior is thin, so no cell is going to fit into it.
         return result;
     }
-    scoped_ptr_t<std::vector<S2CellId> > on_line(const S2Polyline &) {
-        scoped_ptr_t<std::vector<S2CellId> > result(new std::vector<S2CellId>());
+    scoped_ptr_t<vector_t<S2CellId> > on_line(const S2Polyline &) {
+        scoped_ptr_t<vector_t<S2CellId> > result(new vector_t<S2CellId>());
         // A line's interior is thin, so no cell is going to fit into it.
         return result;
     }
-    scoped_ptr_t<std::vector<S2CellId> > on_polygon(const S2Polygon &polygon) {
+    scoped_ptr_t<vector_t<S2CellId> > on_polygon(const S2Polygon &polygon) {
         return from_exterior(polygon);
     }
-    scoped_ptr_t<std::vector<S2CellId> > on_latlngrect(const S2LatLngRect &rect) {
+    scoped_ptr_t<vector_t<S2CellId> > on_latlngrect(const S2LatLngRect &rect) {
         return from_exterior(rect);
     }
 
 private:
-    scoped_ptr_t<std::vector<S2CellId> > from_exterior(const S2Region &region) {
-        scoped_ptr_t<std::vector<S2CellId> > result(new std::vector<S2CellId>());
+    scoped_ptr_t<vector_t<S2CellId> > from_exterior(const S2Region &region) {
+        scoped_ptr_t<vector_t<S2CellId> > result(new vector_t<S2CellId>());
         // S2RegionCoverer has a `GetInteriorCovering` method.
         // However it's *extremely* slow (often in the order of a second or more).
         // We do something faster, at the risk of returning an empty or very sparse
@@ -118,7 +118,7 @@ private:
         return result;
     }
 
-    std::vector<S2CellId> exterior_covering_;
+    vector_t<S2CellId> exterior_covering_;
 };
 
 
@@ -258,13 +258,13 @@ std::pair<S2CellId, bool> order_btree_key_relative_to_s2cellid_keys(
     return std::make_pair(cell_id, inside_cell);
 }
 
-std::vector<std::string> compute_index_grid_keys(
+vector_t<std::string> compute_index_grid_keys(
         const ql::datum_t &key, int goal_cells) {
     // Compute a cover of grid cells
-    std::vector<S2CellId> covering = compute_cell_covering(key, goal_cells);
+    vector_t<S2CellId> covering = compute_cell_covering(key, goal_cells);
 
     // Generate keys
-    std::vector<std::string> result;
+    vector_t<std::string> result;
     result.reserve(covering.size());
     for (size_t i = 0; i < covering.size(); ++i) {
         result.push_back(s2cellid_to_key(covering[i]));
@@ -274,7 +274,7 @@ std::vector<std::string> compute_index_grid_keys(
 }
 
 // Helper for `compute_cell_covering` and `compute_interior_cell_covering`
-std::vector<S2CellId> compute_cell_covering(
+vector_t<S2CellId> compute_cell_covering(
         const ql::datum_t &key, int goal_cells) {
     rassert(key.has());
     if (!key.is_ptype(ql::pseudo::geometry_string)) {
@@ -287,12 +287,12 @@ std::vector<S2CellId> compute_cell_covering(
 
     // Compute a covering of grid cells
     compute_covering_t coverer(goal_cells);
-    scoped_ptr_t<std::vector<S2CellId> > covering = visit_geojson(&coverer, key);
+    scoped_ptr_t<vector_t<S2CellId> > covering = visit_geojson(&coverer, key);
     return *covering;
 }
 
-std::vector<S2CellId> compute_interior_cell_covering(
-        const ql::datum_t &key, const std::vector<S2CellId> &exterior_covering) {
+vector_t<S2CellId> compute_interior_cell_covering(
+        const ql::datum_t &key, const vector_t<S2CellId> &exterior_covering) {
     if (!key.is_ptype(ql::pseudo::geometry_string)) {
         throw geo_exception_t(
             "Expected geometry but found " + key.get_type_name() + ".");
@@ -300,7 +300,7 @@ std::vector<S2CellId> compute_interior_cell_covering(
 
     // Compute an interior covering of grid cells
     compute_interior_covering_t coverer(exterior_covering);
-    scoped_ptr_t<std::vector<S2CellId> > covering = visit_geojson(&coverer, key);
+    scoped_ptr_t<vector_t<S2CellId> > covering = visit_geojson(&coverer, key);
     return *covering;
 }
 
@@ -309,8 +309,8 @@ geo_index_traversal_helper_t::geo_index_traversal_helper_t(
     : is_initialized_(false), skey_version_(skey_version), interruptor_(interruptor) { }
 
 void geo_index_traversal_helper_t::init_query(
-        const std::vector<geo::S2CellId> &query_cell_covering,
-        const std::vector<geo::S2CellId> &query_interior_cell_covering) {
+        const vector_t<geo::S2CellId> &query_cell_covering,
+        const vector_t<geo::S2CellId> &query_interior_cell_covering) {
     guarantee(!is_initialized_);
     rassert(query_cells_.empty());
     query_cells_ = query_cell_covering;
@@ -390,7 +390,7 @@ bool geo_index_traversal_helper_t::any_query_cell_intersects(
 }
 
 bool geo_index_traversal_helper_t::any_cell_intersects(
-        const std::vector<S2CellId> &cells,
+        const vector_t<S2CellId> &cells,
         const S2CellId left_min, const S2CellId right_max) {
     // Check if any of the cells intersects with the given range
     for (const auto &cell : cells) {
@@ -408,7 +408,7 @@ bool geo_index_traversal_helper_t::cell_intersects_with_range(
 }
 
 bool geo_index_traversal_helper_t::any_cell_contains(
-        const std::vector<S2CellId> &cells,
+        const vector_t<S2CellId> &cells,
         const S2CellId key) {
     // Check if any of the cells contains `key`
     for (const auto &cell : cells) {

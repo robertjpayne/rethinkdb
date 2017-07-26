@@ -7,7 +7,7 @@
 
 #include <map>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 
 #include "rdb_protocol/geo/s2/base/logging.h"
@@ -20,7 +20,6 @@ using std::map;
 using std::multimap;
 using std::pair;
 using std::make_pair;
-using std::vector;
 
 
 class S2Cell;
@@ -125,7 +124,7 @@ class S2EdgeIndex {
 
     // All the candidates obtained by GetCandidates() when we are
     // using a quad-tree (i.e. is_brute_force = false).
-    vector<int> candidates_;
+    vector_t<int> candidates_;
 
     // Index within array above.
     // We have: current_index_ = candidates_[current_index_in_candidates_].
@@ -166,7 +165,7 @@ class S2EdgeIndex {
   // Appends to result all edge references in the map that cross the
   // query edge, and possibly some more.
   void FindCandidateCrossings(S2Point const& a, S2Point const& b,
-                              vector<int>* result) const;
+                              vector_t<int>* result) const;
 
   // Tell the index that we just received a new request for candidates.
   // Useful to compute when to switch to quad tree.
@@ -188,16 +187,16 @@ class S2EdgeIndex {
   // the covered edge.
   int GetCovering(S2Point const& a, S2Point const& b,
                   bool thicken_edge,
-                  vector<S2CellId>* result) const;
+                  vector_t<S2CellId>* result) const;
 
   // Adds to candidate_crossings all the edges present in any ancestor of any
   // cell of cover, down to minimum_s2_level_used.  The cell->edge map
   // is in the variable mapping.
   static void GetEdgesInParentCells(
-    const vector<S2CellId>& cover,
+    const vector_t<S2CellId>& cover,
     const CellEdgeMultimap& mapping,
     int minimum_s2_level_used,
-    vector<int>* candidate_crossings);
+    vector_t<int>* candidate_crossings);
 
   // Returns true if the edge and the cell (including boundary) intersect.
   static bool EdgeIntersectsCellBoundary(
@@ -210,9 +209,9 @@ class S2EdgeIndex {
   // not intersect with edge.
   static void GetEdgesInChildrenCells(
     S2Point const& a, S2Point const& b,
-    vector<S2CellId>* cover,
+    vector_t<S2CellId>* cover,
     const CellEdgeMultimap& mapping,
-    vector<int>* candidate_crossings);
+    vector_t<int>* candidate_crossings);
 
   // Maps cell ids to covered edges; has the property that the set of all cell
   // ids mapping to a particular edge forms a covering of that edge.

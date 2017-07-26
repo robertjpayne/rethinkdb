@@ -5,7 +5,7 @@
 #include <numeric>
 #include <set>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "containers/scoped.hpp"
 #include "rpc/semilattice/view.hpp"
@@ -74,7 +74,7 @@ private:
     }
 
     template <typename T>
-    static std::string item_to_str(const std::vector<T> &vec) {
+    static std::string item_to_str(const vector_t<T> &vec) {
         return concat_internal(vec);
     }
 
@@ -87,7 +87,7 @@ class issue_tracker_t {
 public:
     issue_tracker_t() { }
     virtual ~issue_tracker_t() { }
-    virtual std::vector<scoped_ptr_t<issue_t> > get_issues(signal_t *interruptor) const = 0;
+    virtual vector_t<scoped_ptr_t<issue_t> > get_issues(signal_t *interruptor) const = 0;
 private:
     DISABLE_COPYING(issue_tracker_t);
 };

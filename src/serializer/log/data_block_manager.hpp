@@ -2,7 +2,7 @@
 #ifndef SERIALIZER_LOG_DATA_BLOCK_MANAGER_HPP_
 #define SERIALIZER_LOG_DATA_BLOCK_MANAGER_HPP_
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "arch/types.hpp"
 #include "concurrency/new_semaphore.hpp"
@@ -81,13 +81,13 @@ public:
     // ratio of garbage to blocks in the system
     double garbage_ratio() const;
 
-    std::vector<counted_t<ls_block_token_pointee_t> >
-    many_writes(const std::vector<buf_write_info_t> &writes,
+    vector_t<counted_t<ls_block_token_pointee_t> >
+    many_writes(const vector_t<buf_write_info_t> &writes,
                 file_account_t *io_account,
                 iocallback_t *cb);
 
-    std::vector<std::vector<counted_t<ls_block_token_pointee_t> > >
-    gimme_some_new_offsets(const std::vector<buf_write_info_t> &writes);
+    vector_t<vector_t<counted_t<ls_block_token_pointee_t> > >
+    gimme_some_new_offsets(const vector_t<buf_write_info_t> &writes);
 
     bool is_gc_active() const;
 
@@ -123,7 +123,7 @@ private:
     void gc_one_extent(gc_state_t *gc_state);
 
     void write_gcs(
-        std::vector<gc_write_t> &&writes,
+        vector_t<gc_write_t> &&writes,
         gc_state_t *gc_state,
         scoped_device_block_aligned_ptr_t<char> &&gc_blocks,
         new_semaphore_in_line_t &&index_write_semaphore_acq);
@@ -221,9 +221,9 @@ private:
     to improve GC efficiency on drives with slow random access. */
     struct gc_index_write_t {
         gc_index_write_t(
-            std::vector<counted_t<ls_block_token_pointee_t> > &&old_block_tokens_,
-            std::vector<counted_t<ls_block_token_pointee_t> > &&new_block_tokens_,
-            std::vector<gc_write_t> &&writes_,
+            vector_t<counted_t<ls_block_token_pointee_t> > &&old_block_tokens_,
+            vector_t<counted_t<ls_block_token_pointee_t> > &&new_block_tokens_,
+            vector_t<gc_write_t> &&writes_,
             gc_state_t *gc_state_,
             scoped_device_block_aligned_ptr_t<char> &&gc_blocks_)
             : old_block_tokens(std::move(old_block_tokens_)),
@@ -231,15 +231,15 @@ private:
               writes(std::move(writes_)),
               gc_state(gc_state_),
               gc_blocks(std::move(gc_blocks_)) { }
-        std::vector<counted_t<ls_block_token_pointee_t> > old_block_tokens;
-        std::vector<counted_t<ls_block_token_pointee_t> > new_block_tokens;
-        std::vector<gc_write_t> writes;
+        vector_t<counted_t<ls_block_token_pointee_t> > old_block_tokens;
+        vector_t<counted_t<ls_block_token_pointee_t> > new_block_tokens;
+        vector_t<gc_write_t> writes;
         gc_state_t *gc_state;
         scoped_device_block_aligned_ptr_t<char> gc_blocks;
 
         MOVABLE_BUT_NOT_COPYABLE(gc_index_write_t);
     };
-    std::vector<gc_index_write_t> collected_gc_index_writes;
+    vector_t<gc_index_write_t> collected_gc_index_writes;
     pump_coro_t gc_index_write_pumper;
 
     /* This semaphore is there to maximize the number of GC
@@ -272,7 +272,7 @@ void unaligned_read_ahead_interval(const int64_t block_offset,
                                    const uint32_t ser_block_size,
                                    const int64_t extent_size,
                                    const int64_t read_ahead_size,
-                                   const std::vector<uint32_t> &boundaries,
+                                   const vector_t<uint32_t> &boundaries,
                                    int64_t *const offset_out,
                                    int64_t *const end_offset_out);
 

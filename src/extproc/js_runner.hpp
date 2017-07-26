@@ -3,7 +3,7 @@
 #define EXTPROC_JS_RUNNER_HPP_
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 #include <set>
 
 #include "errors.hpp"
@@ -54,7 +54,7 @@ public:
 
     // Calls a previously compiled function.
     js_result_t call(const std::string &source,
-                     const std::vector<ql::datum_t> &args,
+                     const vector_t<ql::datum_t> &args,
                      const req_config_t &config);
 
 private:

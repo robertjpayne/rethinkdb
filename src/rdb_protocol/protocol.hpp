@@ -8,7 +8,7 @@
 #include <set>
 #include <string>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "errors.hpp"
 #include <boost/variant.hpp>
@@ -135,12 +135,12 @@ RDB_DECLARE_SERIALIZABLE_FOR_CLUSTER(rget_read_response_t);
 
 struct nearest_geo_read_response_t {
     typedef std::pair<double, ql::datum_t> dist_pair_t;
-    typedef std::vector<dist_pair_t> result_t;
+    typedef vector_t<dist_pair_t> result_t;
     boost::variant<result_t, ql::exc_t> results_or_error;
 
     nearest_geo_read_response_t() { }
     explicit nearest_geo_read_response_t(result_t &&_results) {
-        // Implement "move" on _results through std::vector<...>::swap to avoid
+        // Implement "move" on _results through vector_t<...>::swap to avoid
         // problems with boost::variant not supporting move assignment.
         results_or_error = result_t();
         boost::get<result_t>(&results_or_error)->swap(_results);
@@ -173,7 +173,7 @@ RDB_DECLARE_SERIALIZABLE_FOR_CLUSTER(changefeed_subscribe_response_t);
 
 struct changefeed_limit_subscribe_response_t {
     int64_t shards;
-    std::vector<ql::changefeed::server_t::limit_addr_t> limit_addrs;
+    vector_t<ql::changefeed::server_t::limit_addr_t> limit_addrs;
 
     changefeed_limit_subscribe_response_t() { }
     changefeed_limit_subscribe_response_t(
@@ -303,7 +303,7 @@ public:
                 serializable_env_t s_env,
                 std::string _table_name,
                 ql::batchspec_t _batchspec,
-                std::vector<ql::transform_variant_t> _transforms,
+                vector_t<ql::transform_variant_t> _transforms,
                 optional<ql::terminal_variant_t> &&_terminal,
                 optional<sindex_rangespec_t> &&_sindex,
                 sorting_t _sorting)
@@ -334,7 +334,7 @@ public:
     ql::batchspec_t batchspec; // used to size batches
 
     // We use these two for lazy maps, reductions, etc.
-    std::vector<ql::transform_variant_t> transforms;
+    vector_t<ql::transform_variant_t> transforms;
     optional<ql::terminal_variant_t> terminal;
 
     // This is non-empty if we're doing an sindex read.
@@ -356,7 +356,7 @@ public:
         serializable_env_t s_env,
         std::string _table_name,
         ql::batchspec_t _batchspec,
-        std::vector<ql::transform_variant_t> _transforms,
+        vector_t<ql::transform_variant_t> _transforms,
         optional<ql::terminal_variant_t> &&_terminal,
         sindex_rangespec_t &&_sindex,
         ql::datum_t _query_geometry)
@@ -378,7 +378,7 @@ public:
     ql::batchspec_t batchspec; // used to size batches
 
     // We use these two for lazy maps, reductions, etc.
-    std::vector<ql::transform_variant_t> transforms;
+    vector_t<ql::transform_variant_t> transforms;
     optional<ql::terminal_variant_t> terminal;
 
     sindex_rangespec_t sindex;
@@ -573,7 +573,7 @@ RDB_DECLARE_SERIALIZABLE_FOR_CLUSTER(write_response_t);
 struct batched_replace_t {
     batched_replace_t() { }
     batched_replace_t(
-            std::vector<store_key_t> &&_keys,
+            vector_t<store_key_t> &&_keys,
             const std::string &_pkey,
             const counted_t<const ql::func_t> &func,
             const optional<counted_t<const ql::func_t> > &wh,
@@ -591,7 +591,7 @@ struct batched_replace_t {
         }
 
     }
-    std::vector<store_key_t> keys;
+    vector_t<store_key_t> keys;
     std::string pkey;
     ql::wire_func_t f;
     optional<ql::wire_func_t> write_hook;
@@ -603,7 +603,7 @@ RDB_DECLARE_SERIALIZABLE_FOR_CLUSTER(batched_replace_t);
 struct batched_insert_t {
     batched_insert_t() { }
     batched_insert_t(
-        std::vector<ql::datum_t> &&_inserts,
+        vector_t<ql::datum_t> &&_inserts,
         const std::string &_pkey,
         const optional<counted_t<const ql::func_t> > &_write_hook,
         conflict_behavior_t _conflict_behavior,
@@ -612,7 +612,7 @@ struct batched_insert_t {
         serializable_env_t s_env,
         return_changes_t _return_changes);
 
-    std::vector<ql::datum_t> inserts;
+    vector_t<ql::datum_t> inserts;
     std::string pkey;
     optional<ql::wire_func_t> write_hook;
     conflict_behavior_t conflict_behavior;

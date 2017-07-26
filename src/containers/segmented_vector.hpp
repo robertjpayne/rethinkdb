@@ -6,7 +6,7 @@
 
 #include <memory>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "errors.hpp"
 
@@ -137,7 +137,7 @@ private:
         element_t elements[ELEMENTS_PER_SEGMENT];
     };
 
-    mutable std::vector<std::unique_ptr<segment_t>> segments_;
+    mutable vector_t<std::unique_ptr<segment_t>> segments_;
     size_t size_;
 
     DISABLE_COPYING(segmented_vector_t);

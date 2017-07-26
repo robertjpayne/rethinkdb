@@ -4,7 +4,7 @@
 
 #include <exception>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 #include <map>
 #include <utility>
 
@@ -23,7 +23,7 @@ struct http_result_t {
 
     // Cookies are not used in the query language, but they should be passed to any
     // subsequent HTTP requests for the query (e.g. if performing depagination).
-    std::vector<std::string> cookies;
+    vector_t<std::string> cookies;
     std::string error;
 };
 
@@ -99,8 +99,8 @@ struct http_opts_t {
     std::string proxy;
     std::string url;
     ql::datum_t url_params;
-    std::vector<std::string> header;
-    std::vector<std::string> cookies;
+    vector_t<std::string> header;
+    vector_t<std::string> cookies;
 
     // These will be used based on the method specified
     std::string data;

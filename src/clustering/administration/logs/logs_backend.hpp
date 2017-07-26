@@ -5,7 +5,7 @@
 #include <map>
 #include <set>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/artificial_table/caching_cfeed_backend.hpp"
 #include "clustering/administration/metadata.hpp"
@@ -41,7 +41,7 @@ public:
     bool read_all_rows_as_vector(
             auth::user_context_t const &user_context,
             signal_t *interruptor,
-            std::vector<ql::datum_t> *rows_out,
+            vector_t<ql::datum_t> *rows_out,
             admin_err_t *error_out);
 
     bool read_row(
@@ -92,7 +92,7 @@ private:
         new changefeed */
         bool get_initial_values(
             const new_mutex_acq_t *proof,
-            std::vector<ql::datum_t> *initial_values_out,
+            vector_t<ql::datum_t> *initial_values_out,
             signal_t *interruptor);
 
         logs_artificial_table_backend_t *parent;

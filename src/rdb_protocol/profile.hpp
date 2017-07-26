@@ -3,7 +3,7 @@
 #define RDB_PROTOCOL_PROFILE_HPP_
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "errors.hpp"
 #include <boost/variant.hpp>
@@ -66,7 +66,7 @@ RDB_DECLARE_SERIALIZABLE(stop_t);
 
 typedef boost::variant<start_t, split_t, sample_t, stop_t> event_t;
 
-typedef std::vector<event_t> event_log_t;
+typedef vector_t<event_t> event_log_t;
 
 /* A trace_t contains an event_log_t and provides private methods for adding
  * events to it. These methods are leveraged by the instruments. */

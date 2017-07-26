@@ -109,7 +109,7 @@ bool looks_like_option_name(const char *const str) {
     return str[0] == '-';
 }
 
-const option_t *find_option(const char *const option_name, const std::vector<option_t> &options) {
+const option_t *find_option(const char *const option_name, const vector_t<option_t> &options) {
     for (auto it = options.begin(); it != options.end(); ++it) {
         for (auto name_it = it->names.begin(); name_it != it->names.end(); ++name_it) {
             if (*name_it == option_name) {
@@ -120,7 +120,7 @@ const option_t *find_option(const char *const option_name, const std::vector<opt
     return nullptr;
 }
 
-std::map<std::string, values_t> default_values_map(const std::vector<option_t> &options) {
+std::map<std::string, values_t> default_values_map(const vector_t<option_t> &options) {
     std::map<std::string, values_t> names_by_values;
     for (auto it = options.begin(); it != options.end(); ++it) {
         if (it->min_appearances == 0) {
@@ -144,14 +144,14 @@ std::map<std::string, values_t> merge(const std::map<std::string, values_t> &hig
 }
 
 std::map<std::string, values_t> do_parse_command_line(
-    const int argc, const char *const *const argv, const std::vector<option_t> &options,
-    std::vector<std::string> *const unrecognized_out) {
+    const int argc, const char *const *const argv, const vector_t<option_t> &options,
+    vector_t<std::string> *const unrecognized_out) {
     guarantee(argc >= 0);
 
     const std::string source = "the command line";
 
     std::map<std::string, values_t> names_by_values;
-    std::vector<std::string> unrecognized;
+    vector_t<std::string> unrecognized;
 
     for (int i = 0; i < argc; ) {
         // The option name as seen _in the command line_.  We output this in
@@ -177,7 +177,7 @@ std::map<std::string, values_t> do_parse_command_line(
         if (option->no_parameter) {
             // Push an empty parameter value -- in particular, this makes our
             // duplicate checking work.
-            auto res = names_by_values.insert(std::make_pair(official_name, values_t(source, std::vector<std::string>())));
+            auto res = names_by_values.insert(std::make_pair(official_name, values_t(source, vector_t<std::string>())));
             res.first->second.values.push_back("");
         } else {
             if (i == argc) {
@@ -192,7 +192,7 @@ std::map<std::string, values_t> do_parse_command_line(
                 throw missing_parameter_error_t(source, option_name);
             }
 
-            auto res = names_by_values.insert(std::make_pair(official_name, values_t(source, std::vector<std::string>())));
+            auto res = names_by_values.insert(std::make_pair(official_name, values_t(source, vector_t<std::string>())));
             res.first->second.values.push_back(option_parameter);
         }
     }
@@ -204,13 +204,13 @@ std::map<std::string, values_t> do_parse_command_line(
     return names_by_values;
 }
 
-std::map<std::string, values_t> parse_command_line(const int argc, const char *const *const argv, const std::vector<option_t> &options) {
+std::map<std::string, values_t> parse_command_line(const int argc, const char *const *const argv, const vector_t<option_t> &options) {
     return do_parse_command_line(argc, argv, options, nullptr);
 }
 
 std::map<std::string, values_t> parse_command_line_and_collect_unrecognized(
-    int argc, const char *const *argv, const std::vector<option_t> &options,
-    std::vector<std::string> *unrecognized_out) {
+    int argc, const char *const *argv, const vector_t<option_t> &options,
+    vector_t<std::string> *unrecognized_out) {
     // We check that unrecognized_out is not NULL because do_parse_command_line
     // throws some exceptions depending on the nullness of that value.
     guarantee(unrecognized_out != nullptr);
@@ -218,7 +218,7 @@ std::map<std::string, values_t> parse_command_line_and_collect_unrecognized(
     return do_parse_command_line(argc, argv, options, unrecognized_out);
 }
 
-void verify_option_counts(const std::vector<option_t> &options,
+void verify_option_counts(const vector_t<option_t> &options,
                           const std::map<std::string, values_t> &names_by_values) {
     for (auto option = options.begin(); option != options.end(); ++option) {
         const std::string option_name = option->names[0];
@@ -243,8 +243,8 @@ void verify_option_counts(const std::vector<option_t> &options,
     }
 }
 
-std::vector<std::string> split_by_lines(const std::string &s) {
-    std::vector<std::string> ret;
+vector_t<std::string> split_by_lines(const std::string &s) {
+    vector_t<std::string> ret;
     auto it = s.begin();
     auto const end = s.end();
 
@@ -274,11 +274,11 @@ bool is_not_space(char ch) {
 
 std::map<std::string, values_t> parse_config_file(const std::string &file_contents,
                                                   const std::string &filepath,
-                                                  const std::vector<option_t> &options,
-                                                  const std::vector<option_t> &options_superset) {
+                                                  const vector_t<option_t> &options,
+                                                  const vector_t<option_t> &options_superset) {
     const std::string source = "the configuration file " + filepath;
 
-    const std::vector<std::string> lines = split_by_lines(file_contents);
+    const vector_t<std::string> lines = split_by_lines(file_contents);
     std::set<std::string> ignored_options;
 
     std::map<std::string, values_t> ret;
@@ -330,7 +330,7 @@ std::map<std::string, values_t> parse_config_file(const std::string &file_conten
                                                    it - lines.begin(),
                                                    name.c_str()));
             }
-            auto res = ret.insert(std::make_pair(option_name, values_t(source, std::vector<std::string>())));
+            auto res = ret.insert(std::make_pair(option_name, values_t(source, vector_t<std::string>())));
             res.first->second.values.push_back("");
         } else {
             // Option requires a parameter, parse it out
@@ -354,7 +354,7 @@ std::map<std::string, values_t> parse_config_file(const std::string &file_conten
                                                    name.c_str()));
             }
 
-            auto res = ret.insert(std::make_pair(option_name, values_t(source, std::vector<std::string>())));
+            auto res = ret.insert(std::make_pair(option_name, values_t(source, vector_t<std::string>())));
             res.first->second.values.push_back(value);
         }
     }
@@ -374,8 +374,8 @@ std::map<std::string, values_t> parse_config_file(const std::string &file_conten
     return ret;
 }
 
-std::vector<std::string> word_wrap(const std::string &s, const size_t width) {
-    std::vector<std::string> ret;
+vector_t<std::string> word_wrap(const std::string &s, const size_t width) {
+    vector_t<std::string> ret;
 
     auto it = s.begin();
     auto const end = s.end();
@@ -426,7 +426,7 @@ std::vector<std::string> word_wrap(const std::string &s, const size_t width) {
     return ret;
 }
 
-std::string format_help(const std::vector<help_section_t> &help) {
+std::string format_help(const vector_t<help_section_t> &help) {
     size_t max_syntax_description_length = 0;
     for (auto section = help.begin(); section != help.end(); ++section) {
         for (auto line = section->help_lines.begin(); line != section->help_lines.end(); ++line) {
@@ -446,7 +446,7 @@ std::string format_help(const std::vector<help_section_t> &help) {
         ret += ":\n";
 
         for (auto line = section->help_lines.begin(); line != section->help_lines.end(); ++line) {
-            std::vector<std::string> parts = word_wrap(line->blurb, summary_width);
+            vector_t<std::string> parts = word_wrap(line->blurb, summary_width);
 
             for (size_t i = 0; i < parts.size(); ++i) {
                 if (i == 0) {

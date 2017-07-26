@@ -2,7 +2,7 @@
 #ifndef RDB_PROTOCOL_WIRE_FUNC_HPP_
 #define RDB_PROTOCOL_WIRE_FUNC_HPP_
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "containers/counted.hpp"
 #include "containers/optional.hpp"
@@ -26,7 +26,7 @@ public:
 
     // Constructs a wire_func_t with a body and arglist, but no scope.
     wire_func_t(const raw_term_t &body,
-                std::vector<sym_t> arg_names);
+                vector_t<sym_t> arg_names);
 
     counted_t<const func_t> compile_wire_func() const;
     backtrace_id_t get_bt() const;
@@ -120,15 +120,15 @@ RDB_DECLARE_SERIALIZABLE_FOR_CLUSTER(zip_wire_func_t);
 class group_wire_func_t {
 public:
     group_wire_func_t() : bt(backtrace_id_t::empty()) { }
-    group_wire_func_t(std::vector<counted_t<const func_t> > &&_funcs,
+    group_wire_func_t(vector_t<counted_t<const func_t> > &&_funcs,
                       bool _append_index, bool _multi);
-    std::vector<counted_t<const func_t> > compile_funcs() const;
+    vector_t<counted_t<const func_t> > compile_funcs() const;
     bool should_append_index() const;
     bool is_multi() const;
     backtrace_id_t get_bt() const;
     RDB_DECLARE_ME_SERIALIZABLE(group_wire_func_t);
 private:
-    std::vector<wire_func_t> funcs;
+    vector_t<wire_func_t> funcs;
     bool append_index, multi;
     backtrace_id_t bt;
 };

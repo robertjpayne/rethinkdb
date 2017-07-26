@@ -47,7 +47,7 @@ std::string issues_artificial_table_backend_t::get_primary_key_name() {
 bool issues_artificial_table_backend_t::read_all_rows_as_vector(
         UNUSED auth::user_context_t const &user_context,
         signal_t *interruptor,
-        std::vector<ql::datum_t> *rows_out,
+        vector_t<ql::datum_t> *rows_out,
         UNUSED admin_err_t *error_out) {
     cross_thread_signal_t ct_interruptor(interruptor, home_thread());
     on_thread_t rethreader(home_thread());
@@ -87,7 +87,7 @@ bool issues_artificial_table_backend_t::read_row(
     uuid_u issue_id;
     admin_err_t dummy_error;
     if (convert_uuid_from_datum(primary_key, &issue_id, &dummy_error)) {
-        std::vector<scoped_ptr_t<issue_t> > issues = all_issues(&ct_interruptor);
+        vector_t<scoped_ptr_t<issue_t> > issues = all_issues(&ct_interruptor);
 
         for (auto const &issue : issues) {
             if (issue->get_id() == issue_id) {
@@ -104,12 +104,12 @@ bool issues_artificial_table_backend_t::read_row(
     return true;
 }
 
-std::vector<scoped_ptr_t<issue_t> > issues_artificial_table_backend_t::all_issues(
+vector_t<scoped_ptr_t<issue_t> > issues_artificial_table_backend_t::all_issues(
         signal_t *interruptor) const {
-    std::vector<scoped_ptr_t<issue_t> > res;
+    vector_t<scoped_ptr_t<issue_t> > res;
 
     for (auto const &tracker : trackers) {
-        std::vector<scoped_ptr_t<issue_t> > issues = tracker->get_issues(interruptor);
+        vector_t<scoped_ptr_t<issue_t> > issues = tracker->get_issues(interruptor);
         std::move(issues.begin(), issues.end(), std::back_inserter(res));
     }
 

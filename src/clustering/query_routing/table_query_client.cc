@@ -158,7 +158,7 @@ void table_query_client_t::write(
 
 std::set<region_t> table_query_client_t::get_sharding_scheme()
         THROWS_ONLY(cannot_perform_query_exc_t) {
-    std::vector<region_t> s;
+    vector_t<region_t> s;
     relationships.visit(relationships.get_domain(),
     [&](const region_t &, const std::set<relationship_t *> &rels) {
         for (relationship_t *rel : rels) {
@@ -198,7 +198,7 @@ void table_query_client_t::dispatch_immediate_op(
 
     if (interruptor->is_pulsed()) throw interrupted_exc_t();
 
-    std::vector<scoped_ptr_t<immediate_op_info_t<op_type, fifo_enforcer_token_type> > >
+    vector_t<scoped_ptr_t<immediate_op_info_t<op_type, fifo_enforcer_token_type> > >
         primaries_to_contact;
     scoped_ptr_t<immediate_op_info_t<op_type, fifo_enforcer_token_type> >
         new_op_info(new immediate_op_info_t<op_type, fifo_enforcer_token_type>());
@@ -238,8 +238,8 @@ void table_query_client_t::dispatch_immediate_op(
         }
     });
 
-    std::vector<op_response_type> results(primaries_to_contact.size());
-    std::vector<optional<cannot_perform_query_exc_t> >
+    vector_t<op_response_type> results(primaries_to_contact.size());
+    vector_t<optional<cannot_perform_query_exc_t> >
         failures(primaries_to_contact.size());
     pmap(primaries_to_contact.size(), std::bind(
              &table_query_client_t::template perform_immediate_op<
@@ -294,10 +294,10 @@ void table_query_client_t::perform_immediate_op(
         signal_t *)
     /* THROWS_ONLY(interrupted_exc_t, resource_lost_exc_t,
        cannot_perform_query_exc_t) */,
-    std::vector<scoped_ptr_t<immediate_op_info_t<op_type, fifo_enforcer_token_type> > >
+    vector_t<scoped_ptr_t<immediate_op_info_t<op_type, fifo_enforcer_token_type> > >
         *primaries_to_contact,
-    std::vector<op_response_type> *results,
-    std::vector<optional<cannot_perform_query_exc_t> > *failures,
+    vector_t<op_response_type> *results,
+    vector_t<optional<cannot_perform_query_exc_t> > *failures,
     order_token_t order_token,
     size_t i,
     signal_t *interruptor)
@@ -339,13 +339,13 @@ void table_query_client_t::dispatch_outdated_read(
 
     if (interruptor->is_pulsed()) throw interrupted_exc_t();
 
-    std::vector<scoped_ptr_t<outdated_read_info_t> > replicas_to_contact;
+    vector_t<scoped_ptr_t<outdated_read_info_t> > replicas_to_contact;
 
     scoped_ptr_t<outdated_read_info_t> new_op_info(new outdated_read_info_t());
     relationships.visit(region_t::universe(),
     [&](const region_t &region, const std::set<relationship_t *> &rels) {
         if (op.shard(region, &new_op_info->sharded_op)) {
-            std::vector<relationship_t *> potential_relationships;
+            vector_t<relationship_t *> potential_relationships;
             relationship_t *chosen_relationship = nullptr;
             for (auto jt = rels.begin(); jt != rels.end(); ++jt) {
                 // See the comment in `dispatch_immediate_op` about why we need to
@@ -378,8 +378,8 @@ void table_query_client_t::dispatch_outdated_read(
         }
     });
 
-    std::vector<read_response_t> results(replicas_to_contact.size());
-    std::vector<std::string> failures(replicas_to_contact.size());
+    vector_t<read_response_t> results(replicas_to_contact.size());
+    vector_t<std::string> failures(replicas_to_contact.size());
     pmap(replicas_to_contact.size(),
         std::bind(&table_query_client_t::perform_outdated_read, this,
             &replicas_to_contact, &results, &failures, ph::_1, interruptor));
@@ -397,9 +397,9 @@ void table_query_client_t::dispatch_outdated_read(
 }
 
 void table_query_client_t::perform_outdated_read(
-        std::vector<scoped_ptr_t<outdated_read_info_t> > *replicas_to_contact,
-        std::vector<read_response_t> *results,
-        std::vector<std::string> *failures,
+        vector_t<scoped_ptr_t<outdated_read_info_t> > *replicas_to_contact,
+        vector_t<read_response_t> *results,
+        vector_t<std::string> *failures,
         size_t i,
         signal_t *interruptor) THROWS_NOTHING {
     outdated_read_info_t *replica_to_contact = (*replicas_to_contact)[i].get();
@@ -444,7 +444,7 @@ void table_query_client_t::dispatch_debug_direct_read(
                 "This server does not have any data available for the given table.",
                 query_state_t::FAILED);
         }
-        std::vector<read_response_t> responses;
+        vector_t<read_response_t> responses;
         pmap(CPU_SHARDING_FACTOR, [&](size_t shard_number) {
             try {
                 region_t region = cpu_sharding_subspace(shard_number);

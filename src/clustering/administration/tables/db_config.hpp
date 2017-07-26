@@ -4,7 +4,7 @@
 
 #include <memory>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "clustering/administration/tables/database_metadata.hpp"
 #include "containers/uuid.hpp"
@@ -37,7 +37,7 @@ public:
     bool read_all_rows_as_vector(
             auth::user_context_t const &user_context,
             signal_t *interruptor_on_caller,
-            std::vector<ql::datum_t> *rows_out,
+            vector_t<ql::datum_t> *rows_out,
             admin_err_t *error_out);
 
     bool read_row(

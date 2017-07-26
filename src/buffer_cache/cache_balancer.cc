@@ -104,7 +104,7 @@ void alt_cache_balancer_t::rebalance_blocking(UNUSED signal_t *interruptor) {
         static_cast<uint64_t>(std::numeric_limits<intptr_t>::max()));
 
     const size_t num_threads = per_thread_data.size();
-    scoped_array_t<std::vector<cache_data_t> > cache_data(num_threads);
+    scoped_array_t<vector_t<cache_data_t> > cache_data(num_threads);
     scoped_array_t<bool> zero_access_counts(num_threads);
 
     // Get cache sizes from shards on each thread
@@ -216,13 +216,13 @@ void alt_cache_balancer_t::rebalance_blocking(UNUSED signal_t *interruptor) {
 
 void alt_cache_balancer_t::collect_stats_from_thread(
         int index,
-        scoped_array_t<std::vector<cache_data_t> > *data_out,
+        scoped_array_t<vector_t<cache_data_t> > *data_out,
         scoped_array_t<bool> *zero_access_count_out) {
     on_thread_t rethreader((threadnum_t(index)));
 
     ASSERT_NO_CORO_WAITING;
     const std::set<alt::evicter_t *> *evicters = &per_thread_data[index].evicters;
-    std::vector<cache_data_t> *per_evicter_data = &(*data_out)[index];
+    vector_t<cache_data_t> *per_evicter_data = &(*data_out)[index];
 
     bool all_access_counts_zero = true;
 
@@ -238,12 +238,12 @@ void alt_cache_balancer_t::collect_stats_from_thread(
 }
 
 void alt_cache_balancer_t::apply_rebalance_to_thread(int index,
-        const scoped_array_t<std::vector<cache_data_t> > *new_sizes,
+        const scoped_array_t<vector_t<cache_data_t> > *new_sizes,
         bool new_read_ahead_ok) {
     on_thread_t rethreader((threadnum_t(index)));
 
     const std::set<alt::evicter_t *> *evicters = &per_thread_data[index].evicters;
-    const std::vector<cache_data_t> *sizes = &(*new_sizes)[index];
+    const vector_t<cache_data_t> *sizes = &(*new_sizes)[index];
 
     ASSERT_NO_CORO_WAITING;
     for (auto it = sizes->begin(); it != sizes->end(); ++it) {

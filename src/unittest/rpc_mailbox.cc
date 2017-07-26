@@ -146,7 +146,7 @@ TPTEST_MULTITHREAD(RPCMailboxTest, MailboxAddressSemantics, 3) {
 
 /* `TypedMailbox` makes sure that `mailbox_t<>` works. */
 
-void string_push_back(std::vector<std::string> *v, const std::string &pushee) {
+void string_push_back(vector_t<std::string> *v, const std::string &pushee) {
     v->push_back(pushee);
 }
 
@@ -155,7 +155,7 @@ TPTEST_MULTITHREAD(RPCMailboxTest, TypedMailbox, 3) {
     mailbox_manager_t m(&c, 'M');
     test_cluster_run_t r(&c);
 
-    std::vector<std::string> inbox;
+    vector_t<std::string> inbox;
     mailbox_t<std::string> mbox(&m,
         [&](signal_t *, const std::string &str) {
             inbox.push_back(str);

@@ -3,7 +3,7 @@
 #ifndef UTIL_GEOMETRY_S2POLYLINE_H__
 #define UTIL_GEOMETRY_S2POLYLINE_H__
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/geo/s2/base/logging.h"
 #include "rdb_protocol/geo/s2/base/macros.h"
@@ -13,7 +13,6 @@
 #include "utils.hpp"
 
 namespace geo {
-using std::vector;
 
 class S1Angle;
 
@@ -27,22 +26,22 @@ class S2Polyline : public S2Region {
   S2Polyline();
 
   // Convenience constructors that call Init() with the given vertices.
-  S2Polyline(vector<S2Point> const& vertices);
-  S2Polyline(vector<S2LatLng> const& vertices);
+  S2Polyline(vector_t<S2Point> const& vertices);
+  S2Polyline(vector_t<S2LatLng> const& vertices);
 
   // Initialize a polyline that connects the given vertices. Empty polylines are
   // allowed.  Adjacent vertices should not be identical or antipodal.  All
   // vertices should be unit length.
-  void Init(vector<S2Point> const& vertices);
+  void Init(vector_t<S2Point> const& vertices);
 
   // Convenience initialization function that accepts latitude-longitude
   // coordinates rather than S2Points.
-  void Init(vector<S2LatLng> const& vertices);
+  void Init(vector_t<S2LatLng> const& vertices);
 
   ~S2Polyline();
 
   // Return true if the given vertices form a valid polyline.
-  static bool IsValid(vector<S2Point> const& vertices);
+  static bool IsValid(vector_t<S2Point> const& vertices);
 
   int num_vertices() const { return num_vertices_; }
   S2Point const& vertex(int k) const {
@@ -144,7 +143,7 @@ class S2Polyline : public S2Region {
   //    (to within the given tolerance).  This is different than the
   //    Douglas-Peucker algorithm used in maps/util/geoutil-inl.h, which only
   //    guarantees geometric equivalence.
-  void SubsampleVertices(S1Angle const& tolerance, vector<int>* indices) const;
+  void SubsampleVertices(S1Angle const& tolerance, vector_t<int>* indices) const;
 
   // Return true if two polylines have the same number of vertices, and
   // corresponding vertex pairs are separated by no more than "max_error".

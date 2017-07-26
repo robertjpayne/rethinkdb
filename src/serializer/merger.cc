@@ -38,7 +38,7 @@ counted_t<standard_block_token_t> merger_serializer_t::index_read(block_id_t blo
 
 void merger_serializer_t::index_write(new_mutex_in_line_t *mutex_acq,
                                       const std::function<void()> &on_writes_reflected,
-                                      const std::vector<index_write_op_t> &write_ops) {
+                                      const vector_t<index_write_op_t> &write_ops) {
     rassert(coro_t::self() != nullptr);
     assert_thread();
 
@@ -73,7 +73,7 @@ void merger_serializer_t::do_index_write() {
 
     // Assemble the currently outstanding index writes into
     // a vector of index_write_op_t-s.
-    std::vector<index_write_op_t> write_ops;
+    vector_t<index_write_op_t> write_ops;
     write_ops.reserve(outstanding_index_write_ops.size());
     for (auto op_pair = outstanding_index_write_ops.begin();
          op_pair != outstanding_index_write_ops.end();

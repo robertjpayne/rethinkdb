@@ -6,7 +6,7 @@
 
 #include <map>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 #include <set>
 
 #include "clustering/administration/auth/permission_error.hpp"
@@ -115,9 +115,9 @@ private:
     template <class op_type, class fifo_enforcer_token_type, class op_response_type>
     void perform_immediate_op(
             void (primary_query_client_t::*how_to_run_query)(const op_type &, op_response_type *, order_token_t, fifo_enforcer_token_type *, signal_t *) /* THROWS_ONLY(interrupted_exc_t, cannot_perform_query_exc_t) */,
-            std::vector<scoped_ptr_t<immediate_op_info_t<op_type, fifo_enforcer_token_type> > > *masters_to_contact,
-            std::vector<op_response_type> *results,
-            std::vector<optional<cannot_perform_query_exc_t> > *failures,
+            vector_t<scoped_ptr_t<immediate_op_info_t<op_type, fifo_enforcer_token_type> > > *masters_to_contact,
+            vector_t<op_response_type> *results,
+            vector_t<optional<cannot_perform_query_exc_t> > *failures,
             order_token_t order_token,
             size_t i,
             signal_t *interruptor)
@@ -130,9 +130,9 @@ private:
         THROWS_ONLY(interrupted_exc_t, cannot_perform_query_exc_t);
 
     void perform_outdated_read(
-            std::vector<scoped_ptr_t<outdated_read_info_t> > *direct_readers_to_contact,
-            std::vector<read_response_t> *results,
-            std::vector<std::string> *failures,
+            vector_t<scoped_ptr_t<outdated_read_info_t> > *direct_readers_to_contact,
+            vector_t<read_response_t> *results,
+            vector_t<std::string> *failures,
             size_t i,
             signal_t *interruptor)
         THROWS_NOTHING;

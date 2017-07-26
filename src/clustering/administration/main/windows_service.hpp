@@ -6,7 +6,7 @@
 #include <exception>
 #include <functional>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "errors.hpp"
 
@@ -32,7 +32,7 @@ bool install_windows_service(
     const std::string &service_name,
     const std::string &display_name,
     const std::string &bin_path,
-    const std::vector<std::string> &arguments,
+    const vector_t<std::string> &arguments,
     const char *account_name = nullptr /* LocalSystem account if nullptr */,
     const char *account_password = nullptr);
 bool remove_windows_service(const std::string &service_name);

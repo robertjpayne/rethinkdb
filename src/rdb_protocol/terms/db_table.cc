@@ -313,7 +313,7 @@ private:
             REQL_RETHROW(error);
         }
 
-        std::vector<datum_t> arr;
+        vector_t<datum_t> arr;
         arr.reserve(dbs.size());
         for (auto it = dbs.begin(); it != dbs.end(); ++it) {
             arr.push_back(datum_t(datum_string_t(it->str())));
@@ -346,7 +346,7 @@ private:
             REQL_RETHROW(error);
         }
 
-        std::vector<datum_t> arr;
+        vector_t<datum_t> arr;
         arr.reserve(tables.size());
         for (auto it = tables.begin(); it != tables.end(); ++it) {
             arr.push_back(datum_t(datum_string_t(it->str())));

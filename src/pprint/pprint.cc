@@ -2,7 +2,7 @@
 #include "pprint/pprint.hpp"
 
 #include <algorithm>
-#include <vector>
+#include "containers/vector.hpp"
 #include <list>
 #include <functional>
 #include <memory>
@@ -102,9 +102,9 @@ public:
 // concatenation of multiple documents
 class concat_t : public document_t {
 public:
-    std::vector<counted_t<const document_t> > children;
+    vector_t<counted_t<const document_t> > children;
 
-    explicit concat_t(std::vector<counted_t<const document_t> > args)
+    explicit concat_t(vector_t<counted_t<const document_t> > args)
         : children(std::move(args)) {}
     template <typename It>
     concat_t(It begin, It end)
@@ -131,7 +131,7 @@ public:
     void visit(const document_visitor_t &v) const override { v(*this); }
 };
 
-counted_t<const document_t> make_concat(std::vector<counted_t<const document_t> > args) {
+counted_t<const document_t> make_concat(vector_t<counted_t<const document_t> > args) {
     return make_counted<concat_t>(std::move(args));
 }
 counted_t<const document_t>
@@ -189,7 +189,7 @@ const counted_t<const document_t> uncond_linebreak = make_counted<linebreak_t>()
 counted_t<const document_t>
 comma_separated(std::initializer_list<counted_t<const document_t> > init) {
     if (init.size() == 0) return empty;
-    std::vector<counted_t<const document_t> > v;
+    vector_t<counted_t<const document_t> > v;
     auto it = init.begin();
     v.push_back(*it++);
     for (; it != init.end(); it++) {
@@ -211,7 +211,7 @@ template <typename It>
 counted_t<const document_t> dotted_list_int(It begin, It end) {
     static const counted_t<const document_t> plain_dot = make_counted<text_t>(".");
     if (begin == end) return empty;
-    std::vector<counted_t<const document_t> > v;
+    vector_t<counted_t<const document_t> > v;
     It it = begin;
     v.push_back(*it++);
     if (it == end) return make_nest(v[0]);
@@ -246,7 +246,7 @@ counted_t<const document_t> funcall(const std::string &name,
 counted_t<const document_t>
 r_dot(std::initializer_list<counted_t<const document_t> > args) {
     static const counted_t<const document_t> r = make_counted<text_t>("r");
-    std::vector<counted_t<const document_t> > v;
+    vector_t<counted_t<const document_t> > v;
     v.push_back(r);
     v.insert(v.end(), args.begin(), args.end());
     return dotted_list_int(v.begin(), v.end());
@@ -538,7 +538,7 @@ counted_t<fn_wrapper_t> annotate_stream(counted_t<fn_wrapper_t> fn) {
 class correct_gbeg_visitor_t : public stream_element_visitor_t {
     counted_t<fn_wrapper_t> fn;
     typedef std::unique_ptr<std::list<counted_t<stream_element_t> > > buffer_t;
-    std::vector<buffer_t> lookahead;
+    vector_t<buffer_t> lookahead;
 
 public:
     explicit correct_gbeg_visitor_t(counted_t<fn_wrapper_t> f) : fn(f), lookahead() {}
@@ -631,7 +631,7 @@ counted_t<fn_wrapper_t> correct_gbeg_stream(counted_t<fn_wrapper_t> fn) {
 class output_visitor_t : public stream_element_visitor_t {
     const size_t width;
     size_t fittingElements, rightEdge, hpos;
-    std::vector<size_t> indent;
+    vector_t<size_t> indent;
 public:
     std::string result;
     explicit output_visitor_t(size_t w)

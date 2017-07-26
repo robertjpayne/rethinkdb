@@ -8,14 +8,14 @@ namespace ql {
 
 class ordered_union_datum_stream_t : public eager_datum_stream_t {
 public:
-    ordered_union_datum_stream_t(std::vector<counted_t<datum_stream_t> > &&_streams,
-                                 std::vector<
+    ordered_union_datum_stream_t(vector_t<counted_t<datum_stream_t> > &&_streams,
+                                 vector_t<
                                  std::pair<order_direction_t,
                                            counted_t<const func_t> > > &&_comparisons,
                                  env_t *env,
                                  backtrace_id_t bt);
 
-    std::vector<datum_t>
+    vector_t<datum_t>
     next_raw_batch(env_t *env, const batchspec_t &batchspec) final;
 
     bool is_array() const final {
@@ -59,7 +59,7 @@ private:
     lt_cmp_t lt;
 
     std::priority_queue<merge_cache_item_t,
-                        std::vector<merge_cache_item_t>,
+                        vector_t<merge_cache_item_t>,
                         merge_less_t> merge_cache;
 };
 

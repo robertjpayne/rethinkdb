@@ -6,7 +6,7 @@
 #include <stddef.h>
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 #include <utility>
 
 #include "buffer_cache/types.hpp"
@@ -80,10 +80,10 @@ public:
     }
 
 private:
-    std::vector<buf_lock_t *> bufs_;
+    vector_t<buf_lock_t *> bufs_;
     // One of writes_ or reads_ will be empty.
-    std::vector<buf_write_t *> writes_;
-    std::vector<buf_read_t *> reads_;
+    vector_t<buf_write_t *> writes_;
+    vector_t<buf_read_t *> reads_;
 
     // disable copying
     blob_acq_t(const blob_acq_t&);

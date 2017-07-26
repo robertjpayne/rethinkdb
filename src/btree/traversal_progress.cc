@@ -25,7 +25,7 @@ void traversal_progress_combiner_t::add_constituent(scoped_ptr_t<traversal_progr
     constituents.push_back(c->release());
 }
 
-void traversal_progress_combiner_t::get_constituent_fraction(int i, std::vector<progress_completion_fraction_t> *outputs) const {
+void traversal_progress_combiner_t::get_constituent_fraction(int i, vector_t<progress_completion_fraction_t> *outputs) const {
     guarantee(size_t(i) < constituents.size());
     rassert(size_t(i) < outputs->size());
     guarantee(!is_destructing);
@@ -40,10 +40,10 @@ progress_completion_fraction_t traversal_progress_combiner_t::guess_completion()
 
     int released = 0, total = 0;
 
-    std::vector<progress_completion_fraction_t> fractions(constituents.size(), progress_completion_fraction_t());
+    vector_t<progress_completion_fraction_t> fractions(constituents.size(), progress_completion_fraction_t());
     pmap(fractions.size(), std::bind(&traversal_progress_combiner_t::get_constituent_fraction, this, ph::_1, &fractions));
 
-    for (std::vector<progress_completion_fraction_t>::const_iterator it = fractions.begin();
+    for (vector_t<progress_completion_fraction_t>::const_iterator it = fractions.begin();
          it != fractions.end();
          ++it) {
         if (it->invalid()) {

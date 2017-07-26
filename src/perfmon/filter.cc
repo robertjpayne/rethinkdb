@@ -11,9 +11,9 @@
 /* Construct a filter from a set of paths.  Paths are of the form foo/bar/baz,
    where each of those can be a regular expression.  They act a lot like XPath
    expressions, but for perfmon_t objects.  */
-perfmon_filter_t::perfmon_filter_t(const std::set<std::vector<std::string> > &paths) {
+perfmon_filter_t::perfmon_filter_t(const std::set<vector_t<std::string> > &paths) {
     for (auto const &path : paths) {
-        std::vector<scoped_ptr_t<RE2> > compiled_path;
+        vector_t<scoped_ptr_t<RE2> > compiled_path;
         for (auto const &str : path) {
             scoped_ptr_t<RE2> re = make_scoped<RE2>("^" + str + "$");
             if (!re->ok()) {
@@ -33,7 +33,7 @@ perfmon_filter_t::perfmon_filter_t(const std::set<std::vector<std::string> > &pa
 
 ql::datum_t perfmon_filter_t::filter(const ql::datum_t &stats) const {
     guarantee(stats.has(), "perfmon_filter_t::filter was passed an uninitialized datum");
-    return subfilter(stats, 0, std::vector<bool>(regexps.size(), true));
+    return subfilter(stats, 0, vector_t<bool>(regexps.size(), true));
 }
 
 /* Filter a perfmon result.  [depth] is how deep we are in the paths that
@@ -42,12 +42,12 @@ ql::datum_t perfmon_filter_t::filter(const ql::datum_t &stats) const {
    only be called by [filter]. */
 ql::datum_t perfmon_filter_t::subfilter(const ql::datum_t &stats,
                                         const size_t depth,
-                                        const std::vector<bool> active) const {
+                                        const vector_t<bool> active) const {
     if (stats.get_type() == ql::datum_t::R_OBJECT) {
         ql::datum_object_builder_t builder;
 
         for (size_t i = 0; i < stats.obj_size(); ++i) {
-            std::vector<bool> subactive = active;
+            vector_t<bool> subactive = active;
             std::pair<datum_string_t, ql::datum_t> pair = stats.get_pair(i);
 
             bool some_subpath = false;

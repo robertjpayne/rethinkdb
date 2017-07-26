@@ -3,7 +3,7 @@
 
 #include <math.h>
 
-#include <vector>
+#include "containers/vector.hpp"
 #include <memory>
 
 #include "pprint/generic_term_walker.hpp"
@@ -17,7 +17,7 @@ namespace pprint {
 class sexp_pretty_printer_t
     : public generic_term_walker_t<counted_t<const document_t> > {
     unsigned int depth;
-    typedef std::vector<counted_t<const document_t> > v;
+    typedef vector_t<counted_t<const document_t> > v;
 public:
     sexp_pretty_printer_t() : depth(0) {}
 protected:
@@ -46,12 +46,12 @@ protected:
             break;
         }
         default: {
-            std::vector<counted_t<const document_t> > term;
+            vector_t<counted_t<const document_t> > term;
             term.push_back(lparen);
             term.push_back(make_text(to_lisp_name(t)));
             if (t.num_args() > 0 || t.num_optargs() > 0) {
                 term.push_back(sp);
-                std::vector<counted_t<const document_t> > args;
+                vector_t<counted_t<const document_t> > args;
                 for (size_t i = 0; i < t.num_args(); ++i) {
                     ql::raw_term_t item = t.arg(i);
                     if (!args.empty()) args.push_back(cond_linebreak);
@@ -114,7 +114,7 @@ private:
         case ql::datum_t::type_t::R_STR:
             return make_text(strprintf("\"%s\"", d.as_str().to_std().c_str()));
         case ql::datum_t::type_t::R_ARRAY: {
-            std::vector<counted_t<const document_t> > term;
+            vector_t<counted_t<const document_t> > term;
             term.push_back(lbrack);
             for (size_t i = 0; i < d.arr_size(); ++i) {
                 if (i != 0) term.push_back(cond_linebreak);
@@ -124,7 +124,7 @@ private:
             return make_nest(make_concat(std::move(term)));
         }
         case ql::datum_t::type_t::R_OBJECT: {
-            std::vector<counted_t<const document_t> > term;
+            vector_t<counted_t<const document_t> > term;
             term.push_back(lbrace);
             for (size_t i = 0; i < d.obj_size(); ++i) {
                 if (i != 0) term.push_back(cond_linebreak);
@@ -144,15 +144,15 @@ private:
     }
 
     counted_t<const document_t> string_gets_together(const ql::raw_term_t &t) {
-        std::vector<counted_t<const document_t> > term;
+        vector_t<counted_t<const document_t> > term;
         term.push_back(lparen);
         term.push_back(dotdot);
         r_sanity_check(t.num_args() == 2);
         term.push_back(sp);
-        std::vector<counted_t<const document_t> > nest;
+        vector_t<counted_t<const document_t> > nest;
         ql::raw_term_t arg0 = t.arg(0);
         if (should_continue_string(arg0.type())) {
-            std::vector<counted_t<const document_t> > stack;
+            vector_t<counted_t<const document_t> > stack;
             while (should_continue_string(arg0.type())) {
                 r_sanity_check(arg0.num_args() == 2);
                 ql::raw_term_t next_arg = arg0.arg(0);
@@ -175,15 +175,15 @@ private:
     counted_t<const document_t> string_branches_together(const ql::raw_term_t &t) {
         r_sanity_check(t.num_args() == 3);
 
-        std::vector<counted_t<const document_t> > term;
+        vector_t<counted_t<const document_t> > term;
         term.push_back(lparen);
         term.push_back(cond);
         term.push_back(sp);
 
-        std::vector<counted_t<const document_t> > branches;
+        vector_t<counted_t<const document_t> > branches;
         ql::raw_term_t var = t;
         while (var.type() == Term::BRANCH) {
-            std::vector<counted_t<const document_t> > branch;
+            vector_t<counted_t<const document_t> > branch;
             branch.push_back(lparen);
             branch.push_back(make_nest(make_concat({visit_generic(var.arg(0)),
                                                     cond_linebreak,
@@ -236,10 +236,10 @@ private:
     counted_t<const document_t> to_lisp_func(const ql::raw_term_t &t) {
         r_sanity_check(t.type() == Term::FUNC);
         r_sanity_check(t.num_args() >= 2);
-        std::vector<counted_t<const document_t> > nest;
+        vector_t<counted_t<const document_t> > nest;
         ql::raw_term_t arg0 = t.arg(0);
         if (arg0.type() == Term::MAKE_ARRAY) {
-            std::vector<counted_t<const document_t> > args;
+            vector_t<counted_t<const document_t> > args;
             for (size_t i = 0; i < arg0.num_args(); ++i) {
                 ql::raw_term_t item = arg0.arg(i);
                 if (!args.empty()) args.push_back(cond_linebreak);
@@ -254,7 +254,7 @@ private:
         } else if (arg0.type() == Term::DATUM &&
                    arg0.datum().get_type() == ql::datum_t::type_t::R_ARRAY) {
             ql::datum_t d = arg0.datum();
-            std::vector<counted_t<const document_t> > args;
+            vector_t<counted_t<const document_t> > args;
             for (size_t i = 0; i < d.arr_size(); ++i) {
                 if (i != 0) args.push_back(cond_linebreak);
                 args.push_back(var_name(d.get(i)));

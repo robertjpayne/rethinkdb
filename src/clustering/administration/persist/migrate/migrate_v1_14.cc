@@ -146,7 +146,7 @@ metadata_v1_16::servers_semilattice_metadata_t migrate_servers(
 metadata_v1_16::write_ack_config_t::req_t migrate_ack_req(
         int num_acks,
         std::set<server_id_t> replicas_for_acks,
-        const std::vector<metadata_v1_16::table_config_t::shard_t> &config_shards,
+        const vector_t<metadata_v1_16::table_config_t::shard_t> &config_shards,
         name_string_t table_name,
         name_string_t db_name,
         const std::string &where) {

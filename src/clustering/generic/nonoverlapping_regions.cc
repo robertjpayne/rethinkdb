@@ -1,7 +1,7 @@
 // Copyright 2010-2013 RethinkDB, all rights reserved.
 #include "clustering/generic/nonoverlapping_regions.hpp"
 
-bool valid_regions_helper(const std::vector<region_t> &regionvec,
+bool valid_regions_helper(const vector_t<region_t> &regionvec,
                           const std::set<region_t> &regionset) {
     // Disallow empty regions.
     if (regionset.find(region_t()) != regionset.end()) {
@@ -18,7 +18,7 @@ bool valid_regions_helper(const std::vector<region_t> &regionvec,
     return true;
 }
 
-bool nonoverlapping_regions_t::set_regions(const std::vector<region_t> &regions) {
+bool nonoverlapping_regions_t::set_regions(const vector_t<region_t> &regions) {
     std::set<region_t> regionset(regions.begin(), regions.end());
 
     // Disallow duplicate regions.
@@ -31,7 +31,7 @@ bool nonoverlapping_regions_t::set_regions(const std::vector<region_t> &regions)
 }
 
 bool nonoverlapping_regions_t::valid_for_sharding() const {
-    std::vector<region_t> regionvec(regions_.begin(), regions_.end());
+    vector_t<region_t> regionvec(regions_.begin(), regions_.end());
 
     return valid_regions_helper(regionvec, regions_);
 }

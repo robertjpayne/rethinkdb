@@ -189,13 +189,13 @@ void read_mailbox_header(read_stream_t *stream,
 void mailbox_manager_t::on_local_message(
         UNUSED connectivity_cluster_t::connection_t *connection,
         UNUSED auto_drainer_t::lock_t connection_keepalive,
-        std::vector<char> &&data) {
+        vector_t<char> &&data) {
     vector_read_stream_t stream(std::move(data));
 
     mailbox_header_t mbox_header;
     read_mailbox_header(&stream, &mbox_header);
 
-    std::vector<char> stream_data;
+    vector_t<char> stream_data;
     int64_t stream_data_offset = 0;
 
     stream.swap(&stream_data, &stream_data_offset);
@@ -226,7 +226,7 @@ void mailbox_manager_t::on_message(
 
     // Read the data from the read stream, so it can be deallocated before we continue
     // in a coroutine
-    std::vector<char> stream_data;
+    vector_t<char> stream_data;
     stream_data.resize(mbox_header.data_length);
     int64_t bytes_read = force_read(stream, stream_data.data(), mbox_header.data_length);
     if (bytes_read != static_cast<int64_t>(mbox_header.data_length)) {
@@ -247,7 +247,7 @@ void mailbox_manager_t::on_message(
 void mailbox_manager_t::mailbox_read_coroutine(
         threadnum_t dest_thread,
         raw_mailbox_t::id_t dest_mailbox_id,
-        std::vector<char> *stream_data,
+        vector_t<char> *stream_data,
         int64_t stream_data_offset,
         force_yield_t force_yield) {
 

@@ -7,14 +7,13 @@
 #define STRINGS_SPLIT_H_
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 #include <set>
 #include <utility>
 #include <unordered_map>
 #include <unordered_set>
 
 namespace geo {
-using std::vector;
 using std::set;
 using std::multiset;
 using std::pair;
@@ -37,7 +36,7 @@ using std::unordered_set;
 //    If "full" is the empty string, yields an empty string as the only value.
 // ----------------------------------------------------------------------
 void SplitStringAllowEmpty(const std::string& full, const char* delim,
-                           vector<std::string>* res);
+                           vector_t<std::string>* res);
 void SplitStringToHashsetAllowEmpty(const std::string& full, const char* delim,
                                     unordered_set<std::string>* res);
 void SplitStringToSetAllowEmpty(const std::string& full, const char* delim,
@@ -62,7 +61,7 @@ void SplitStringToHashmapAllowEmpty(const std::string& full, const char* delim,
 //    all of them.
 // ----------------------------------------------------------------------
 void SplitStringUsing(const std::string& full, const char* delim,
-                      vector<std::string>* res);
+                      vector_t<std::string>* res);
 void SplitStringToHashsetUsing(const std::string& full, const char* delim,
                                unordered_set<std::string>* res);
 void SplitStringToSetUsing(const std::string& full, const char* delim,

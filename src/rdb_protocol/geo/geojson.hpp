@@ -4,7 +4,7 @@
 
 #include <string>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "containers/counted.hpp"
 #include "containers/scoped.hpp"
@@ -41,7 +41,7 @@ ql::datum_t construct_geo_polygon(
         const ql::configured_limits_t &limits);
 ql::datum_t construct_geo_polygon(
         const lon_lat_line_t &shell,
-        const std::vector<lon_lat_line_t> &holes,
+        const vector_t<lon_lat_line_t> &holes,
         const ql::configured_limits_t &limits);
 // This is not part of the GeoJSON standard, but our own extension that we use
 // internally for `getIntersecting` changefeeds.

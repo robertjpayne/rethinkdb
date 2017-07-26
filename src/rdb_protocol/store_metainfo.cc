@@ -6,11 +6,11 @@
 #include "containers/archive/vector_stream.hpp"
 
 store_metainfo_manager_t::store_metainfo_manager_t(real_superblock_t *superblock) {
-    std::vector<std::pair<std::vector<char>, std::vector<char> > > kv_pairs;
+    vector_t<std::pair<vector_t<char>, vector_t<char> > > kv_pairs;
     // TODO: this is inefficient, cut out the middleman (vector)
     get_superblock_metainfo(superblock, &kv_pairs, &cache_version);
-    std::vector<region_t> regions;
-    std::vector<binary_blob_t> values;
+    vector_t<region_t> regions;
+    vector_t<binary_blob_t> values;
     for (auto &pair : kv_pairs) {
         region_t region;
         {
@@ -62,8 +62,8 @@ void store_metainfo_manager_t::update(
 
     cache.update(new_values);
 
-    std::vector<std::vector<char> > keys;
-    std::vector<binary_blob_t> values;
+    vector_t<vector_t<char> > keys;
+    vector_t<binary_blob_t> values;
     cache.visit(region_t::universe(),
         [&](const region_t &region, const binary_blob_t &value) {
             vector_stream_t key;

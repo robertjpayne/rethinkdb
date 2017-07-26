@@ -6,6 +6,7 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include "containers/vector.hpp"
 
 #include "arch/runtime/coroutines.hpp"
 #include "containers/archive/buffer_stream.hpp"
@@ -331,7 +332,7 @@ serialization_result_t datum_array_serialize(
 
 // For legacy R_ARRAY datums. BUF_R_ARRAY datums are not deserialized through this.
 MUST_USE archive_result_t
-datum_deserialize_array(read_stream_t *s, std::vector<datum_t> *v) {
+datum_deserialize_array(read_stream_t *s, vector_t<datum_t> *v) {
     v->clear();
 
     uint64_t sz;
@@ -351,7 +352,7 @@ datum_deserialize_array(read_stream_t *s, std::vector<datum_t> *v) {
     return archive_result_t::SUCCESS;
 }
 MUST_USE archive_result_t
-datum_deserialize(read_stream_t *s, std::vector<datum_t> *v) {
+datum_deserialize(read_stream_t *s, vector_t<datum_t> *v) {
     return datum_deserialize_array(s, v);
 }
 
@@ -441,7 +442,7 @@ serialization_result_t datum_object_serialize(
 // For legacy R_OBJECT datums. BUF_R_OBJECT datums are not deserialized through this.
 MUST_USE archive_result_t datum_deserialize_object(
         read_stream_t *s,
-        std::vector<std::pair<datum_string_t, datum_t> > *m) {
+        vector_t<std::pair<datum_string_t, datum_t> > *m) {
     m->clear();
 
     uint64_t sz;
@@ -467,7 +468,7 @@ MUST_USE archive_result_t datum_deserialize_object(
 }
 MUST_USE archive_result_t datum_deserialize(
         read_stream_t *s,
-        std::vector<std::pair<datum_string_t, datum_t> > *m) {
+        vector_t<std::pair<datum_string_t, datum_t> > *m) {
     return datum_deserialize_object(s, m);
 }
 
@@ -645,7 +646,7 @@ archive_result_t datum_deserialize(read_stream_t *s, datum_t *datum) {
         }
     } break;
     case datum_serialized_type_t::R_ARRAY: {
-        std::vector<datum_t> value;
+        vector_t<datum_t> value;
         res = call_with_enough_stack<archive_result_t>([&] () {
                 return datum_deserialize_array(s, &value);
             }, MIN_DATUM_SERIALIZATION_STACK_SPACE);
@@ -722,7 +723,7 @@ archive_result_t datum_deserialize(read_stream_t *s, datum_t *datum) {
         }
     } break;
     case datum_serialized_type_t::R_OBJECT: {
-        std::vector<std::pair<datum_string_t, datum_t> > value;
+        vector_t<std::pair<datum_string_t, datum_t> > value;
         res = call_with_enough_stack<archive_result_t>([&] () {
                 return datum_deserialize_object(s, &value);
             }, MIN_DATUM_SERIALIZATION_STACK_SPACE);

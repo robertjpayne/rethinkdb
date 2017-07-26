@@ -3,7 +3,7 @@
 
 #include <string>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "parsing/utf8.hpp"
 #include "rdb_protocol/datum_stream/eq_join.hpp"
@@ -184,7 +184,7 @@ private:
     virtual scoped_ptr_t<val_t> eval_impl(scope_env_t *env,
                                           args_t *args,
                                           eval_flags_t) const {
-        std::vector<counted_t<datum_stream_t> > streams;
+        vector_t<counted_t<datum_stream_t> > streams;
         streams.reserve(args->num_args() - 1);
         for (size_t i = 0; i < args->num_args() - 1; ++i) {
             streams.push_back(args->arg(env, i)->as_seq(env->env));
@@ -297,7 +297,7 @@ private:
             batchspec_t batchspec = batchspec_t::user(batch_type_t::TERMINAL, env->env);
             {
                 datum_t row;
-                std::vector<datum_t> acc_args;
+                vector_t<datum_t> acc_args;
                 while (row = stream->next(env->env, batchspec), row.has()) {
                     acc_args.push_back(std::move(result));
                     acc_args.push_back(std::move(row));
@@ -311,7 +311,7 @@ private:
 
             if (final_emit_arg.has()) {
                 datum_t final_result;
-                std::vector<datum_t> final_args{std::move(result)};
+                vector_t<datum_t> final_args{std::move(result)};
 
                 counted_t<const func_t> final_emit_func = final_emit_arg->as_func();
                 final_result = final_emit_func->call(env->env, final_args)->as_datum();
@@ -370,7 +370,7 @@ public:
                                 optargspec_t({"index", "multi"})) { }
 private:
     virtual scoped_ptr_t<val_t> eval_impl(scope_env_t *env, args_t *args, eval_flags_t) const {
-        std::vector<counted_t<const func_t> > funcs;
+        vector_t<counted_t<const func_t> > funcs;
         funcs.reserve(args->num_args() - 1);
         for (size_t i = 1; i < args->num_args(); ++i) {
             funcs.push_back(args->arg(env, i)->as_func(GET_FIELD_SHORTCUT));
@@ -590,8 +590,8 @@ private:
                 args->optarg(env, "changefeed_queue_size"));
         if (v->get_type().is_convertible(val_t::type_t::SEQUENCE)) {
             counted_t<datum_stream_t> seq = v->as_seq(env->env);
-            std::vector<counted_t<datum_stream_t> > streams;
-            std::vector<changespec_t> changespecs = seq->get_changespecs();
+            vector_t<counted_t<datum_stream_t> > streams;
+            vector_t<changespec_t> changespecs = seq->get_changespecs();
             r_sanity_check(changespecs.size() >= 1);
             for (auto &&changespec : changespecs) {
                 if (include_initial) {
@@ -638,7 +638,7 @@ private:
                             // because we get the initial values from the stamp
                             // read instead.
                             ? make_counted<vector_datum_stream_t>(
-                                sel->get_bt(), std::vector<datum_t>(), r_nullopt)
+                                sel->get_bt(), vector_t<datum_t>(), r_nullopt)
                             : counted_t<vector_datum_stream_t>(),
                         sel->get_tbl()->display_name(),
                         include_offsets,
@@ -744,14 +744,14 @@ private:
     virtual scoped_ptr_t<val_t> eval_impl(scope_env_t *env,
                                           args_t *args,
                                           eval_flags_t eval_flags) const {
-        std::vector<counted_t<datum_stream_t> > streams;
+        vector_t<counted_t<datum_stream_t> > streams;
         for (size_t i = 0; i < args->num_args(); ++i) {
             streams.push_back(args->arg(env, i)->as_seq(env->env));
         }
 
         optional<raw_term_t> r_interleave_arg_op = get_src().optarg("interleave");
 
-        std::vector<scoped_ptr_t<val_t> > evaluated_interleave_args;
+        vector_t<scoped_ptr_t<val_t> > evaluated_interleave_args;
 
         bool allow_unordered_interleave = true;
         bool order_by_field = false;
@@ -771,10 +771,10 @@ private:
                 r_sanity_check(it != optargs.end());
                 interleave_term = it->second;
 
-                const std::vector<counted_t<const term_t> > &array_args
+                const vector_t<counted_t<const term_t> > &array_args
                     = interleave_term->get_original_args();
 
-                std::vector<scoped_ptr_t<val_t> > array_args_evaluated;
+                vector_t<scoped_ptr_t<val_t> > array_args_evaluated;
                 for (auto &arg : array_args) {
                     array_args_evaluated.push_back(arg->eval(env, eval_flags));
                 }
@@ -822,7 +822,7 @@ private:
         } else if (!order_by_field) {
             union_stream = make_counted<ordered_union_datum_stream_t>(
                 std::move(streams),
-                std::vector<std::pair<order_direction_t, counted_t<const func_t> > >(),
+                vector_t<std::pair<order_direction_t, counted_t<const func_t> > >(),
                 env->env,
                 backtrace());
         }

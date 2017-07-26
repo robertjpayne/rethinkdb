@@ -10,7 +10,7 @@ namespace geo {
 
 S2RegionUnion::S2RegionUnion() { }
 
-S2RegionUnion::S2RegionUnion(vector<S2Region*>* regions) {
+S2RegionUnion::S2RegionUnion(vector_t<S2Region*>* regions) {
   Init(regions);
 }
 
@@ -21,7 +21,7 @@ S2RegionUnion::~S2RegionUnion() {
   regions_.clear();
 }
 
-void S2RegionUnion::Init(vector<S2Region*>* regions) {
+void S2RegionUnion::Init(vector_t<S2Region*>* regions) {
   DCHECK(regions_.empty());
   // We copy the vector rather than calling swap() to optimize storage.
   regions_ = *regions;
@@ -35,7 +35,7 @@ S2RegionUnion::S2RegionUnion(S2RegionUnion const* src)
   }
 }
 
-void S2RegionUnion::Release(vector<S2Region*>* regions) {
+void S2RegionUnion::Release(vector_t<S2Region*>* regions) {
   if (regions != NULL) {
     regions->insert(regions->end(), regions_.begin(), regions_.end());
   }

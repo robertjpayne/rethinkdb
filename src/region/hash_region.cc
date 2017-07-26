@@ -41,16 +41,16 @@ uint64_t hash_region_hasher(const store_key_t &key) {
     return hash_region_hasher(key.contents(), key.size());
 }
 
-const hash_region_t<key_range_t> *double_lookup(int i, const std::vector<hash_region_t<key_range_t> > &vec) {
+const hash_region_t<key_range_t> *double_lookup(int i, const vector_t<hash_region_t<key_range_t> > &vec) {
     rassert(0 <= i && i < static_cast<ssize_t>(vec.size() * 2));
     return &vec[i / 2];
 }
 
-uint64_t double_hash_lookup(int i, const std::vector<hash_region_t<key_range_t> > &vec) {
+uint64_t double_hash_lookup(int i, const vector_t<hash_region_t<key_range_t> > &vec) {
     return i % 2 == 0 ? double_lookup(i, vec)->beg : double_lookup(i, vec)->end;
 }
 
-const store_key_t *double_key_lookup(int i, const std::vector<hash_region_t<key_range_t> > &vec) {
+const store_key_t *double_key_lookup(int i, const vector_t<hash_region_t<key_range_t> > &vec) {
     const hash_region_t<key_range_t> *r = double_lookup(i, vec);
 
     if (i % 2 == 0) {
@@ -67,7 +67,7 @@ const store_key_t *double_key_lookup(int i, const std::vector<hash_region_t<key_
 
 class hash_splitpoint_comparer_t {
 public:
-    explicit hash_splitpoint_comparer_t(const std::vector< hash_region_t<key_range_t> > *vec) : vec_(vec) { }
+    explicit hash_splitpoint_comparer_t(const vector_t< hash_region_t<key_range_t> > *vec) : vec_(vec) { }
 
     int compare(int i, int j) {
         uint64_t ival = double_hash_lookup(i, *vec_);
@@ -81,12 +81,12 @@ public:
 
 private:
 public: // TODO
-    const std::vector<hash_region_t<key_range_t> > *vec_;
+    const vector_t<hash_region_t<key_range_t> > *vec_;
 };
 
 class key_splitpoint_comparer_t {
 public:
-    explicit key_splitpoint_comparer_t(const std::vector<hash_region_t<key_range_t> > *vec) : vec_(vec) { }
+    explicit key_splitpoint_comparer_t(const vector_t<hash_region_t<key_range_t> > *vec) : vec_(vec) { }
 
     int compare(int i, int j) {
         const store_key_t *ival = double_key_lookup(i, *vec_);
@@ -113,13 +113,13 @@ public:
 
 private:
 public:  // TODO
-    const std::vector<hash_region_t<key_range_t> > *vec_;
+    const vector_t<hash_region_t<key_range_t> > *vec_;
 };
 
 template <class comparer_type>
 class splitpoint_less_t {
 public:
-    explicit splitpoint_less_t(const std::vector<hash_region_t<key_range_t> > *vec) : comparer_(vec) { }
+    explicit splitpoint_less_t(const vector_t<hash_region_t<key_range_t> > *vec) : comparer_(vec) { }
 
     bool operator()(int i, int j) {
         return comparer_.compare(i, j) < 0;
@@ -132,7 +132,7 @@ private:
 template <class comparer_type>
 class splitpoint_equal_t {
 public:
-    explicit splitpoint_equal_t(const std::vector<hash_region_t<key_range_t> > *vec) : comparer_(vec) { }
+    explicit splitpoint_equal_t(const vector_t<hash_region_t<key_range_t> > *vec) : comparer_(vec) { }
 
     bool operator()(int i, int j) {
         return comparer_.compare(i, j) == 0;
@@ -141,15 +141,15 @@ private:
     comparer_type comparer_;
 };
 
-MUST_USE region_join_result_t region_join(const std::vector< hash_region_t<key_range_t> > &vec,
+MUST_USE region_join_result_t region_join(const vector_t< hash_region_t<key_range_t> > &vec,
                                           hash_region_t<key_range_t> *out) {
 
     // Look at all this allocation we're doing.  Somebody shoot me.
     // These are weird indices pointing into vec, where 0 <=
     // hash_splitpoints[i] / 2 < vec.size(), and the LSB tells whether
     // it's low or high.
-    std::vector<int> hash_splitpoints(2 * vec.size());
-    std::vector<int> key_splitpoints(2 * vec.size());
+    vector_t<int> hash_splitpoints(2 * vec.size());
+    vector_t<int> key_splitpoints(2 * vec.size());
     for (int i = 0, e = 2 * vec.size(); i < e; ++i) {
         hash_splitpoints[i] = i;
         key_splitpoints[i] = i;
@@ -161,15 +161,15 @@ MUST_USE region_join_result_t region_join(const std::vector< hash_region_t<key_r
     splitpoint_equal_t<key_splitpoint_comparer_t> key_eq(&vec);
 
 
-    std::vector<int>::iterator hash_beg = hash_splitpoints.begin();
+    vector_t<int>::iterator hash_beg = hash_splitpoints.begin();
     std::sort(hash_beg, hash_splitpoints.end(), hash_less);
 
-    std::vector<int>::iterator hash_end = std::unique(hash_beg, hash_splitpoints.end(), hash_eq);
+    vector_t<int>::iterator hash_end = std::unique(hash_beg, hash_splitpoints.end(), hash_eq);
 
-    std::vector<int>::iterator key_beg = key_splitpoints.begin();
+    vector_t<int>::iterator key_beg = key_splitpoints.begin();
     std::sort(key_beg, key_splitpoints.end(), key_less);
 
-    std::vector<int>::iterator key_end = std::unique(key_beg, key_splitpoints.end(), key_eq);
+    vector_t<int>::iterator key_end = std::unique(key_beg, key_splitpoints.end(), key_eq);
 
     // TODO: Finish implementing this function.
     int granular_height = hash_end - hash_beg - 1;
@@ -185,19 +185,19 @@ MUST_USE region_join_result_t region_join(const std::vector< hash_region_t<key_r
 
     guarantee(granular_width < INT_MAX / granular_height);
 
-    std::vector<bool> covered(granular_width * granular_height, false);
+    vector_t<bool> covered(granular_width * granular_height, false);
 
     int num_covered = 0;
 
     for (int i = 0, e = vec.size(); i < e; ++i) {
-        std::vector<int>::iterator beg_pos = std::lower_bound(hash_beg, hash_end, 2 * i, hash_less);
-        std::vector<int>::iterator end_pos = std::lower_bound(beg_pos, hash_end, 2 * i + 1, hash_less);
+        vector_t<int>::iterator beg_pos = std::lower_bound(hash_beg, hash_end, 2 * i, hash_less);
+        vector_t<int>::iterator end_pos = std::lower_bound(beg_pos, hash_end, 2 * i + 1, hash_less);
 
-        std::vector<int>::iterator left_pos = std::lower_bound(key_beg, key_end, 2 * i, key_less);
-        std::vector<int>::iterator right_pos = std::lower_bound(left_pos, key_end, 2 * i + 1, key_less);
+        vector_t<int>::iterator left_pos = std::lower_bound(key_beg, key_end, 2 * i, key_less);
+        vector_t<int>::iterator right_pos = std::lower_bound(left_pos, key_end, 2 * i + 1, key_less);
 
-        for (std::vector<int>::iterator it = beg_pos; it < end_pos; ++it) {
-            for (std::vector<int>::iterator jt = left_pos; jt < right_pos; ++jt) {
+        for (vector_t<int>::iterator it = beg_pos; it < end_pos; ++it) {
+            for (vector_t<int>::iterator jt = left_pos; jt < right_pos; ++jt) {
                 int x = jt - key_beg;
                 int y = it - hash_beg;
                 int ix = y * granular_width + x;

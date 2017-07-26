@@ -1,7 +1,7 @@
 // Copyright 2010-2014 RethinkDB, all rights reserved.
 #include "rdb_protocol/geo/inclusion.hpp"
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rdb_protocol/geo/geojson.hpp"
 #include "rdb_protocol/geo/geo_visitor.hpp"
@@ -54,7 +54,7 @@ bool geo_does_include(const S2Polygon &polygon,
 
 bool geo_does_include(const S2Polygon &polygon,
                       const S2Polyline &g) {
-    std::vector<S2Polyline *> remaining_pieces;
+    vector_t<S2Polyline *> remaining_pieces;
     polygon.SubtractFromPolyline(&g, &remaining_pieces);
     // We're not interested in the actual line pieces that are not contained
     for (size_t i = 0; i < remaining_pieces.size(); ++i) {

@@ -52,7 +52,7 @@ geo_job_data_t::geo_job_data_t(
     region_t region,
     store_key_t last_key,
     const ql::batchspec_t &batchspec,
-    const std::vector<ql::transform_variant_t> &_transforms,
+    const vector_t<ql::transform_variant_t> &_transforms,
     const optional<ql::terminal_variant_t> &_terminal,
     is_stamp_read_t is_stamp_read)
     : env(_env),
@@ -100,7 +100,7 @@ geo_intersecting_cb_t::geo_intersecting_cb_t(
 
 void geo_intersecting_cb_t::init_query(const ql::datum_t &_query_geometry) {
     query_geometry = _query_geometry;
-    std::vector<geo::S2CellId> covering(
+    vector_t<geo::S2CellId> covering(
         compute_cell_covering(query_geometry, QUERYING_GOAL_GRID_CELLS));
     geo_index_traversal_helper_t::init_query(
         covering, compute_interior_cell_covering(query_geometry, covering));
@@ -345,7 +345,7 @@ void nearest_traversal_cb_t::init_query_geometry() {
     try {
         // 1. Construct a shape with an exradius of no more than state->processed_inradius.
         //    This is what we don't have to process again.
-        std::vector<lon_lat_line_t> holes;
+        vector_t<lon_lat_line_t> holes;
         if (state->processed_inradius > 0.0) {
             holes.push_back(build_polygon_with_exradius_at_most(
                 state->center, state->processed_inradius,

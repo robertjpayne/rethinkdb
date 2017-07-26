@@ -3,7 +3,7 @@
 #define RDB_PROTOCOL_GEO_LON_LAT_TYPES_HPP_
 
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "rpc/serialize_macros.hpp"
 
@@ -25,6 +25,6 @@ struct lon_lat_point_t {
 
 RDB_DECLARE_SERIALIZABLE(lon_lat_point_t);
 
-typedef std::vector<lon_lat_point_t> lon_lat_line_t;
+typedef vector_t<lon_lat_point_t> lon_lat_line_t;
 
 #endif  // RDB_PROTOCOL_GEO_LON_LAT_TYPES_HPP_

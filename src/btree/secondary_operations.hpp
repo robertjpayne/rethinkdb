@@ -4,7 +4,7 @@
 
 #include <map>
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "btree/keys.hpp"
 #include "buffer_cache/types.hpp"
@@ -57,8 +57,8 @@ struct secondary_index_t {
     /* An opaque blob that describes the index.  See serialize_sindex_info and
      deserialize_sindex_info.  At one point it contained a serialized map_wire_func_t
      and a sindex_multi_bool_t.  Now it also contains reql version info.  (This being
-     a std::vector<char> is a holdover from when we had multiple protocols.) */
-    std::vector<char> opaque_definition;
+     a vector_t<char> is a holdover from when we had multiple protocols.) */
+    vector_t<char> opaque_definition;
 
     /* Sindexes contain a uuid_u to prevent a rapid deletion and recreation of
      * a sindex with the same name from tricking a post construction in to

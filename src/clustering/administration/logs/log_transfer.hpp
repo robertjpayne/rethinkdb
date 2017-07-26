@@ -3,13 +3,13 @@
 #define CLUSTERING_ADMINISTRATION_LOGS_LOG_TRANSFER_HPP_
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "clustering/administration/logs/log_writer.hpp"
 
 class log_server_business_card_t {
 public:
-    typedef mailbox_t<boost::variant<std::vector<log_message_t>, std::string>> result_mailbox_t;
+    typedef mailbox_t<boost::variant<vector_t<log_message_t>, std::string>> result_mailbox_t;
     typedef mailbox_t<int, struct timespec, struct timespec, result_mailbox_t::address_t> request_mailbox_t;
 
     log_server_business_card_t() { }
@@ -49,7 +49,7 @@ public:
     log_transfer_exc_t() : std::runtime_error(
         "Lost contact with server while trying to transfer log messages") { }
 };
-std::vector<log_message_t> fetch_log_file(
+vector_t<log_message_t> fetch_log_file(
     mailbox_manager_t *mailbox_manager,
     const log_server_business_card_t &server_bcard,
     int max_entries,

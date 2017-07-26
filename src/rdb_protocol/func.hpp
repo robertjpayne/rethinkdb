@@ -5,7 +5,7 @@
 #include <map>
 #include <string>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "errors.hpp"
 #include <boost/variant/static_visitor.hpp>
@@ -32,7 +32,7 @@ public:
 
     virtual scoped_ptr_t<val_t> call(
         env_t *env,
-        const std::vector<datum_t> &args,
+        const vector_t<datum_t> &args,
         eval_flags_t eval_flags = NO_FLAGS) const = 0;
 
     virtual optional<size_t> arity() const = 0;
@@ -82,20 +82,20 @@ class reql_func_t : public func_t {
 public:
     // Used when constructing in an existing environment - reusing another term storage
     reql_func_t(const var_scope_t &captured_scope,
-                std::vector<sym_t> arg_names,
+                vector_t<sym_t> arg_names,
                 counted_t<const term_t> body);
 
     // Used when constructing from a function read off the wire
     reql_func_t(scoped_ptr_t<term_storage_t> &&_storage,
                 const var_scope_t &captured_scope,
-                std::vector<sym_t> arg_names,
+                vector_t<sym_t> arg_names,
                 counted_t<const term_t> body);
 
     ~reql_func_t();
 
     scoped_ptr_t<val_t> call(
         env_t *env,
-        const std::vector<datum_t> &args,
+        const vector_t<datum_t> &args,
         eval_flags_t eval_flags) const;
 
     optional<size_t> arity() const;
@@ -117,7 +117,7 @@ private:
     var_scope_t captured_scope;
 
     // The argument names, for the corresponding positional argument number.
-    std::vector<sym_t> arg_names;
+    vector_t<sym_t> arg_names;
 
     // Term storage if this was deserialized off the wire to ensure the lifetime of
     // the raw term tree.
@@ -139,7 +139,7 @@ public:
     // Some queries, like filter, can take a shortcut object instead of a
     // function as their argument.
     scoped_ptr_t<val_t> call(env_t *env,
-                             const std::vector<datum_t> &args,
+                             const vector_t<datum_t> &args,
                              eval_flags_t eval_flags) const;
 
     optional<size_t> arity() const;
@@ -219,7 +219,7 @@ private:
     virtual scoped_ptr_t<val_t> term_eval(scope_env_t *env, eval_flags_t flags) const;
     virtual const char *name() const { return "func"; }
 
-    std::vector<sym_t> arg_names;
+    vector_t<sym_t> arg_names;
     counted_t<const term_t> body;
 
     var_captures_t external_captures;

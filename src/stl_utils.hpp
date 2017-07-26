@@ -7,7 +7,7 @@
 #include <set>
 #include <string>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "errors.hpp"
 
@@ -28,7 +28,7 @@ template <class T>
 void debug_print(printf_buffer_t *buf, const std::set<T> &map);
 
 template <class T>
-void debug_print(printf_buffer_t *buf, const std::vector<T> &vec);
+void debug_print(printf_buffer_t *buf, const vector_t<T> &vec);
 
 template <class T>
 void debug_print(printf_buffer_t *buf, const std::deque<T> &vec);
@@ -38,8 +38,8 @@ void debug_print(printf_buffer_t *buf, const std::pair<T, U> &p);
 
 // We pass the first argument explicitly so that the compiler can infer the template parameters.
 template <class T, class... Args>
-std::vector<T> make_vector(const T &arg, Args... args) {
-    std::vector<T> ret;
+vector_t<T> make_vector(const T &arg, Args... args) {
+    vector_t<T> ret;
     ret.reserve(sizeof...(args) + 1);
     ret.emplace_back(std::move(arg));
     UNUSED int dummy[] = { 0, (ret.emplace_back(std::move(args)), 1)... };
@@ -54,7 +54,7 @@ std::map<K, V> make_map(const std::pair<K, V> &arg, Args... args) {
     return ret;
 }
 
-std::vector<std::string> split_string(const std::string &s, char sep);
+vector_t<std::string> split_string(const std::string &s, char sep);
 
 #include "stl_utils.tcc"
 

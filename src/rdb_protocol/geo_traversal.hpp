@@ -4,7 +4,7 @@
 
 #include <set>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "btree/concurrent_traversal.hpp"
 #include "btree/keys.hpp"
@@ -39,7 +39,7 @@ public:
                    region_t region,
                    store_key_t last_key,
                    const ql::batchspec_t &batchspec,
-                   const std::vector<ql::transform_variant_t> &_transforms,
+                   const vector_t<ql::transform_variant_t> &_transforms,
                    const optional<ql::terminal_variant_t> &_terminal,
                    is_stamp_read_t is_stamp_read);
     geo_job_data_t(geo_job_data_t &&jd)
@@ -52,7 +52,7 @@ private:
     friend class collect_all_geo_intersecting_cb_t;
     ql::env_t *const env;
     scoped_ptr_t<ql::batcher_t> batcher;
-    std::vector<scoped_ptr_t<ql::op_t> > transformers;
+    vector_t<scoped_ptr_t<ql::op_t> > transformers;
     scoped_ptr_t<ql::accumulator_t> accumulator;
 };
 
@@ -226,7 +226,7 @@ private:
     void init_query_geometry();
 
     // Accumulate results for the current batch until finish() is called
-    std::vector<std::pair<double, ql::datum_t> > result_acc;
+    vector_t<std::pair<double, ql::datum_t> > result_acc;
     optional<ql::exc_t> error;
 
     nearest_traversal_state_t *state;

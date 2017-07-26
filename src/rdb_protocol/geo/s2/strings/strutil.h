@@ -18,7 +18,7 @@
 #include <set>
 #include <string>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 #include <string.h>
 #include <stdlib.h>
 
@@ -51,7 +51,6 @@ using std::set;
 using std::multiset;
 using std::pair;
 using std::make_pair;
-using std::vector;
 
 // A buffer size which is large enough for all the FastToBuffer functions, as
 // well as DoubleToBuffer and FloatToBuffer.  We define this here in case other
@@ -211,7 +210,7 @@ inline uint64 ParseLeadingUDec64Value(const std::string& str, uint64 deflt) {
 //    otherwise.
 // -------------------------------------------------------------------------
 bool DictionaryParse(const std::string& encoded_str,
-                      vector<pair<std::string, std::string> >* items);
+                      vector_t<pair<std::string, std::string> >* items);
 
 }  // namespace geo
 

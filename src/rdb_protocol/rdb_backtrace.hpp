@@ -2,7 +2,7 @@
 #ifndef RDB_PROTOCOL_RDB_BACKTRACE_HPP_
 #define RDB_PROTOCOL_RDB_BACKTRACE_HPP_
 
-#include <vector>
+#include "containers/vector.hpp"
 #include <stdexcept>
 
 #include "rdb_protocol/datum.hpp"
@@ -59,7 +59,7 @@ private:
         datum_t val;
     };
 
-    std::vector<frame_t> frames;
+    vector_t<frame_t> frames;
     DISABLE_COPYING(backtrace_registry_t);
 };
 

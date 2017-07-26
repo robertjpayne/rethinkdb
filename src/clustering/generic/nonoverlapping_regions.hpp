@@ -3,7 +3,7 @@
 #define CLUSTERING_GENERIC_NONOVERLAPPING_REGIONS_HPP_
 
 #include <set>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "containers/archive/stl_types.hpp"
 #include "region/region.hpp"
@@ -16,7 +16,7 @@ public:
     // Returns true upon success, false if there's an overlap or the
     // regions don't join to the universal set.  This is like calling
     // add_region in a loop and then valid_for_sharding, only maybe without being O(n^2).
-    MUST_USE bool set_regions(const std::vector<region_t> &regions);
+    MUST_USE bool set_regions(const vector_t<region_t> &regions);
 
     // We already know by the public interface that no regions
     // overlap.  This checks that their join is the universe, and that

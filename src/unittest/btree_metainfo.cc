@@ -33,11 +33,11 @@ binary_blob_t string_to_blob(const std::string &s) {
     return binary_blob_t(s.data(), s.data() + s.size());
 }
 
-std::vector<char> string_to_vector(const std::string &s) {
-    return std::vector<char>(s.data(), s.data() + s.size());
+vector_t<char> string_to_vector(const std::string &s) {
+    return vector_t<char>(s.data(), s.data() + s.size());
 }
 
-std::string vector_to_string(const std::vector<char> &v) {
+std::string vector_to_string(const vector_t<char> &v) {
     return std::string(v.data(), v.size());
 }
 
@@ -67,7 +67,7 @@ TPTEST(BtreeMetainfo, MetainfoTest) {
             real_superblock_t superblock(std::move(sb_lock));
             btree_slice_t::init_real_superblock(
                 &superblock,
-                std::vector<char>(), binary_blob_t());
+                vector_t<char>(), binary_blob_t());
         }
         txn.commit();
     }
@@ -84,8 +84,8 @@ TPTEST(BtreeMetainfo, MetainfoTest) {
                 get_btree_superblock_and_txn_for_writing(
                     &cache_conn, nullptr, write_access_t::write, 1,
                     write_durability_t::SOFT, &superblock, &txn);
-                std::vector<std::vector<char> > keys;
-                std::vector<binary_blob_t> values;
+                vector_t<vector_t<char> > keys;
+                vector_t<binary_blob_t> values;
                 for (const auto &pair : metainfo) {
                     keys.push_back(string_to_vector(pair.first));
                     values.push_back(string_to_blob(pair.second));
@@ -101,7 +101,7 @@ TPTEST(BtreeMetainfo, MetainfoTest) {
             get_btree_superblock_and_txn_for_reading(
                 &cache_conn, CACHE_SNAPSHOTTED_NO, &superblock, &txn);
             cluster_version_t version;
-            std::vector<std::pair<std::vector<char>, std::vector<char> > > read_back;
+            vector_t<std::pair<vector_t<char>, vector_t<char> > > read_back;
             get_superblock_metainfo(superblock.get(), &read_back, &version);
             std::set<std::string> seen;
             for (const auto &pair : read_back) {

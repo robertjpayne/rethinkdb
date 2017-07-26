@@ -3,7 +3,7 @@
 #define CLUSTERING_ADMINISTRATION_ISSUES_LOCAL_HPP_
 
 #include <string>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "clustering/administration/issues/log_write.hpp"
 #include "clustering/administration/issues/memory.hpp"
@@ -19,8 +19,8 @@ the `rethinkdb.current_issues` system table, each server polls the other servers
 retrieve their local issues. */
 class local_issues_t {
 public:
-    std::vector<log_write_issue_t> log_write_issues;
-    std::vector<memory_issue_t> memory_issues;
+    vector_t<log_write_issue_t> log_write_issues;
+    vector_t<memory_issue_t> memory_issues;
 };
 
 RDB_DECLARE_SERIALIZABLE(local_issues_t);
@@ -59,7 +59,7 @@ public:
     local_issue_client_t(
         mailbox_manager_t *_mailbox_manager,
         watchable_map_t<peer_id_t, cluster_directory_metadata_t> *_directory);
-    std::vector<scoped_ptr_t<issue_t> > get_issues(signal_t *interruptor) const;
+    vector_t<scoped_ptr_t<issue_t> > get_issues(signal_t *interruptor) const;
 
 private:
     mailbox_manager_t *const mailbox_manager;

@@ -6,7 +6,7 @@
 #include <set>
 #include <string>
 #include <utility>
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "buffer_cache/types.hpp"
 #include "clustering/administration/auth/user_context.hpp"

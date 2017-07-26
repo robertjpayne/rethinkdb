@@ -2,7 +2,7 @@
 #ifndef SERIALIZER_TRANSLATOR_HPP_
 #define SERIALIZER_TRANSLATOR_HPP_
 
-#include <vector>
+#include "containers/vector.hpp"
 
 #include "buffer_cache/types.hpp"
 #include "serializer/serializer.hpp"
@@ -14,15 +14,15 @@ class serializer_multiplexer_t {
 public:
     /* Blocking call. Assumes the given serializers are empty; initializes them such that they can
     be treated as 'n_proxies' proxy-serializers. */
-    static void create(const std::vector<serializer_t *> &underlying, int n_proxies);
+    static void create(const vector_t<serializer_t *> &underlying, int n_proxies);
 
     /* Blocking call. Must give the same set of underlying serializers you gave to create(). (It
     will abort if this is not the case.) */
-    explicit serializer_multiplexer_t(const std::vector<serializer_t *> &underlying);
+    explicit serializer_multiplexer_t(const vector_t<serializer_t *> &underlying);
 
     /* proxies.size() is the same as 'n_proxies' you passed to create(). Please do not mutate
     'proxies'. */
-    std::vector<translator_serializer_t *> proxies;
+    vector_t<translator_serializer_t *> proxies;
 
     /* Blocking call. */
     ~serializer_multiplexer_t();
@@ -115,10 +115,10 @@ public:
 
     void index_write(new_mutex_in_line_t *mutex_acq,
                      const std::function<void()> &on_writes_reflected,
-                     const std::vector<index_write_op_t> &write_ops);
+                     const vector_t<index_write_op_t> &write_ops);
 
-    std::vector<counted_t<standard_block_token_t> >
-    block_writes(const std::vector<buf_write_info_t> &write_infos, file_account_t *io_account, iocallback_t *cb);
+    vector_t<counted_t<standard_block_token_t> >
+    block_writes(const vector_t<buf_write_info_t> &write_infos, file_account_t *io_account, iocallback_t *cb);
 
     max_block_size_t max_block_size() const;
 

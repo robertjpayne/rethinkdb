@@ -252,7 +252,7 @@ fd_t extproc_spawner_t::spawn(process_id_t *pid_out) {
     guarantee_winerr(fd.get() != INVALID_FD, "CreateNamedPipe failed");
 
     std::string command_line = strprintf("RethinkDB " SUBCOMMAND_START_WORKER " %s", pipe_path.c_str());
-    std::vector<char> mutable_command_line(command_line.begin(), command_line.end());
+    vector_t<char> mutable_command_line(command_line.begin(), command_line.end());
     mutable_command_line.push_back('\0');
 
     STARTUPINFO startup_info;

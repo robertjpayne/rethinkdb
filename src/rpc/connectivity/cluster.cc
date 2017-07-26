@@ -52,9 +52,9 @@ static bool version_number_recognized_compatible(const std::string &version_stri
 
 // Returns false if the string is not a valid version string (matching /\d+(\.\d+)*/)
 static bool split_version_string(const std::string &version_string,
-                                 std::vector<int64_t> *out) {
-    const std::vector<std::string> parts = split_string(version_string, '.');
-    std::vector<int64_t> ret(parts.size());
+                                 vector_t<int64_t> *out) {
+    const vector_t<std::string> parts = split_string(version_string, '.');
+    vector_t<int64_t> ret(parts.size());
     for (size_t i = 0; i < parts.size(); ++i) {
         if (!strtoi64_strict(parts[i], 10, &ret[i])) {
             return false;
@@ -69,12 +69,12 @@ static bool split_version_string(const std::string &version_string,
 // false for unparseable version strings (see split_version_string) or lesser or
 // equal version strings.
 static bool version_number_unrecognized_greater(const std::string &version_string) {
-    std::vector<int64_t> parts;
+    vector_t<int64_t> parts;
     if (!split_version_string(version_string, &parts)) {
         return false;
     }
 
-    std::vector<int64_t> our_parts;
+    vector_t<int64_t> our_parts;
     const bool success = split_version_string(
             connectivity_cluster_t::cluster_version_string,
             &our_parts);
@@ -962,7 +962,7 @@ join_result_t connectivity_cluster_t::run_t::handle(
             // Peers before 1.14 don't support receiving a handshake error message.
             // So we must not send one.
             bool handshake_error_supported = false;
-            std::vector<int64_t> parts;
+            vector_t<int64_t> parts;
             if (split_version_string(remote_version_string, &parts)) {
                 if ((parts.size() >= 1 && parts[0] > 1)
                     || (parts.size() >= 2 && parts[0] == 1 && parts[1] >= 14)) {
@@ -1520,7 +1520,7 @@ void connectivity_cluster_t::send_message(connection_t *connection,
 
     if (connection->is_loopback()) {
         // We could be on any thread here! Oh no!
-        std::vector<char> buffer_data;
+        vector_t<char> buffer_data;
         buffer.swap(&buffer_data);
         rassert(message_handlers[tag], "No message handler for tag %" PRIu8, tag);
         message_handlers[tag]->on_local_message(connection, connection_keepalive,
@@ -1609,7 +1609,7 @@ cluster_message_handler_t::~cluster_message_handler_t() {
 void cluster_message_handler_t::on_local_message(
         connectivity_cluster_t::connection_t *conn,
         auto_drainer_t::lock_t keepalive,
-        std::vector<char> &&data) {
+        vector_t<char> &&data) {
     vector_read_stream_t read_stream(std::move(data));
     on_message(conn, keepalive, &read_stream);
 }

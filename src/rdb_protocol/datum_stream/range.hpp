@@ -12,7 +12,7 @@ public:
                          int64_t _stop,
                          backtrace_id_t);
 
-    virtual std::vector<datum_t>
+    virtual vector_t<datum_t>
     next_raw_batch(env_t *, const batchspec_t &batchspec);
 
     virtual bool is_array() const {
