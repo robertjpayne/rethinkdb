@@ -3966,6 +3966,7 @@
 					"$(SRCROOT)/build/external/curl_7.54.1/include",
 					"$(SRCROOT)/src",
 				);
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -3989,6 +3990,7 @@
 					CoreFoundation,
 					"-framework",
 					Security,
+					"-ljemalloc",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -4028,7 +4030,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
@@ -4060,6 +4062,7 @@
 					"$(SRCROOT)/build/external/curl_7.54.1/include",
 					"$(SRCROOT)/src",
 				);
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = "-Wno-instantiation-after-specialization";
@@ -4082,6 +4085,7 @@
 					CoreFoundation,
 					"-framework",
 					Security,
+					"-ljemalloc",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
