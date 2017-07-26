@@ -454,6 +454,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		EE1647601F285B0B005DF15D /* vector.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = vector.hpp; sourceTree = "<group>"; };
 		EE354C251EF3F53E004CB846 /* random.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = random.cc; sourceTree = "<group>"; };
 		EE354C261EF3F53E004CB846 /* random.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = random.hpp; sourceTree = "<group>"; };
 		EE3973F71F24905E00890217 /* ql2.pb.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ql2.pb.cc; sourceTree = "<group>"; };
@@ -2506,6 +2507,7 @@
 				EEE6D0451EF3CD80001A08E2 /* two_level_array.hpp */,
 				EEE6D0461EF3CD80001A08E2 /* uuid.cc */,
 				EEE6D0471EF3CD80001A08E2 /* uuid.hpp */,
+				EE1647601F285B0B005DF15D /* vector.hpp */,
 			);
 			path = containers;
 			sourceTree = "<group>";
@@ -3965,6 +3967,11 @@
 					"$(SRCROOT)/build/external/v8_3.30.33.16-patched/include",
 					"$(SRCROOT)/build/external/curl_7.54.1/include",
 					"$(SRCROOT)/src",
+					/usr/local/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -3989,6 +3996,7 @@
 					CoreFoundation,
 					"-framework",
 					Security,
+					"-lfolly",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -4059,6 +4067,11 @@
 					"$(SRCROOT)/build/external/v8_3.30.33.16-patched/include",
 					"$(SRCROOT)/build/external/curl_7.54.1/include",
 					"$(SRCROOT)/src",
+					/usr/local/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -4082,6 +4095,7 @@
 					CoreFoundation,
 					"-framework",
 					Security,
+					"-lfolly",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
