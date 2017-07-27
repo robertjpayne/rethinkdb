@@ -292,12 +292,12 @@ private:
         raw_term_t preceeding = in.arg(0);
         if ((preceeding.type() == Term_TermType_GET_FIELD ||
              preceeding.type() == Term_TermType_BRACKET)) {
-            optional<raw_term_t> v = in.optarg("_NON_EXISTENCE_NULL_");
+            boost::optional<raw_term_t> v = in.optarg("_NON_EXISTENCE_NULL_");
             minidriver_t r(preceeding.bt());
             minidriver_t::reql_t term =
             r.expr(preceeding);
             term.copy_optargs_from_term(preceeding);
-            term.add_arg(r.optarg("_NON_EXISTENCE_NULL_", v.value_or(r.boolean(false).root_term())));
+            term.add_arg(r.optarg("_NON_EXISTENCE_NULL_", v.get_value_or(r.boolean(false).root_term())));
             term = term[in.arg(1)];
             term.copy_optargs_from_term(in);
             return term.root_term();
@@ -353,12 +353,12 @@ private:
         raw_term_t preceeding = in.arg(0);
         if ((preceeding.type() == Term_TermType_GET_FIELD ||
              preceeding.type() == Term_TermType_BRACKET)) {
-            optional<raw_term_t> v = in.optarg("_NON_EXISTENCE_NULL_");
+            boost::optional<raw_term_t> v = in.optarg("_NON_EXISTENCE_NULL_");
             minidriver_t r(preceeding.bt());
             minidriver_t::reql_t term =
                 r.expr(preceeding);
             term.copy_optargs_from_term(preceeding);
-            term.add_arg(r.optarg("_NON_EXISTENCE_NULL_", v.value_or(r.boolean(false).root_term())));
+            term.add_arg(r.optarg("_NON_EXISTENCE_NULL_", v.get_value_or(r.boolean(false).root_term())));
             term = term.bracket(in.arg(1));
             term.copy_optargs_from_term(in);
             return term.root_term();
