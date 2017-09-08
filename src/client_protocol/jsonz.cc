@@ -1,6 +1,8 @@
 // Copyright 2010-2015 RethinkDB, all rights reserved.
 #include "client_protocol/jsonz.hpp"
 
+#include <lzfse.h>
+
 #include "arch/io/network.hpp"
 #include "arch/timing.hpp"
 #include "client_protocol/protocols.hpp"
@@ -15,7 +17,6 @@
 #include "rdb_protocol/response.hpp"
 #include "rdb_protocol/term_storage.hpp"
 #include "utils.hpp"
-#include <lzfse.h>
 
 scoped_ptr_t<ql::query_params_t> jsonz_protocol_t::parse_query_from_buffer(
         scoped_array_t<char> &&buffer, size_t offset,
@@ -107,9 +108,9 @@ scoped_ptr_t<ql::query_params_t> jsonz_protocol_t::parse_query(
 
         decompressed.resize(capacity);
 
-        size_t decompressed_size = lzfse_decode_buffer((uint8_t *)decompressed.data(),
+        size_t decompressed_size = lzfse_decode_buffer(reinterpret_cast<uint8_t *>(decompressed.data()),
                                                        capacity,
-                                                       (const uint8_t *)compressed.data(),
+                                                       reinterpret_cast<const uint8_t *>(compressed.data()),
                                                        compressed.size(),
                                                        scratch.data());
 
@@ -272,9 +273,9 @@ void jsonz_protocol_t::send_response(ql::response_t *response,
     // the resulting buffer may actually be larger than the input as such
     // we allocate at least 256 bytes extra to ensure enough space.
     scoped_array_t<char> compressed_buffer(uncompressed_buffer.GetSize() + 256);
-    payload_size = lzfse_encode_buffer((uint8_t *)compressed_buffer.data() + prefix_size,
+    payload_size = lzfse_encode_buffer(reinterpret_cast<uint8_t *>(compressed_buffer.data() + prefix_size),
                                        compressed_buffer.size() - prefix_size,
-                                       (const uint8_t *)uncompressed_buffer.GetString() + prefix_size,
+                                       reinterpret_cast<const uint8_t *>(uncompressed_buffer.GetString() + prefix_size),
                                        uncompressed_buffer.GetSize() - prefix_size,
                                        nullptr);
     if (payload_size <= 0) {
