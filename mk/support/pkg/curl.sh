@@ -14,7 +14,7 @@ pkg_configure () {
     if [[ "$CROSS_COMPILING" = 1 ]]; then
         configure_flags="--host=$($CXX -dumpmachine)"
     fi
-    in_dir "$build_dir" ./configure --prefix="$prefix" --without-gnutls $ssl_command --without-librtmp --disable-ldap --disable-shared ${configure_flags:-}
+    in_dir "$build_dir" ./configure --prefix="$prefix" --without-nghttp2 --without-gnutls $ssl_command --without-librtmp --disable-ldap --disable-shared ${configure_flags:-}
 }
 
 pkg_install-include () {
