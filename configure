@@ -20,12 +20,14 @@ init () {
     min_browserify_version=13.0.0
     max_browserify_version=13.1.0
     min_python_version=2.6.0
+    
+    osx_min_version=10.11
 
     must_fetch_list='bluebird v8'
     please_fetch_list="handlebars gtest re2 $must_fetch_list"
 
     optional_libs="gtest termcap boost_system"
-    required_libs="protobuf v8 re2 z crypto ssl curl"
+    required_libs="protobuf v8 re2 z crypto ssl curl lzfse"
     other_libs="unwind tcmalloc jemalloc"
     all_libs="$required_libs $optional_libs $other_libs"
     default_static="tcmalloc jemalloc"
@@ -94,8 +96,11 @@ configure () {
     if [ "$COMPILER" = CLANG ]; then
         require stdlib
         case "$OS" in
-            Darwin) var_append LDFLAGS -lc++
-                    var_append CXXFLAGS -stdlib=libc++ ;;
+            Darwin) var_append LDFLAGS -stdlib=libc++ -lc++
+                    var_append LDFLAGS -mmacosx-version-min="$osx_min_version"
+                    var_append CFLAGS -mmacosx-version-min="$osx_min_version"
+                    var_append CXXFLAGS -stdlib=libc++
+                    var_append CXXFLAGS -mmacosx-version-min="$osx_min_version" ;;
             *) var_append LDFLAGS -lstdc++ ;;
         esac
 

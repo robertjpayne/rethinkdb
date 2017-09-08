@@ -273,6 +273,7 @@ void query_server_t::handle_conn(const scoped_ptr_t<tcp_conn_descriptor_t> &ncon
     uint8_t version = 0;
     std::unique_ptr<auth::base_authenticator_t> authenticator;
     uint32_t error_code = 0;
+    bool compression = false;
     std::string error_message;
     try {
         conn->enable_keepalive();
@@ -382,6 +383,12 @@ void query_server_t::handle_conn(const scoped_ptr_t<tcp_conn_descriptor_t> &ncon
                         2, "Unsupported `protocol_version`.");
                 }
 
+                ql::datum_t protocol_compression =
+                    datum.get_field("protocol_compression", ql::NOTHROW);
+                if (protocol_compression.get_type() == ql::datum_t::R_BOOL) {
+                    compression = protocol_compression.as_bool();
+                }
+
                 ql::datum_t authentication_method =
                     datum.get_field("authentication_method", ql::NOTHROW);
                 if (authentication_method.get_type() != ql::datum_t::R_STR) {
@@ -449,13 +456,23 @@ void query_server_t::handle_conn(const scoped_ptr_t<tcp_conn_descriptor_t> &ncon
                 : ql::return_empty_normal_batches_t::NO,
             auth::user_context_t(authenticator->get_authenticated_username()));
 
-        connection_loop<json_protocol_t>(
-            conn.get(),
-            (version < 4)
-                ? 1
-                : 1024,
-            &query_cache,
-            &ct_keepalive);
+        if (compression) {
+            connection_loop<jsonz_protocol_t>(
+                conn.get(),
+                (version < 4)
+                    ? 1
+                    : 1024,
+                &query_cache,
+                &ct_keepalive);
+        } else {
+            connection_loop<json_protocol_t>(
+                conn.get(),
+                (version < 4)
+                    ? 1
+                    : 1024,
+                &query_cache,
+                &ct_keepalive);
+        }
     } catch (client_protocol::client_server_error_t const &error) {
         // We can't write the response here due to coroutine switching inside an
         // exception handler

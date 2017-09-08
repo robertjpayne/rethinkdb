@@ -1,5 +1,5 @@
 // Copyright 2010-2015 RethinkDB, all rights reserved.
-#include "client_protocol/json.hpp"
+#include "client_protocol/jsonz.hpp"
 
 #include "arch/io/network.hpp"
 #include "arch/timing.hpp"
@@ -15,15 +15,17 @@
 #include "rdb_protocol/response.hpp"
 #include "rdb_protocol/term_storage.hpp"
 #include "utils.hpp"
+#include <lzfse.h>
 
-scoped_ptr_t<ql::query_params_t> json_protocol_t::parse_query_from_buffer(
+scoped_ptr_t<ql::query_params_t> jsonz_protocol_t::parse_query_from_buffer(
         scoped_array_t<char> &&buffer, size_t offset,
         ql::query_cache_t *query_cache, int64_t token,
         ql::response_t *error_out) {
+
     rapidjson::Document doc;
     doc.ParseInsitu(buffer.data() + offset);
-
     scoped_ptr_t<ql::query_params_t> res;
+
     if (!doc.HasParseError()) {
         try {
             res = make_scoped<ql::query_params_t>(token, query_cache,
@@ -45,7 +47,7 @@ scoped_ptr_t<ql::query_params_t> json_protocol_t::parse_query_from_buffer(
     return res;
 }
 
-scoped_ptr_t<ql::query_params_t> json_protocol_t::parse_query(
+scoped_ptr_t<ql::query_params_t> jsonz_protocol_t::parse_query(
         tcp_conn_t *conn,
         signal_t *interruptor,
         ql::query_cache_t *query_cache) {
@@ -55,32 +57,69 @@ scoped_ptr_t<ql::query_params_t> json_protocol_t::parse_query(
     conn->read_buffered(&size, sizeof(size), interruptor);
     ql::response_t error;
 
-    if (size >= wire_protocol_t::TOO_LARGE_QUERY_SIZE) {
-        error.fill_error(Response::CLIENT_ERROR,
-                         Response::RESOURCE_LIMIT,
-                         wire_protocol_t::too_large_query_message(size),
-                         ql::backtrace_registry_t::EMPTY_BACKTRACE);
+    // decompress
+    scoped_array_t<char> scratch(lzfse_decode_scratch_size());
+    std::vector<char> compressed;
+    std::vector<char> decompressed;
 
-        if (size < wire_protocol_t::HARD_LIMIT_TOO_LARGE_QUERY_SIZE) {
-            // Ignore all the extra data that the client is trying to send.
-            // within reason. This is so it doesn't look like a broken pipe error.
+    // set capacity to size * 4 to begin with
+    size_t capacity = size * 4;
+    size_t used_capacity = 0;
 
-            signal_timer_t read_timeout_interruptor{wire_protocol_t::TOO_LONG_QUERY_TIME};
-            wait_any_t pop_interruptor(interruptor, &read_timeout_interruptor);
-            conn->pop(size, &pop_interruptor);
+    // loop, each time if there is not enough space to
+    // decompress all of the data the decompressed buffer
+    // will be increased by 1.5x the size
+    while (used_capacity == 0) {
+        // check capacity is not too large
+        if (capacity >= wire_protocol_t::TOO_LARGE_QUERY_SIZE) {
+            error.fill_error(Response::CLIENT_ERROR,
+                             Response::RESOURCE_LIMIT,
+                             wire_protocol_t::too_large_query_message(size),
+                             ql::backtrace_registry_t::EMPTY_BACKTRACE);
+
+            if (capacity < wire_protocol_t::HARD_LIMIT_TOO_LARGE_QUERY_SIZE) {
+                // Ignore all the extra data that the client is trying to send.
+                // within reason. This is so it doesn't look like a broken pipe error.
+
+                signal_timer_t read_timeout_interruptor{wire_protocol_t::TOO_LONG_QUERY_TIME};
+                wait_any_t pop_interruptor(interruptor, &read_timeout_interruptor);
+                conn->pop(size, &pop_interruptor);
+            }
+
+            send_response(&error, token, conn, interruptor);
+            throw tcp_conn_read_closed_exc_t();
         }
 
-        send_response(&error, token, conn, interruptor);
-        throw tcp_conn_read_closed_exc_t();
+        // read compressed data if we have not already
+        if (compressed.size() == 0) {
+            compressed.resize(size);
+            // It's *usually* more efficient to do an un-buffered read here. The client is
+            // usually not going to group multiple queries into the same network package
+            // (especially not with tcp_nodelay set), and using the non-buffered `read` can
+            // avoid an extra copy.
+            conn->read(compressed.data(), size, interruptor);
+        }
+
+        decompressed.resize(capacity);
+
+        size_t decompressed_size = lzfse_decode_buffer((uint8_t *)decompressed.data(),
+                                                       capacity,
+                                                       (const uint8_t *)compressed.data(),
+                                                       compressed.size(),
+                                                       scratch.data());
+
+        // we're only done if we were able to decompress all of the data
+        if (decompressed_size < capacity) {
+            used_capacity = decompressed_size;
+            break;
+        } else {
+            capacity *= 1.5;
+        }
     }
 
-    scoped_array_t<char> data(size + 1);
-    // It's *usually* more efficient to do an un-buffered read here. The client is
-    // usually not going to group multiple queries into the same network package
-    // (especially not with tcp_nodelay set), and using the non-buffered `read` can
-    // avoid an extra copy.
-    conn->read(data.data(), size, interruptor);
-    data[size] = 0; // Null terminate the string, which the json parser requires
+    scoped_array_t<char> data(used_capacity + 1);
+    memcpy(data.data(), decompressed.data(), used_capacity);
+    data[used_capacity] = 0;
 
     scoped_ptr_t<ql::query_params_t> res =
         parse_query_from_buffer(std::move(data), 0, query_cache, token, &error);
@@ -91,7 +130,7 @@ scoped_ptr_t<ql::query_params_t> json_protocol_t::parse_query(
     return res;
 }
 
-void json_protocol_t_write_response_internal(ql::response_t *response,
+void jsonz_protocol_t_write_response_internal(ql::response_t *response,
                                               rapidjson::StringBuffer *buffer_out,
                                               bool throw_errors) {
     rapidjson::Writer<rapidjson::StringBuffer> writer(*buffer_out);
@@ -172,7 +211,7 @@ void json_protocol_t_write_response_internal(ql::response_t *response,
         buffer_out->Pop(buffer_out->GetSize() - start_offset);
         response->fill_error(Response::RUNTIME_ERROR, Response::QUERY_LOGIC,
                              ex.what(), ql::backtrace_registry_t::EMPTY_BACKTRACE);
-        json_protocol_t_write_response_internal(response, buffer_out, true);
+        jsonz_protocol_t_write_response_internal(response, buffer_out, true);
     } catch (const std::exception &ex) {
         if (throw_errors) {
             throw;
@@ -180,35 +219,35 @@ void json_protocol_t_write_response_internal(ql::response_t *response,
 
         buffer_out->Pop(buffer_out->GetSize() - start_offset);
         response->fill_error(Response::RUNTIME_ERROR, Response::INTERNAL,
-            strprintf("Internal error in json_protocol_t::write: %s", ex.what()),
+            strprintf("Internal error in jsonz_protocol_t::write: %s", ex.what()),
             ql::backtrace_registry_t::EMPTY_BACKTRACE);
-        json_protocol_t_write_response_internal(response, buffer_out, true);
+        jsonz_protocol_t_write_response_internal(response, buffer_out, true);
     }
 }
 
 // Small wrapper - in debug mode we would rather crash than send the error back
-void json_protocol_t::write_response_to_buffer(ql::response_t *response,
-                                               rapidjson::StringBuffer *buffer_out) {
+void jsonz_protocol_t::write_response_to_buffer(ql::response_t *response,
+                                                rapidjson::StringBuffer *buffer_out) {
 #ifdef NDEBUG
-    json_protocol_t_write_response_internal(response, buffer_out, false);
+    jsonz_protocol_t_write_response_internal(response, buffer_out, false);
 #else
-    json_protocol_t_write_response_internal(response, buffer_out, true);
+    jsonz_protocol_t_write_response_internal(response, buffer_out, true);
 #endif
 }
 
-void json_protocol_t::send_response(ql::response_t *response,
-                                    int64_t token,
-                                    tcp_conn_t *conn,
-                                    signal_t *interruptor) {
+void jsonz_protocol_t::send_response(ql::response_t *response,
+                                     int64_t token,
+                                     tcp_conn_t *conn,
+                                     signal_t *interruptor) {
     uint32_t data_size; // filled in below
     const size_t prefix_size = sizeof(token) + sizeof(data_size);
 
     // Reserve space for the token and the size
-    rapidjson::StringBuffer buffer;
-    buffer.Push(prefix_size);
+    rapidjson::StringBuffer uncompressed_buffer;
+    uncompressed_buffer.Push(prefix_size);
 
-    write_response_to_buffer(response, &buffer);
-    int64_t payload_size = buffer.GetSize() - prefix_size;
+    write_response_to_buffer(response, &uncompressed_buffer);
+    int64_t payload_size = uncompressed_buffer.GetSize() - prefix_size;
     guarantee(payload_size > 0);
 
     static_assert(std::is_same<decltype(wire_protocol_t::TOO_LARGE_RESPONSE_SIZE),
@@ -224,8 +263,21 @@ void json_protocol_t::send_response(ql::response_t *response,
         return;
     }
 
+    // lzfse has a certain amount of overhead so for very small payloads
+    // the resulting buffer may actually be larger than the input as such
+    // we allocate at least 256 bytes extra to ensure enough space.
+    scoped_array_t<char> compressed_buffer(uncompressed_buffer.GetSize() + 256);
+    payload_size = lzfse_encode_buffer((uint8_t *)compressed_buffer.data() + prefix_size,
+                                       compressed_buffer.size() - prefix_size,
+                                       (const uint8_t *)uncompressed_buffer.GetString() + prefix_size,
+                                       uncompressed_buffer.GetSize() - prefix_size,
+                                       nullptr);
+    if (payload_size <= 0) {
+        throw tcp_conn_write_closed_exc_t();
+    }
+
     // Fill in the token and size
-    char *mutable_buffer = buffer.GetMutableBuffer();
+    char *mutable_buffer = compressed_buffer.data();
     for (size_t i = 0; i < sizeof(token); ++i) {
         mutable_buffer[i] = reinterpret_cast<const char *>(&token)[i];
     }
@@ -236,6 +288,6 @@ void json_protocol_t::send_response(ql::response_t *response,
             reinterpret_cast<const char *>(&data_size)[i];
     }
 
-    conn->write(buffer.GetString(), buffer.GetSize(), interruptor);
+    conn->write(compressed_buffer.data(), payload_size + prefix_size, interruptor);
 }
 
