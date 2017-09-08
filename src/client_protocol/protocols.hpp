@@ -8,6 +8,7 @@
 
 // Include all available wire protocols
 #include "client_protocol/json.hpp"
+#include "client_protocol/jsonz.hpp"
 
 // Contains common declarations used by all wire protocols, this is a class rather than
 // a namespace so we don't have to extern stuff.

@@ -520,6 +520,8 @@
 		EE8F275A1F2F067C004CA40D /* utils_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D2A01EF3CD81001A08E2 /* utils_test.cc */; };
 		EE8F275B1F2F067C004CA40D /* uuid_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D2A11EF3CD81001A08E2 /* uuid_test.cc */; };
 		EE8F275C1F2F067C004CA40D /* varint_test.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6D2A21EF3CD81001A08E2 /* varint_test.cc */; };
+		EEDD24761F60FA2A003A096F /* jsonz.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEDD24751F60FA2A003A096F /* jsonz.cc */; };
+		EEDD24771F60FA2A003A096F /* jsonz.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEDD24751F60FA2A003A096F /* jsonz.cc */; };
 		EEE6D2A81EF3CDF6001A08E2 /* activity_logger.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6CDFF1EF3CD80001A08E2 /* activity_logger.cc */; };
 		EEE6D2A91EF3CDF6001A08E2 /* address.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6CE021EF3CD80001A08E2 /* address.cc */; };
 		EEE6D2AA1EF3CDF6001A08E2 /* arch.cc in Sources */ = {isa = PBXBuildFile; fileRef = EEE6CE041EF3CD80001A08E2 /* arch.cc */; };
@@ -966,6 +968,8 @@
 		EE3973FC1F2492C500890217 /* web_assets.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = web_assets.cc; sourceTree = "<group>"; };
 		EE7039BA1EF3CD11004BF657 /* rethinkdb */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rethinkdb; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE8F270D1F2F0628004CA40D /* rethinkdb-unittest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "rethinkdb-unittest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		EEDD24741F60FA29003A096F /* jsonz.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = jsonz.hpp; sourceTree = "<group>"; };
+		EEDD24751F60FA2A003A096F /* jsonz.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = jsonz.cc; sourceTree = "<group>"; };
 		EEE6CDFF1EF3CD80001A08E2 /* activity_logger.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = activity_logger.cc; sourceTree = "<group>"; };
 		EEE6CE001EF3CD80001A08E2 /* activity_logger.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = activity_logger.hpp; sourceTree = "<group>"; };
 		EEE6CE021EF3CD80001A08E2 /* address.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = address.cc; sourceTree = "<group>"; };
@@ -2468,6 +2472,8 @@
 			isa = PBXGroup;
 			children = (
 				EEE6CEAC1EF3CD80001A08E2 /* client_server_error.hpp */,
+				EEDD24751F60FA2A003A096F /* jsonz.cc */,
+				EEDD24741F60FA29003A096F /* jsonz.hpp */,
 				EEE6CEAD1EF3CD80001A08E2 /* json.cc */,
 				EEE6CEAE1EF3CD80001A08E2 /* json.hpp */,
 				EEE6CEAF1EF3CD80001A08E2 /* protocols.cc */,
@@ -4215,6 +4221,7 @@
 				EEE6D3D61EF3CDF6001A08E2 /* s2cellunion.cc in Sources */,
 				EEE6D42E1EF3CDF6001A08E2 /* peer_id.cc in Sources */,
 				EEE6D3701EF3CDF6001A08E2 /* new_semaphore.cc in Sources */,
+				EEDD24771F60FA2A003A096F /* jsonz.cc in Sources */,
 				EEE6D33A1EF3CDF6001A08E2 /* generate_config.cc in Sources */,
 				EEE6D3A71EF3CDF6001A08E2 /* filter.cc in Sources */,
 				EEE6D3411EF3CDF6001A08E2 /* multi_client_client.cc in Sources */,
@@ -4589,6 +4596,7 @@
 				EE8F27311F2F0665004CA40D /* extproc_test.cc in Sources */,
 				EE8F271D1F2F0665004CA40D /* clustering_contract_executor.cc in Sources */,
 				EE8F25F21F2F0628004CA40D /* extproc_pool.cc in Sources */,
+				EEDD24761F60FA2A003A096F /* jsonz.cc in Sources */,
 				EE8F25F31F2F0628004CA40D /* issues_backend.cc in Sources */,
 				EE8F25F41F2F0628004CA40D /* disk_structure.cc in Sources */,
 				EE8F272B1F2F0665004CA40D /* datum_test.cc in Sources */,
@@ -5014,6 +5022,7 @@
 					"$(SRCROOT)/build/external/re2_2015-11-01/include",
 					"$(SRCROOT)/build/external/v8_3.30.33.16-patched/include",
 					"$(SRCROOT)/build/external/curl_7.54.1/include",
+					"$(SRCROOT)/build/external/lzfse_1.0/include",
 					"$(SRCROOT)/src",
 				);
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
@@ -5040,6 +5049,7 @@
 					CoreFoundation,
 					"-framework",
 					Security,
+					"-llzfse",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -5109,6 +5119,7 @@
 					"$(SRCROOT)/build/external/re2_2015-11-01/include",
 					"$(SRCROOT)/build/external/v8_3.30.33.16-patched/include",
 					"$(SRCROOT)/build/external/curl_7.54.1/include",
+					"$(SRCROOT)/build/external/lzfse_1.0/include",
 					"$(SRCROOT)/src",
 				);
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
@@ -5134,6 +5145,7 @@
 					CoreFoundation,
 					"-framework",
 					Security,
+					"-llzfse",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
